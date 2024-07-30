@@ -16,7 +16,7 @@ const checkAuth = async (logState) => {
       }
     });
     return true;
-  } catch (e) {
+  } catch (e) { 
     const authErrors = ['Unauthorised user', 'Invalid token', 'No user found', 'Password changed']
     if (authErrors.includes(e.response?.data?.message)) {
       localStorage.removeItem('token')
