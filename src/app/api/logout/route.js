@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server"
+import { cookies } from 'next/headers';
 
 export async function GET(req) {
+  const cookieStore = cookies();
   const response = NextResponse.json(
     {
       message: "Logged out",
@@ -10,6 +12,6 @@ export async function GET(req) {
       status: 200,
     }
   );
-  response.cookies.set("token", "", { maxAge: -1 });
+  cookieStore.set("token", "", { maxAge: -1 });
   return response;
 }

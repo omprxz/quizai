@@ -3,9 +3,11 @@ import User from "@/models/user"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { NextResponse } from "next/server"
+import { cookies } from 'next/headers';
 
 export async function POST(req){
   await Db()
+  const cookieStore = cookies();
   const { email, password } = await req.json()
   
   if(!email){
@@ -36,7 +38,7 @@ export async function POST(req){
     },{
       status:200
     })
-    response.cookies.set("token", token, {
+    cookieStore.set("token", token, {
       httpOnly: true
     })
     return response
