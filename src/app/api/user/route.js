@@ -1,6 +1,7 @@
 import Db from "@/utils/db"
 import User from "@/models/user"
 import jwt from "jsonwebtoken"
+import { cookies } from 'next/headers';
 import { NextResponse } from "next/server"
 
 export async function POST(req){
@@ -83,33 +84,35 @@ export async function POST(req){
   
 }
 
+export async function GET(req) {
+  await Db();
+  
+  const token = cookies().get('token')?.value;
 
-export async function GET(req){
-  await Db()
-  const { searchParams } = new URL(req.url)
-  const token = req.headers.get('Authorization')
-  if(!token){
+  if (!token) {
     return NextResponse.json({
       message: "Unauthorised user"
     }, {
-      status: 400})
-  }
-  try{
-    const userDetails = jwt.verify(token, process.env.JWT_SECRET)
-    const userData = await User.findById(userDetails?.data?._id).select("name email createdAt")
-    
-  return NextResponse.json({
-    message: "User data fetched",
-    data: userData, success: true
-  }, {
-    status:200
-    })
-  }catch(e){
-    return NextResponse.json({
-      message: 'Invalid token',
-    }, {
-      status: 401
-      })
+      status: 400
+    });
   }
 
+  try {
+    const userDetails = jwt.verify(token, process.env.JWT_SECRET);
+    const userData = await User.findById(userDetails?.data?._id).select("name email createdAt");
+
+    return NextResponse.json({
+      message: "User data fetched",
+      data: userData, 
+      success: true
+    }, {
+      status: 200
+    });
+  } catch (e) {
+    return NextResponse.json({
+      message: 'Invalid token'
+    }, {
+      status: 401
+    });
+  }
 }

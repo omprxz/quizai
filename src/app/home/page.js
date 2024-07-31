@@ -1,46 +1,23 @@
 'use client';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import Link from "next/link";
-import { redirect } from 'next/navigation';
-import checkAuth from '@/utils/checkAuth'
+import useLogout from "@/utils/logout";
+import {CreateQuizButton, QuizButton} from "@/components/quizButton"
 
 export default function Page() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  checkAuth('in')
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get('/api/user', {
-          headers: {
-            Authorization: token
-          }
-        });
-        setName(res.data.data.name);
-        setEmail(res.data.data.email);
-      } catch (e) {
-        const authErrors = ['Unauthorised user', 'Invalid token']
-        if (authErrors.includes(e.response?.data?.message)) {
-          return false
-        }
-      }
-    };
-
-    fetchData();
-  }, []);
+  const logOut = useLogout();
 
   return (
-    <div>
-      <h1>Hello {name}</h1>
-      <p>Your email is: {email}</p>
-      <button className='btn my-8 mx-8' onClick={()=>{
-        localStorage.removeItem('token')
-        redirect('/login')
-      }}>Logout</button>
+    <div className=''>
+      <h1 className='text-2xl font-black mt-5 mb-2 mx-7'>Your Quizes</h1>
+      <div className='flex flex-row flex-wrap gap-6 my-4 justify-evenly md:justify-start md:gap-y-10 md:gap-8 px-7'>
+        <CreateQuizButton />
+        <QuizButton id="1" title="DSA Quiz for devs" />
+        <QuizButton id="2" title="DSA Quiz for devs" />
+        <QuizButton id="3" title="DSA Quiz for devs" />
+        <QuizButton id="4" title="DSA Quiz for devs" />
+        <QuizButton id="5" title="DSA Quiz for devs" />
+        <QuizButton id="6" title="DSA Quiz for devs" />
+      </div>
+      {<button className='btn my-8 mx-8' onClick={logOut}>Logout</button>}
     </div>
   );
 }

@@ -1,0 +1,68 @@
+{
+  "quiz": {
+    "title": "Quiz Title",
+    "description": "Description of the quiz",
+    "type": "mixed",
+    "level": "beginner",
+    "category": "General Knowledge",
+    "time_limit": 1200,
+    "passing_score": 70,
+    "shuffle_questions": false,
+    "shuffle_answers": false,
+    "language": "english",
+    "total_questions": 2,
+    "questions": [
+      {
+        "question_type": "mcq",
+        "question_text": "What is the capital of France?",
+        "options": [
+          {
+            "id": 1,
+            "text": "Paris"
+          },
+          {
+            "id": 2,
+            "text": "London"
+          },
+          {
+            "id": 3,
+            "text": "Berlin"
+          },
+          {
+            "id": 4,
+            "text": "Madrid"
+          }
+        ],
+        "correct_answers": [
+          1
+        ]
+      },
+      {
+        "question_type": "multianswer",
+        "question_text": "Which of the following are programming languages?",
+        "options": [
+          {
+            "id": 1,
+            "text": "Python"
+          },
+          {
+            "id": 2,
+            "text": "HTML"
+          },
+          {
+            "id": 3,
+            "text": "Java"
+          },
+          {
+            "id": 4,
+            "text": "CSS"
+          }
+        ],
+        "correct_answers": [
+          1,
+          3
+        ]
+      }
+    ]
+  }
+}

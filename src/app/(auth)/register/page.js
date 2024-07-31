@@ -3,11 +3,11 @@ import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import Link from "next/link"
-import { redirect } from 'next/navigation';
-import checkAuth from '@/utils/checkAuth'
+import { useRouter } from 'next/navigation';
+import SocialSigninButton from '@/components/socialSignin/socialSignin'
 
 export default function Register() {
-  checkAuth('out')
+  const router = useRouter()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -42,15 +42,14 @@ const handleSubmit = async (e) => {
     email: '',
     password: '',
   })
-  const timer = setTimeout(() => {
-      redirect('/login');
-    }, 1500);
+    router.push('/login');
     }
     toast.success(res.data.message)
   } catch (error) {
     toast.error(error.response.data.message);
-  }
+  } finally{
   setloading(false)
+  }
 };
 
 
@@ -59,7 +58,7 @@ const handleSubmit = async (e) => {
       <h1 className='text-center font-bold my-7 text-2xl'>Signup at QuizAI</h1>
       <form className='flex flex-col items-center gap-y-4 px-4' onSubmit={handleSubmit}>
 
-          <label className="input input-bordered flex items-center gap-2 min-w-full max-w-sm">Name
+          <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">Name
             <input type="text" className="grow" placeholder="" 
             name="name"
             value={formData.name}
@@ -67,7 +66,7 @@ const handleSubmit = async (e) => {
             required />
           </label>
           
-          <label className="input input-bordered flex items-center gap-2 min-w-full max-w-sm">Email
+          <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">Email
             <input type="email" className="grow" placeholder="" 
             name="email"
             value={formData.email}
@@ -75,7 +74,7 @@ const handleSubmit = async (e) => {
             required />
           </label>
           
-          <label className="input input-bordered flex items-center gap-2 min-w-full max-w-sm">Password
+          <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">Password
             <input type="password" className="grow" placeholder="" 
             name="password"
             value={formData.password}
@@ -86,8 +85,10 @@ const handleSubmit = async (e) => {
         <button className='btn btn-neutral rounded-full px-8 mt-4' disabled={loading} type="submit">{
           loading ? 'Please wait' : 'Signup'
         }</button>
-        <p className='text-center mt-2 text-blue-600'><Link href="/password/reset">Forgot password?</Link></p>
-        <Link href='/login' className='btn btn-neutral btn-outline rounded-full mt-14 px-12' type="button">Login</Link>
+        <p className='text-center'>or</p>
+        <SocialSigninButton />
+        <p className='text-center mt-6 text-blue-600'><Link href="/password/reset">Forgot password?</Link></p>
+        <Link href='/login' className='btn btn-neutral btn-outline rounded-full mt-6 px-12' type="button">Login</Link>
       </form>
     </div>
   );

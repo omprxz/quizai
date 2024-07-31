@@ -3,11 +3,10 @@ import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import Link from "next/link"
-import checkAuth from '@/utils/checkAuth'
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function Reset() {
-  checkAuth('out')
+  const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
     otp: '',
@@ -45,8 +44,9 @@ const handleSendOtp = async () => {
     toast.success(res.data.message)
   } catch (error) {
     toast.error(error.response.data.message);
-  }
+  } finally{
   setloading(false)
+  }
 };
 
 const handlePasswordChange = async () => {
@@ -63,16 +63,15 @@ const handlePasswordChange = async () => {
         otp: '',
         newPassword: ''
       })
-       const timer = setTimeout(() => {
-      redirect('/login');
-    }, 1000);
+      router.push('/login');
       setOtpSent(false)
     }
     toast.success(res.data.message)
   }catch(e){
     toast.error(e.response.data.message)
+  } finally {
+    setloading(false)
   }
-  setloading(false)
 }
 
 const handleClick = async () => {
@@ -89,7 +88,7 @@ const handleClick = async () => {
       <h1 className='text-center font-bold my-7 text-2xl'>Reset Password</h1>
       <form className='flex flex-col items-center gap-y-4 px-4'>
           
-          <label className="input input-bordered flex items-center gap-2 min-w-full max-w-sm">Email
+          <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">Email
             <input type="email" disabled={otpSent} className="grow" placeholder="" 
             name="email"
             value={formData.email}
@@ -98,7 +97,7 @@ const handleClick = async () => {
           </label>
           { otpSent && (
             <>
-          <label className="input input-bordered flex items-center gap-2 min-w-full max-w-sm">OTP
+          <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">OTP
             <input type="number" className="grow" placeholder="" 
             name="otp"
             value={formData.otp}
@@ -106,7 +105,7 @@ const handleClick = async () => {
             required />
           </label>
           
-          <label className="input input-bordered flex items-center gap-2 min-w-full max-w-sm">Password
+          <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">Password
             <input type="password" className="grow" placeholder="" 
             name="newPassword"
             value={formData.newPassword}

@@ -29,13 +29,17 @@ export async function POST(req){
     const token = jwt.sign({
       data: userDetail
     }, process.env.JWT_SECRET,{expiresIn: '10d'})
-    return NextResponse.json({
+    const response = NextResponse.json({
       message: "Logged in successfully",
       success: true,
       token
     },{
       status:200
     })
+    response.cookies.set("token", token, {
+      httpOnly: false
+    })
+    return response
   }else{
     return NextResponse.json({
       message: "Invalid credentials.",

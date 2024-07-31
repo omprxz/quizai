@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import Link from "next/link"
-import { redirect } from 'next/navigation';
-import checkAuth from '@/utils/checkAuth'
+import { useRouter } from 'next/navigation';
+import SocialSigninButton from '@/components/socialSignin/socialSignin'
 
 export default function Login() {
-  checkAuth('out')
+  const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -18,6 +18,7 @@ export default function Login() {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -39,18 +40,15 @@ const handleSubmit = async (e) => {
     email: '',
     password: '',
   })
-  localStorage.setItem('token', res.data.token)
-  
-    const timer = setTimeout(() => {
-      redirect('/home');
-    }, 1500);
+  router.push('/home');
     }
     toast.success(res.data.message)
   } catch (error) {
     console.log(error)
     toast.error(error.response.data.message);
-  }
+  } finally{
   setloading(false)
+  }
 };
 
 
@@ -59,7 +57,7 @@ const handleSubmit = async (e) => {
       <h1 className='text-center font-bold my-7 text-2xl'>Log into QuizAI</h1>
       <form className='flex flex-col items-center gap-y-4 px-4' onSubmit={handleSubmit}>
           
-          <label className="input input-bordered flex items-center gap-2 min-w-full max-w-sm">Email
+          <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">Email
             <input type="email" className="grow" placeholder="" 
             name="email"
             value={formData.email}
@@ -67,7 +65,7 @@ const handleSubmit = async (e) => {
             required />
           </label>
           
-          <label className="input input-bordered flex items-center gap-2 min-w-full max-w-sm">Password
+          <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">Password
             <input type="password" className="grow" placeholder="" 
             name="password"
             value={formData.password}
@@ -78,8 +76,10 @@ const handleSubmit = async (e) => {
         <button className='btn btn-neutral rounded-full px-8 mt-4' disabled={loading} type="submit">{
           loading ? 'Please wait' : 'Login'
         }</button>
-        <p className='text-center mt-2 text-blue-600'><Link href="/password/reset">Forgot password?</Link></p>
-        <Link href='/register' className='btn btn-neutral btn-outline rounded-full mt-14 px-12' type="button">Register</Link>
+        <p className='text-center'>or</p>
+        <SocialSigninButton />
+        <p className='text-center mt-6 text-blue-600'><Link href="/password/reset">Forgot password?</Link></p>
+        <Link href='/register' className='btn btn-neutral btn-outline rounded-full mt-6 px-12' type="button">Register</Link>
       </form>
     </div>
   );
