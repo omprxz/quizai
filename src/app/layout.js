@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
   
   return (
     <html lang="en">
-      <body className={`${inter.className} dark:bg-base-100`}>
+      <body className={`${inter.className}`}>
       <Eruda />
       <Toaster position="bottom-center" />
       <Authprovider>

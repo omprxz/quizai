@@ -35,7 +35,6 @@ const handler = NextAuth({
           const randomPassword = randomBytes(16).toString('hex');
           const hashedPassword = await hash(randomPassword, 10);
           if(!user.email){
-            //user.email = 'abc@ok.com'
             throw new Error("Email address is required");
           }
           if(!user.name){
@@ -62,7 +61,9 @@ const handler = NextAuth({
 if (isValid) {
   const token = jwt.sign({ data: userDetails }, process.env.JWT_SECRET, { expiresIn: '10d' });
   
-  cookieStore.set('token', token);
+  cookieStore.set('token', token, {
+    httpOnly: true
+  });
 
   return true;
 }
