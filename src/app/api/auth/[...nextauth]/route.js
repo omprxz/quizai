@@ -27,7 +27,6 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user }) {
       const cookieStore = cookies();
-      console.log(user)
       try {
         await Db();
         let existingUser = await User.findOne({ email: user.email });

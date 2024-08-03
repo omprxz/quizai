@@ -4,16 +4,17 @@ import Otp from "@/models/otp"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { NextResponse } from "next/server"
+import { cookies } from 'next/headers'
 
 export async function POST(req, {params}){
   await Db()
   
   const { action } = params
   if(action == "modify"){
+    const cookieStore = cookies()
     
     const { password, newPassword } = await req.json()
-    const reqJson = await req.json()
-    const token = await reqJson.headers.Authorization.split(' ')?.[1]
+    const token = cookieStore.get('token').value
     
     if(!password){
       return NextResponse.json({

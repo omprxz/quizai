@@ -7,7 +7,7 @@ export default function Page() {
 
   return (
     <div className=''>
-      <h1 className='text-2xl font-black mt-5 mb-2 mx-7'>Your Quizes</h1>
+      <h1 className='text-xl font-black mt-5 mb-2 mx-7 text-primary'>Your Quizes</h1>
       <div className='flex flex-row flex-wrap gap-6 my-4 justify-evenly md:justify-start md:gap-y-10 md:gap-8 px-7'>
         <CreateQuizButton />
         <QuizButton id="1" title="DSA Quiz for devs" />
