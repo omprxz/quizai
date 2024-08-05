@@ -12,6 +12,7 @@ const {
   HarmBlockThreshold,
 } = require("@google/generative-ai");
 
+export const maxDuration = 60;
 
 export async function POST(req) {
   const cookieStore = cookies()
