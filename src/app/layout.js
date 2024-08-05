@@ -4,6 +4,7 @@ import Eruda from "@/utils/eruda"
 import { Toaster } from "react-hot-toast";
 import Authprovider from "@/components/Authprovider/Authprovider"
 import Header from "@/components/Header"
+import ScrollToTop from '@/components/ScrollToTop';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${inter.className} min-h-screen`}>
       {/*<Eruda />*/}
+      <ScrollToTop />
       <Toaster position="top-center" />
       <Authprovider>
       <Header />
