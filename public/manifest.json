@@ -2,7 +2,7 @@
   "name": "QuizAI",
   "short_name": "QuizAI",
   "description": "AI Quiz Generator",
-  "start_url": "/",
+  "start_url": "/home",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
