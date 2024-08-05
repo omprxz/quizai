@@ -4,7 +4,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import axios from 'axios';
 import { RiLoader2Fill } from "react-icons/ri";
-import { MdErrorOutline } from "react-icons/md";
+import { MdErrorOutline, MdOutlineSportsScore, MdVisibility } from "react-icons/md";
+import { LuTimer } from "react-icons/lu";
+import { FaRankingStar } from "react-icons/fa6";
+import { FaTimes, FaCheck } from "react-icons/fa";
 
 export default function Page({ params }) {
   const router = useRouter();
@@ -39,99 +42,142 @@ export default function Page({ params }) {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-4 px-4">
       {responseDetails._id ? (
-        <div className="min-h-screen p-4 bg-gray-100">
-          <div className="max-w-3xl mx-auto p-6 bg-white shadow-xl rounded-lg">
-            <h1 className="text-3xl font-bold text-blue-500">Result Details</h1>
-            <div className="divider my-4 bg-gray-300"></div>
+        <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+          <h1 className="text-3xl font-bold text-blue-500 dark:text-blue-400 text-center mb-6">Result Details</h1>
 
-            {/* Submission Info */}
-            <div className="bg-blue-50 rounded-md p-4 mb-4">
-              <p className="text-gray-600">
-                Submitted on: <span className="font-medium">{new Date(responseDetails.createdAt).toLocaleString('en-US', {
+          {/* Submission and Quiz Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="bg-blue-50 dark:bg-blue-900 rounded-md p-4 border border-blue-200 dark:border-blue-800">
+              <p className="text-gray-600 dark:text-gray-400">
+                <span className="font-semibold">Submitted on:</span>{' '}
+                {new Date(responseDetails.createdAt).toLocaleString('en-US', {
                   day: '2-digit',
                   month: 'short',
                   year: 'numeric',
                   hour: '2-digit',
                   minute: '2-digit',
                   hour12: false
-                }).replace(',', '')}</span>
+                }).replace(',', '')}
               </p>
-              <p className="text-gray-600">
-                Submitted by: <span className="font-medium">{responseDetails.username}</span>
+              <p className="text-gray-600 dark:text-gray-400">
+                <span className="font-semibold">Submitted by:</span>{' '}
+                {responseDetails.username}
               </p>
             </div>
 
-            {/* Quiz Info */}
-            <div className="bg-gray-50 rounded-md p-4 mb-4">
-              <p className="text-gray-600">
-                Quiz Title:{" "}
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-md p-4 border border-gray-200 dark:border-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
+                <span className="font-semibold">Quiz Title:</span>{' '}
                 {responseDetails.quiz ? (
-                  <Link href={`/quiz/${responseDetails.quizId}/view`} className="text-blue-500 hover:underline">
-                    {responseDetails.quizTitle}
+                  <Link href={`/quiz/${responseDetails.quizDetails._id}/view`} className="text-blue-500 dark:text-blue-400 hover:underline">
+                    {responseDetails.quizDetails.title}
                   </Link>
                 ) : (
-                  responseDetails.quizTitle
+                  responseDetails.quizDetails.title
                 )}
               </p>
-              <p className="text-gray-600">
-                Total Questions: <span className="font-medium">{responseDetails.total_questions}</span>
+              <p className="text-gray-600 dark:text-gray-400">
+                <span className="font-semibold">Total Questions:</span>{' '}
+                {responseDetails.total_questions}
               </p>
+              {responseDetails.quizDetails.passing_score !== null && <p className="text-gray-600 dark:text-gray-400">
+                  <span className="font-semibold">Passing Score:</span>{' '}
+                  {responseDetails.quizDetails.passing_score == 0 ? 0 : responseDetails.quizDetails.passing_score.toFixed(2)}%
+                </p>
+              }
             </div>
-
-            {/* Score Breakdown */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="alert alert-success shadow-md">
-                <span className="text-xl font-bold">{responseDetails.correct}</span>
-                <span className="text-sm font-medium ml-2">Correct</span>
-              </div>
-              <div className="alert alert-error shadow-md">
-                <span className="text-xl font-bold">{responseDetails.wrong}</span>
-                <span className="text-sm font-medium ml-2">Wrong</span>
-              </div>
-              <div className="alert alert-warning shadow-md">
-                <span className="text-xl font-bold">{responseDetails.notAttempted}</span>
-                <span className="text-sm font-medium ml-2">Not Attempted</span>
-              </div>
-              {responseDetails.quizPassing_score && (
-                <div className="alert alert-info shadow-md">
-                  <span className="text-xl font-bold">{responseDetails.percentage.toFixed(2)}%</span>
-                  <span className="text-sm font-medium ml-2">Scored</span>
-                </div>
-              )}
-            </div>
-
-            {/* Additional Info */}
-            {responseDetails.quizPassing_score && (
-              <div className="bg-gray-50 rounded-md p-4 mb-4">
-                <p className="text-gray-600">
-                  Passing Score: <span className="font-medium">{responseDetails.quizPassing_score.toFixed(2)}%</span>
-                </p>
-                <p className="text-gray-600">
-                  Rank: <span className="font-medium">{`${responseDetails.rank}/${responseDetails.quizResponsesCount}`}</span>
-                </p>
-                <p className="text-gray-600">
-                  Result:{" "}
-                  <span className={responseDetails.percentage >= responseDetails.quizPassing_score ? "text-green-500 font-medium" : "text-red-500 font-medium"}>
-                    {responseDetails.percentage >= responseDetails.quizPassing_score ? "Passed" : "Failed"}
-                  </span>
-                </p>
-                <p className="text-gray-600">
-                  Time Taken: <span className="font-medium">{formatTime(responseDetails.timeTaken)}</span>
-                </p>
-              </div>
-            )}
-
-            {/* Retake Button */}
-            {responseDetails.quiz && (
-              <div className="mt-6 text-center">
-                <Link href={`/quiz/${responseDetails.quizId}/view`} className="btn btn-primary">
-                  Give Quiz Again
-                </Link>
-              </div>
-            )}
           </div>
+          
+          <div className="alert dark:bg-gray-700 dark:border-gray-600 my-6 shadow-md">
+            <p className="text-gray-600 dark:text-gray-200 font-bold text-xl">
+              {`${responseDetails.rank}/${responseDetails.quizResponsesCount}`}
+            </p>
+            <FaRankingStar className='text-5xl dark:text-gray-400' />
+          </div>
+
+          {/* Score Breakdown */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div class="flex justify-center gap-4">
+            <div className="alert alert-success shadow-md">
+              <span className="text-2xl font-bold">{responseDetails.correct}</span>
+              <span className="text-sm font-medium">Correct</span>
+            </div>
+            <div className="alert alert-error shadow-md">
+              <span className="text-2xl font-bold">{responseDetails.wrong}</span>
+              <span className="text-sm font-medium">Wrong</span>
+            </div>
+            <div className="alert alert-warning shadow-md">
+              <span className="text-2xl font-bold">{responseDetails.notAttempted}</span>
+              <span className="text-sm font-medium">Skipped</span>
+            </div>
+           </div>
+           
+           <div class="flex justify-center gap-4">
+            
+            <div className="alert alert-success shadow-md">
+              <span className="text-xl font-bold">{responseDetails.percentage.toFixed(2)}%</span>
+              <MdOutlineSportsScore className='text-3xl' />
+            </div>
+            <div className="alert alert-warning shadow-md">
+              <span className="text-xl font-bold">
+                     {formatTime(responseDetails.timeTaken)}
+                  </span>
+              <LuTimer className='text-3xl' />
+            </div>
+           </div>
+          {responseDetails.quizDetails.passing_score !== null && <div className={`alert ${responseDetails.percentage >= responseDetails.quizDetails.passing_score ? 'alert-success' : 'alert-error'} shadow-md text-gray-200`}>
+              <span className={`text-2xl font-bold`}>
+                      {responseDetails.percentage >= responseDetails.quizDetails.passing_score ? "Passed" : "Failed"}
+                  </span>
+                   {responseDetails.percentage >= responseDetails.quizDetails.passing_score ? (<FaCheck className="text-3xl" />) : (<FaTimes className="text-3xl" />)}
+            </div>
+          }
+          </div>
+
+          {/* Answers Summary */}
+         { responseDetails.quizDetails.questions && <div className="w-full">
+  <div className="collapse collapse-arrow join-item border-base-300 border rounded-md">
+    <input type="checkbox" name="my-accordion-4" defaultChecked />
+    <div className="collapse-title text-xl font-medium dark:text-gray-200">View your answers <MdVisibility className='inline' /></div>
+    <div className="collapse-content">
+    <p className='text-sm mb-3'>Some questions may display different details in "View your answers" because they might have been modified.</p>
+    <div class="flex flex-col justify-center items-center gap-y-3 text-xs">
+      {responseDetails.quizDetails.questions.map((question, index) => (
+              <div className={`rounded-md py-4 w-full border shadow px-3 ${responseDetails.selectedAnswers[question._id] ? (responseDetails.selectedAnswers[question._id].length == 0 ? 'border-yellow-500 shadow-yellow-300 bg-yellow-100' : ((question.correct_answers.length == responseDetails.selectedAnswers[question._id].length && question.correct_answers.every(ans => responseDetails.selectedAnswers[question._id].includes(ans))) ?  'border-green-500 shadow-green-300 bg-green-100' :  'border-red-500 shadow-red-300 bg-red-100 dark:bg-red-200 dark:text-neutral' )) : 'border-yellow-500 shadow-yellow-300 bg-yellow-100'}`} key={question._id}>
+                <p className="font-bold text-sm">{index + 1}. {question.question_text}</p>
+                <div className="flex flex-col justify-center items-start gap-4 mt-3">
+                  {question.options.map((option) => (
+                    <label className={`${question.correct_answers.includes(option.id) && 'text-green-500'} flex flex-row whitespace-break-spaces justify-start items-center gap-2`} key={option.id}>
+                      <input
+                        type={question.question_type === 'single_correct' ? 'radio' : 'checkbox'}
+                        name={question._id}
+                        value={option.id}
+                        disabled={true}
+                        checked={responseDetails.selectedAnswers[question._id] ? responseDetails.selectedAnswers[question._id].includes(option.id) : false}
+                      /> {option.text}
+                    </label>
+                  ))}
+                  {question.reason && <p>Reason: {question.reason}</p>}
+                </div>
+              </div>
+            ))}
+    </div>
+      
+    </div>
+  </div>
+</div>
+          }
+          
+          {/* Retake Button */}
+          {responseDetails.quiz && (
+            <div className="mt-6 text-center">
+              <Link href={`/quiz/${responseDetails.quizDetails._id}/view`} className="btn btn-primary">
+                Give Quiz Again
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
         dataStatus === 0 ? (
@@ -155,6 +201,6 @@ export default function Page({ params }) {
           </div>
         ) : null
       )}
-    </>
+    </div>
   );
 }

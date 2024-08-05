@@ -17,6 +17,7 @@ export default function Page() {
     title: '',
     description: 'Html,css, js and react',
     total_questions: '10',
+    visibility: 'public',
     level: 'Medium',
     type: 'single_correct',
     single_correct: 'checked',
@@ -64,6 +65,33 @@ export default function Page() {
       "nord",
       "sunset",
     ]
+  const categories = [
+    { value: "art", text: "Art" },
+    { value: "business", text: "Business" },
+    { value: "comics", text: "Comics" },
+    { value: "current_events", text: "Current Events" },
+    { value: "economics", text: "Economics" },
+    { value: "entertainment", text: "Entertainment" },
+    { value: "food", text: "Food" },
+    { value: "general_knowledge", text: "General Knowledge" },
+    { value: "geography", text: "Geography" },
+    { value: "history", text: "History" },
+    { value: "languages", text: "Languages" },
+    { value: "literature", text: "Literature" },
+    { value: "math", text: "Math" },
+    { value: "movies", text: "Movies" },
+    { value: "music", text: "Music" },
+    { value: "mythology", text: "Mythology" },
+    { value: "nature", text: "Nature" },
+    { value: "philosophy", text: "Philosophy" },
+    { value: "politics", text: "Politics" },
+    { value: "psychology", text: "Psychology" },
+    { value: "religion", text: "Religion" },
+    { value: "science", text: "Science" },
+    { value: "space", text: "Space" },
+    { value: "sports", text: "Sports" },
+    { value: "technology", text: "Technology" }
+];
 
   const maxChars = 1000;
   const remainingChars = maxChars - formData.description.length;
@@ -156,7 +184,7 @@ export default function Page() {
     setLoading(false);
     toast.success(response.data.message);
     if(response.data.success){
-      router.push(`/quiz/${response.data.data.quizId}/view`)
+      router.push(`/quiz/${response.data.data.quizId}/edit`)
     }
   })
   .catch(error => {
@@ -218,6 +246,20 @@ export default function Page() {
             onChange={handleChange}
           />
         </label>
+        
+        <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-2">
+              Visibility
+              <select
+                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+                name='visibility'
+                value={formData.visibility}
+                onChange={handleChange}
+              >
+                 <option value="public">Public</option>
+                 <option value="private">Private</option>
+              </select>
+            </label>
+        
 
         <div className="level">
           <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Level</p>
@@ -291,10 +333,12 @@ export default function Page() {
                 value={formData.category}
                 onChange={handleChange}
               >
-                <option value="" disabled>Pick one</option>
-                <option value="art">Art</option>
-                <option value="business">Business</option>
-                <option value="comics">Comics</option>
+                <option value="Uncategorised">Uncategorised</option>
+                {categories.map(category => (
+            <option key={category.value} value={category.value}>
+                {category.text}
+            </option>
+        ))}
               </select>
             </label>
 
@@ -386,7 +430,7 @@ export default function Page() {
                 </div>
                 </div>
                 </div>
-                <input type="radio" value={theme} data-theme={theme} name="theme" className="radio radio-sm" onChange={handleChange} checked={formData.theme == theme} />
+                <input type="radio" value={theme} name="theme" className="radio radio-sm" onChange={handleChange} checked={formData.theme == theme} />
                 </label>
               ))
             }

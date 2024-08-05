@@ -21,7 +21,10 @@ const questionSchema = new mongoose.Schema({
   options: [optionSchema],
   correct_answers: [{
     type: Number,
-  }]
+  }],
+  reason: {
+    type: String
+  }
 });
 
 const quizSchema = new mongoose.Schema({

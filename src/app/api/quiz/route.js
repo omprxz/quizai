@@ -19,7 +19,7 @@ export async function POST(req) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
   model: "gemini-1.5-flash",
-  systemInstruction: "You are an AI designed to generate quiz questions based on the given user input. The user will provide a JSON structure with the necessary details, and you are to respond with a complete quiz JSON structure that includes the quiz metadata and questions. Follow the schema structure provided and ensure your response is properly formatted.\n\n#### JSON Structure to Follow (Given questions, options and correct answers are just an example just follow the structure not the data of this example structure):\n\n```json\n{\n  \"quiz\": {\n    \"questions\": [\n      {\n        \"question_type\": \"single_correct\",\n        \"question_text\": \"(Question here)\",\n        \"options\": [\n          {\n            \"id\": 1,\n            \"text\": \"(Option 1)\"\n          },\n          {\n            \"id\": 2,\n            \"text\": \"(Option 2)\"\n          },\n          {\n            \"id\": 3,\n            \"text\": \"(Option 3)\"\n          },\n          {\n            \"id\": 4,\n            \"text\": \"(Option 4)\"\n          }\n        ],\n        \"correct_answers\": [\n          (Correct answer id)\n        ]\n      },\n      {\n        \"question_type\": \"multi_correct\",\n        \"question_text\": \"(Question here)\",\n        \"options\": [\n          {\n            \"id\": 1,\n            \"text\": \"(Option 1)\"\n          },\n          {\n            \"id\": 2,\n            \"text\": \"(Option 2)\"\n          },\n          {\n            \"id\": 3,\n            \"text\": \"(Option 3)\"\n          },\n          {\n            \"id\": 4,\n            \"text\": \"(Option 4)\"\n          }\n        ],\n        \"correct_answers\": [\n          (Correct answers ids seperated by commas eg: 2,4)\n        ]\n      }\n    ],\n    \"meta\": {\n      \"title\": \"(Suggested Title)\",\n      \"category\": \"(Suggested Category)\"\n    }\n  }\n}\n```\n\n### Task:\n1. Generate quiz questions based on the provided user input.\n2. Include a `meta` field in the JSON response.\n3. In `meta.title`, include a suggested short title derived from the given description.\n4. In `meta.category`, include a suggested category derived from the given description.\n5. Ensure the response follows the schema structure exactly.\n6. Use `single_correct` or `multi_correct` for `question_type` in the questions.\n7. If 'type' is mixed then include single_correct and multi_correct both type of questions\n8. Input Data For Quiz Generation Given below in json format",
+  systemInstruction: "You are an AI designed to generate quiz questions based on the given user input. The user will provide a JSON structure with the necessary details, and you are to respond with a complete quiz JSON structure that includes the quiz metadata and questions. Follow the schema structure provided and ensure your response is properly formatted.\n\n#### JSON Structure to Follow (Given questions, options and correct answers are just an example just follow the structure not the data of this example structure):\n\n```json\n{\n  \"quiz\": {\n    \"questions\": [\n      {\n        \"question_type\": \"single_correct\",\n        \"question_text\": \"What is the capital of France?\",\n        \"options\": [\n          {\n            \"id\": 1,\n            \"text\": \"Paris\"\n          },\n          {\n            \"id\": 2,\n            \"text\": \"London\"\n          },\n          {\n            \"id\": 3,\n            \"text\": \"Berlin\"\n          },\n          {\n            \"id\": 4,\n            \"text\": \"Madrid\"\n          }\n        ],\n        \"correct_answers\": [\n          1\n        ]\n      },\n      {\n        \"question_type\": \"multi_correct\",\n        \"question_text\": \"Which of the following are programming languages?\",\n        \"options\": [\n          {\n            \"id\": 1,\n            \"text\": \"Python\"\n          },\n          {\n            \"id\": 2,\n            \"text\": \"HTML\"\n          },\n          {\n            \"id\": 3,\n            \"text\": \"Java\"\n          },\n          {\n            \"id\": 4,\n            \"text\": \"CSS\"\n          }\n        ],\n        \"correct_answers\": [\n          1,\n          3\n        ],\n\"reason\": (Concise but well informative reason for correct answers. keep it in single para if possible not in list)\n      }\n    ],\n    \"meta\": {\n      \"title\": \"(Suggested Title)\",\n      \"category\": \"(Suggested Category)\"\n    }\n  }\n}\n```\n\n### Task:\n1. Generate quiz questions based on the provided user input.\n2. Include a `meta` field in the JSON response.\n3. In `meta.title`, include a suggested short title derived from the given description.\n4. In `meta.category`, include a suggested category derived from the given description.\n5. Ensure the response follows the schema structure exactly.\n6. Use `single_correct` or `multi_correct` for `question_type` in the questions.\n7. If 'type' is mixed then include single_correct and multi_correct both type of questions\n8. Input Data For Quiz Generation Given below in json format",
 });
   const generationConfig = {
   temperature: 1,
@@ -34,8 +34,6 @@ export async function POST(req) {
   async function generateQuiz(inputData) {
   const chatSession = model.startChat({
     generationConfig,
- // safetySettings: Adjust safety settings
- // See https://ai.google.dev/gemini-api/docs/safety-settings
     history: [
     ],
   });
@@ -82,7 +80,7 @@ export async function POST(req) {
         }
         
         const { 
-            title, description, total_questions, level, type, category, duration, 
+            title, description, total_questions, visibility, level, type, category, duration, 
             passing_score, language, shuffle_question, shuffle_option, theme 
         } = body;
 
@@ -147,13 +145,22 @@ export async function POST(req) {
         
         const quizData = await extractJson(inputData, quizResponse)
         
+        if(quizData.quiz.questions.length == 0){
+          return NextResponse.json({
+            message: 'No questions generated',
+            success: false
+          }, {
+            status: 400
+          })
+        }
+        
         const dbQuizData = {
   userid: tokenDetails.data._id,
 	description,
 	total_questions,
+	visibility,
 	level,
 	type,
-	visibility: 'public',
 	duration,
 	passing_score,
 	language,
@@ -194,12 +201,10 @@ return NextResponse.json({
     status:400
   })
 }
-        
-
-        // Your logic for handling the validated request goes here
 
         return NextResponse.json({ message: "Request processed successfully.", success: true }, { status: 200 });
     } catch (error) {
+      console.log(error)
         return NextResponse.json({ message: "Server error. Please try again later.", success: false, error: error.message }, { status: 500 });
     }
 }
@@ -230,27 +235,19 @@ export async function GET(req) {
 
     const quizDetails = await Quiz.findById(id);
     if (quizDetails) {
-      if (quizDetails.visibility === 'public') {
-        if(quizDetails.questions.length > 0){
-          
-          let loggedIn = false;
+       let loggedIn = false;
+       let tokenDetails
           try{
             const token = cookieStore.get('token').value
             try{
-              const tokenDetails = jwt.verify(token, process.env.JWT_SECRET)
+               tokenDetails = jwt.verify(token, process.env.JWT_SECRET)
               loggedIn=true
             }catch(e){}
           }catch(err){}
+      if (quizDetails.visibility === 'public' || quizDetails.userid == tokenDetails.data._id) {
           return NextResponse.json({quiz:quizDetails, loggedIn});
-        }else{
-          return NextResponse.json({
-          message: 'Quiz have no questions',
-          success: false
-        }, {
-          status: 403
-        });
-        }
       } else {
+        
         return NextResponse.json({
           message: 'Quiz is private',
           success: false
@@ -275,4 +272,49 @@ export async function GET(req) {
       status: 500
     });
   }
+}
+
+export async function DELETE(req) {
+  try{
+  const url = new URL(req.url)
+  const id = url.searchParams.get('id')
+  
+  if(!id){
+    return NextResponse.json({
+      message: 'ID Not provided',
+      success: false
+    }, {
+      status: 404
+      })
+  }
+  
+  if(!mongoose.isValidObjectId(id)){
+    return NextResponse.json({
+      message: 'Invalid quiz ID',
+      success: false
+    }, {
+      status: 403
+      })
+  }
+  
+  const deleteQuiz = await Quiz.deleteOne({_id: id})
+  console.log(deleteQuiz)
+  if(deleteQuiz.deletedCount > 0){
+    return NextResponse.json({
+      message: 'Quiz deleted',
+      success: true
+    }, {
+      status: 200})
+  }else{
+    return NextResponse.json({
+      message: 'No quiz deleted',
+      success: false
+    }, {
+      status: 201 })
+  }
+  }catch(e){
+    console.log(e)
+    return NextResponse.json({message: 'Server ERR: '+e.message, success: false}, {status: 500})
+  }
+  
 }

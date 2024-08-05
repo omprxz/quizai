@@ -54,8 +54,8 @@ const handleSubmit = async (e) => {
 
 
   return (
-    <div>
-      <h1 className='text-center font-bold my-7 text-2xl'>Signup at QuizAI</h1>
+    <div className='min-h-screen pt-7'>
+      <h1 className='text-center font-bold mb-7 text-2xl'>Signup at QuizAI</h1>
       <form className='flex flex-col items-center gap-y-4 px-4' onSubmit={handleSubmit}>
 
           <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">Name

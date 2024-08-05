@@ -100,14 +100,19 @@ export async function GET(req) {
     
     responseDetails.quizResponsesCount = responseDetailsByQuiz.length
     responseDetails.rank = responseRank || 0
-    const quizDetails = await Quiz.findById(responseDetails.quizid);
+    let quizDetails = await Quiz.findById(responseDetails.quizid);
     if (quizDetails) {
+      quizDetails = {...quizDetails._doc}
       responseDetails.quiz = true
-      responseDetails.quizTitle = quizDetails.title || "No title";
-      if(quizDetails.passing_score){
-        responseDetails.quizPassing_score = quizDetails.passing_score
+      quizDetails.title = quizDetails.title || "No title";
+      if(quizDetails.passing_score !== null){
+        if(quizDetails.passing_score == 0){
+        quizDetails.passing_score = 0
+        }else{
+        quizDetails.passing_score = quizDetails.passing_score
+        }
       }
-      responseDetails.quizId = quizDetails._id
+      responseDetails.quizDetails = quizDetails
     } else {
       responseDetails.quizTitle = "Quiz not found";
     }
@@ -128,7 +133,7 @@ export async function GET(req) {
       return NextResponse.json({ message: 'AUTH ERR: Invalid token' }, { status: 401 });
     }
 
-    if (responseDetails.userid !== tokenDetails.data._id) {
+    if (responseDetails.userid !== tokenDetails.data._id && responseDetails.quizDetails.userid !== tokenDetails.data._id) {
       return NextResponse.json({ message: 'This response is not submitted by the current logged-in user' }, { status: 403 });
     }
 
@@ -139,7 +144,6 @@ export async function GET(req) {
       console.log('User not found for userid:', responseDetails.userid);
       responseDetails.username = "User not found";
     }
-
     return NextResponse.json(responseDetails);
 
   } catch (error) {
