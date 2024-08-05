@@ -15,7 +15,7 @@ export default function Page() {
   
   const [formData, setFormData] = useState({
     title: '',
-    description: 'Html,css, js and react',
+    description: '',
     total_questions: '10',
     visibility: 'public',
     level: 'Medium',
