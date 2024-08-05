@@ -418,7 +418,7 @@ export default function Page() {
             <div className='flex flex-row gap-x-4 flex-nowrap overflow-x-scroll max-w-sm rounded-md py-3 px-4 bg-neutral hide-scrollbar'>
             {
               themes.map((theme, index) => (
-                <label className='flex flex-col justify-center items-center gap-y-3'>
+                <label className='flex flex-col justify-center items-center gap-y-3' key={index}>
                 <div className='rounded' data-theme={theme}>
                 <div className='flex justify-between items-center w-auto h-10 px-1.5 gap-x-4'>
                 <p className='text-sm'>{theme}</p>

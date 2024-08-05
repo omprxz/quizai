@@ -6,6 +6,7 @@ import { IoMdSettings } from "react-icons/io";
 import axios from 'axios';
 import { RiLoader2Fill } from "react-icons/ri";
 import { MdErrorOutline } from "react-icons/md";
+import Link from 'next/link'
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import $ from 'jquery';
 import dynamic from 'next/dynamic';

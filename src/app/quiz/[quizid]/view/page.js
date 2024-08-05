@@ -260,7 +260,7 @@ export default function Page({ params }) {
     <div
       dangerouslySetInnerHTML={{ __html: resultContent }}
     />
-      <div className="modal-action" className='mx-auto flex justify-center items-center'>
+      <div className="modal-action mx-auto flex justify-center items-center">
       <Link href={`/quiz/response/${responseId}`} className="btn btn-primary"><FaClipboardCheck /> View Detailed Result</Link>
     </div>
   </div>

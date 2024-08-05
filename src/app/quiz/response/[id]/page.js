@@ -142,7 +142,7 @@ export default function Page({ params }) {
     <input type="checkbox" name="my-accordion-4" defaultChecked />
     <div className="collapse-title text-xl font-medium dark:text-gray-200">View your answers <MdVisibility className='inline' /></div>
     <div className="collapse-content">
-    <p className='text-sm mb-3'>Some questions may display different details in "View your answers" because they might have been modified.</p>
+    <p className='text-sm mb-3'>Some questions may display different details in &quot;View your answers&quot; because they might have been modified.</p>
     <div class="flex flex-col justify-center items-center gap-y-3 text-xs">
       {responseDetails.quizDetails.questions.map((question, index) => (
               <div className={`rounded-md py-4 w-full border shadow px-3 ${responseDetails.selectedAnswers[question._id] ? (responseDetails.selectedAnswers[question._id].length == 0 ? 'border-yellow-500 shadow-yellow-300 bg-yellow-100' : ((question.correct_answers.length == responseDetails.selectedAnswers[question._id].length && question.correct_answers.every(ans => responseDetails.selectedAnswers[question._id].includes(ans))) ?  'border-green-500 shadow-green-300 bg-green-100' :  'border-red-500 shadow-red-300 bg-red-100 dark:bg-red-200 dark:text-neutral' )) : 'border-yellow-500 shadow-yellow-300 bg-yellow-100'}`} key={question._id}>
