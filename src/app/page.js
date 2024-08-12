@@ -22,6 +22,7 @@ const HomePage = () => {
         <div className="text-center p-5 backdrop-blur-md bg-black/50 rounded-lg">
           <h1 className="text-5xl font-extrabold text-white drop-shadow-lg mb-5">Welcome to QuizAI</h1>
           <p className="text-lg text-gray-300 mb-10">Your Ultimate Platform for Creating and Participating in Quizzes</p>
+          <p className="text text-gray-300 mb-10">Generate, Learn, Ace</p>
           <Link href="/login" className="btn btn-primary shadow-lg transform transition hover:scale-105">Get Started</Link>
         </div>
       </section>
