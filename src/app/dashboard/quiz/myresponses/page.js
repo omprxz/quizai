@@ -36,7 +36,7 @@ export default function Page({ params }) {
     }
   };
 
-  const passed = responses.filter(response => response.passing_score !== null && response.percentage >= response.passing_score).length;
+  const passed = responses.filter(response => response.passing_score !== null ? response.percentage >= response.passing_score : response.percentage >= 0).length;
   const failed = responses.length - passed;
   const total = responses.length;
   const passedPercentage = total > 0 ? (passed / total) * 100 : 0;
