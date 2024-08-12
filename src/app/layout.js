@@ -6,6 +6,7 @@ import Authprovider from "@/components/Authprovider/Authprovider";
 import Header from "@/components/Header";
 import ScrollToTop from '@/components/ScrollToTop';
 import ProgressBarProvider from '@/components/ProgressBarProvider.jsx';
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} min-h-screen`}>
         {/*<Eruda />*/}
         <ScrollToTop />
+        <Analytics/>
         <Toaster position="top-center" />
         <Authprovider>
         <ProgressBarProvider>
