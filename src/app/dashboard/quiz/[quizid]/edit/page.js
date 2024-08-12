@@ -26,7 +26,7 @@ const useJQueryConfirm = () => {
 export default function Page({ params }) {
   const router = useRouter();
   const {quizid} = params
-  const [url, setUrl] = useState(`${window.location.protocol}//${window.location.host}/quiz/${quizid}/view`);
+  const [url, setUrl] = useState(`${window.location.protocol}//${window.location.host}/dashboard/quiz/${quizid}/view`);
   useJQueryConfirm();
   
   const [isRotated, setIsRotated] = useState(false);
