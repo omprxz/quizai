@@ -10,7 +10,7 @@ export function middleware(request) {
   ];
 
   const authUrls = [
-    /^\/login\/?$/, /^\/register\/?$/, /^\/password\/reset\/?$/
+    /^\/login\/?$/, /^\/register\/?$/, /^\/password\/reset\/?$/, /^\/?$/
   ];
 
   const isAuthUrl = authUrls.some((regex) => regex.test(pathname));
