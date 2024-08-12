@@ -147,6 +147,7 @@ export default function Page({ params }) {
 
       const data = {
         quizid: quizDetails._id,
+        passing_score: quizDetails.passing_score,
         username,
         selectedAnswers: selectedAnswers,
         correct: totalCorrect,
@@ -261,7 +262,7 @@ export default function Page({ params }) {
       dangerouslySetInnerHTML={{ __html: resultContent }}
     />
       <div className="modal-action mx-auto flex justify-center items-center">
-      <Link href={`/quiz/response/${responseId}`} className="btn btn-primary"><FaClipboardCheck /> View Detailed Result</Link>
+      <Link href={`/dashboard/quiz/response/${responseId}`} className="btn btn-primary"><FaClipboardCheck /> View Detailed Result</Link>
     </div>
   </div>
   <form method="dialog" className="modal-backdrop">

@@ -71,7 +71,7 @@ export default function Page({ params }) {
               <p className="text-gray-600 dark:text-gray-400">
                 <span className="font-semibold">Quiz Title:</span>{' '}
                 {responseDetails.quiz ? (
-                  <Link href={`/quiz/${responseDetails.quizDetails._id}/view`} className="text-blue-500 dark:text-blue-400 hover:underline">
+                  <Link href={`/dashboard/quiz/${responseDetails.quizDetails._id}/view`} className="text-blue-500 dark:text-blue-400 hover:underline">
                     {responseDetails.quizDetails.title}
                   </Link>
                 ) : (
@@ -173,7 +173,7 @@ export default function Page({ params }) {
           {/* Retake Button */}
           {responseDetails.quiz && (
             <div className="mt-6 text-center">
-              <Link href={`/quiz/${responseDetails.quizDetails._id}/view`} className="btn btn-primary">
+              <Link href={`/dashboard/quiz/${responseDetails.quizDetails._id}/view`} className="btn btn-primary">
                 Give Quiz Again
               </Link>
             </div>

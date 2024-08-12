@@ -1,26 +1,42 @@
 import { NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
+import mongoose from "mongoose";
 import Db from '@/utils/db'
 import Response from '@/models/response'
 import User from '@/models/user'
 import Quiz from '@/models/quiz'
+import {cookies} from 'next/headers'
 
 export async function GET(req) {
   await Db()
+  const cookieStore = cookies()
   const url = new URL(req.url)
-  const quizid = url.searchParams.get('id')
-
-  let responseDets = await Response.find({ quizid })
-
-  if (!responseDets || responseDets.length === 0) {
+  const filter = url.searchParams.get('filter')
+  let responsesWithDetails
+  try{
+  let responseDets, quizid
+  quizid = url.searchParams.get('id')
+  if(filter=='quizid'){
+    if (!mongoose.isValidObjectId(quizid)) {
+      return NextResponse.json({
+        message: 'Invalid Quiz ID',
+        success: false
+      }, {
+        status: 400
+      });
+    }
+    
+    const quizDets = await Quiz.findOne({_id:quizid}).select("_id")
+    if(!quizDets){
     return NextResponse.json({
-      message: 'No responses'
+      message: 'Quiz doesn\'t exists'
     }, {
-      status: 403
+      status: 404
     })
   }
-
-  const responsesWithUserDetails = await Promise.all(
+   responseDets = await Response.find({ quizid })
+   
+   responsesWithDetails = await Promise.all(
     responseDets.map(async (response) => {
       if (response.userid) {
         const userDets = await User.findById(response.userid).select('-password')
@@ -34,14 +50,71 @@ export async function GET(req) {
       return response
     })
   )
+  }else if(filter=='user'){
+    const token = cookieStore.get('token')?.value
+    if(!token){
+      return NextResponse.json({
+        message: 'AUTH ERR: Loggin first'
+      }, {
+        status: 403
+      })
+    }
+    try{
+    const tokenDetails = jwt.verify(token, process.env.JWT_SECRET)
+    
+    const userid = tokenDetails?.data?._id || undefined
+   responseDets = await Response.find({ userid})
+   
+ responsesWithDetails = await Promise.all(
+    responseDets.map(async (response) => {
+      if (response.userid) {
+        const qDets = await Quiz.findById(response.quizid).select('title')
+        if (qDets) {
+          return {
+            ...response._doc,
+            title: qDets.title
+          }
+        }
+      }
+      return response
+    })
+  )
+    }catch(e){
+      return NextResponse.json({
+        message: 'AUTH ERR: Invalid token'
+      }, {
+        status: 403
+      })
+    }
+  }else{
+    return NextResponse.json({
+      message: 'Invalid filter'
+    }, {
+      status: 403
+    })
+  }
+  
+
+  if (!responseDets || responseDets.length === 0) {
+    return NextResponse.json({
+      message: 'Nothing found'
+    }, {
+      status: 404
+    })
+  }
+
 
   return NextResponse.json({
     message: 'Working',
     data: {
       quizid,
-      responses: responsesWithUserDetails
+      responses: responsesWithDetails
     }
   }, {
     status: 200
   })
+  } catch (e){
+    return NextResponse.json({message: e?.message || 'Something went wrong.'}, {
+      status:403 })
+  }
 }

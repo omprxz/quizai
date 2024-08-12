@@ -29,12 +29,23 @@ export async function POST(request) {
     if (!data.quizid) {
       return NextResponse.json({ message: 'Quiz ID is missing.' }, { status: 400 });
     }
+    
+    const quizDetails = await Quiz.findById(data.quizid)
+    if(!quizDetails){
+      return NextResponse.json({
+        message: 'Quiz not found'
+      },{
+        status:403
+        })
+    }
 
     const response = new Response({
       userid: tokenDetails?.data?._id ? tokenDetails?.data?._id : null,
       username: data.username || 'Unknown',
       quizid: data.quizid,
       selectedAnswers: data.selectedAnswers || {},
+      passing_score: quizDetails.passing_score,
+      questions: quizDetails.questions,
       correct: data.correct || 0,
       wrong: data.wrong || 0,
       notAttempted: data.notAttempted || 0,

@@ -184,7 +184,7 @@ export default function Page() {
     setLoading(false);
     toast.success(response.data.message);
     if(response.data.success){
-      router.push(`/quiz/${response.data.data.quizId}/edit`)
+      router.push(`/dashboard/quiz/${response.data.data.quizId}/edit`)
     }
   })
   .catch(error => {

@@ -60,7 +60,6 @@ export async function GET(req, { params }) {
     if(quizDetails.userid !== tokenDetails.data._id){
       return NextResponse.json({message: 'Quiz was not created by current logged in user'}, {status: 403})
     }
-    
     return NextResponse.json({quiz: quizDetails})
 
 }

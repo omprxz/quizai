@@ -40,7 +40,7 @@ const handleSubmit = async (e) => {
     email: '',
     password: '',
   })
-  router.push('/home');
+  router.push('/dashboard');
     }
     toast.success(res.data.message)
   } catch (error) {

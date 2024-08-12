@@ -6,7 +6,7 @@ export function middleware(request) {
   const { pathname } = request.nextUrl;
 
   const dynamicPublicUrls = [
-    /^\/quiz\/[^\/]+\/view$/, /^\/quiz\/response\/[^\/]+/
+    /^\/dashboard\/quiz\/[^\/]+\/view$/, /^\/quiz\/response\/[^\/]+/
   ];
 
   const authUrls = [
@@ -18,7 +18,7 @@ export function middleware(request) {
 
   if (token && isAuthUrl) {
     const url = request.nextUrl.clone();
-    url.pathname = '/home';
+    url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   } else if (!token && !isDynamicPublicUrl && !isAuthUrl) {
     const url = request.nextUrl.clone();

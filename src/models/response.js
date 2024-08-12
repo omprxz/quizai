@@ -1,5 +1,32 @@
 import mongoose from 'mongoose';
 
+const optionSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true
+  },
+  text: {
+    type: String,
+  }
+});
+
+const questionSchema = new mongoose.Schema({
+  question_type: {
+    type: String,
+    required: true
+  },
+  question_text: {
+    type: String,
+  },
+  options: [optionSchema],
+  correct_answers: [{
+    type: Number,
+  }],
+  reason: {
+    type: String
+  }
+});
+
 const responseSchema = new mongoose.Schema({
   userid: {
     type: String,
@@ -8,6 +35,10 @@ const responseSchema = new mongoose.Schema({
   username: {
     type: String,
     default: 'Unknown'
+  },
+  passing_score: {
+    type: Number,
+    default: 0
   },
   quizid: {
     type: String,
@@ -18,6 +49,7 @@ const responseSchema = new mongoose.Schema({
     of: [Number],
     default: {}
   },
+  questions: [questionSchema],
   correct: {
     type: Number,
     default: 0

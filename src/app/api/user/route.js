@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { NextResponse } from "next/server"
 
 export async function POST(req){
+  const cookiesStore = cookies()
   const {
     name, email
   } = await req.json()
@@ -18,7 +19,14 @@ export async function POST(req){
   }
   
   
-  const token = await req.headers.get("Authorization")?.split(' ')[1]
+  const token = cookiesStore.get("token")?.value
+  if(!token){
+    return NextResponse.json({
+      message: 'No user logged in'
+    }, {
+      status: 403
+      })
+  }
   let userDetails
   try{
     userDetails = jwt.verify(token, process.env.JWT_SECRET)
@@ -32,7 +40,7 @@ export async function POST(req){
         })
     }else{
       return NextResponse.json({
-          message: "Something wemt wrong"
+          message: "AUTH ERR: "+e.message
         },
         {
           status: 500
@@ -54,7 +62,7 @@ export async function POST(req){
     
   if(!updateUser){
     return NextResponse.json({
-      message: "Something wemt wrong"
+      message: "Something wemt wron"
     }, {
       status: 401
       })
@@ -99,7 +107,7 @@ export async function GET(req) {
 
   try {
     const userDetails = jwt.verify(token, process.env.JWT_SECRET);
-    const userData = await User.findById(userDetails?.data?._id).select("name email createdAt");
+    const userData = await User.findById(userDetails?.data?._id).select("name email createdAt image");
 
     return NextResponse.json({
       message: "User data fetched",

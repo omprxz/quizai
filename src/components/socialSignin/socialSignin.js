@@ -6,17 +6,22 @@ import { FaGithub, FaXTwitter } from "react-icons/fa6";
 export default function SocialSigninButton(){
   return(
     <>
-    <div className="flex flex-row flex-nowrap gap-3 border-2 border-neutral rounded-full px-6 py-2 justify-center items-center">
-      <FcGoogle />
-      <button type="button" onClick={() => signIn('google')}>Continue with Google</button>
+    <div className='flex flex-row gap-x-3 flex-wrap'>
+    <div className="flex flex-row flex-nowrap gap-3 border-2 border-neutral rounded-full p-3 justify-center items-center">
+      <button type="button" onClick={() => signIn('google')}>
+      <FcGoogle className='text-xl' />
+      </button>
     </div>
-    <div className="flex flex-row flex-nowrap gap-3 border-2 border-neutral rounded-full px-6 py-2 justify-center items-center">
-      <FaGithub className='text-black' />
-      <button type="button" onClick={() => signIn('github')}>Continue with Github</button>
+    <div className="flex flex-row flex-nowrap gap-3 border-2 border-neutral rounded-full p-3 justify-center items-center">
+      <button type="button" onClick={() => signIn('github')}>
+      <FaGithub className='text-black dark:text-white text-xl' />
+      </button>
     </div>
-    <div className="flex flex-row flex-nowrap gap-3 border-2 border-neutral rounded-full px-6 py-2 justify-center items-center">
-      <FaXTwitter className='text-black' />
-      <button type="button" onClick={() => signIn('twitter')}>Continue with Twitter</button>
+    <div className="flex flex-row flex-nowrap gap-3 border-2 border-neutral rounded-full p-3 justify-center items-center">
+      <button type="button" onClick={() => signIn('twitter')}>
+      <FaXTwitter className='text-black dark:text-white text-xl' />
+      </button>
+    </div>
     </div>
     </>
     )

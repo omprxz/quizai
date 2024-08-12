@@ -14,7 +14,15 @@ export async function POST(req, {params}){
     const cookieStore = cookies()
     
     const { password, newPassword } = await req.json()
-    const token = cookieStore.get('token').value
+    const token = cookieStore.get('token')?.value
+    
+    if(!token){
+      return NextResponse.json({
+        message: "User not logged in"
+      }, {
+        status: 400
+      })
+    }
     
     if(!password){
       return NextResponse.json({
