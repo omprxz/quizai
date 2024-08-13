@@ -159,7 +159,7 @@ export async function POST(req) {
         const dbQuizData = {
   userid: tokenDetails.data._id,
 	description,
-	total_questions,
+	total_questions: quizData.quiz.questions.length || total_questions,
 	visibility,
 	level,
 	type,

@@ -437,7 +437,7 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
       <h2 className="text-lg font-semibold mb-2">Generate Questions with AI</h2>
       <div className="space-y-2">
         <label className="label cursor-pointer gap-2">
-          <span className="label-text text-neutral dark:text-neutral-content text-xs">
+          <span className="label-text text-neutral dark:text-neutral-content text-sm">
             Use Existing Quiz Topic and Details
           </span>
           <input

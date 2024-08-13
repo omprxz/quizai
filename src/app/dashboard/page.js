@@ -51,8 +51,12 @@ export default function Page() {
             title={quiz.title}
             visibility={quiz.visibility}
             total_questions={quiz.total_questions}
-            language={quiz.language}
-            level={quiz.level}
+            response_count={quiz.response_count}
+            createdAt={new Date(quiz.createdAt).toLocaleString('en-US', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  }).replace(',', '')}
             fetchQuizList={fetchQuizList}
           />
         ))}

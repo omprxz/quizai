@@ -1,6 +1,7 @@
 "use client";
 import { FaPlus, FaGlobe, FaLock } from "react-icons/fa6";
 import { MdSchool, MdEdit, MdDelete, MdVisibility, MdBarChart } from 'react-icons/md';
+import { IoLinkOutline } from 'react-icons/io5';
 import { useState, useEffect } from 'react';
 import Link from "next/link";
 import $ from 'jquery';
@@ -29,7 +30,7 @@ export function CreateQuizButton() {
   );
 }
 
-export function QuizButton({ id, title, visibility, level, total_questions, language, fetchQuizList = () => {} }) {
+export function QuizButton({ id, title, visibility, createdAt, total_questions, response_count, fetchQuizList = () => {} }) {
   const [isDeleting, setIsDeleting] = useState(false);
   useJQueryConfirm();
 
@@ -62,6 +63,11 @@ export function QuizButton({ id, title, visibility, level, total_questions, lang
     });
   };
 
+  const handleCopyClick = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/dashboard/quiz/${id}/view`);
+    toast.success('Quiz link copied to clipboard!');
+  };
+
   return (
     <>
       <dialog id="deleting" className="modal">
@@ -92,6 +98,9 @@ export function QuizButton({ id, title, visibility, level, total_questions, lang
           <Link href={`/dashboard/quiz/${id}/view`} className="text-gray-500 hover:text-primary transition duration-200 ease-in-out">
             <MdVisibility className="text-xl" />
           </Link>
+          <button onClick={handleCopyClick} className="text-gray-500 hover:text-primary transition duration-200 ease-in-out">
+            <IoLinkOutline className="text-xl" />
+          </button>
           <Link href={`/dashboard/quiz/${id}/responses`} className="text-gray-500 hover:text-primary transition duration-200 ease-in-out">
             <MdBarChart className="text-xl" />
           </Link>
@@ -105,9 +114,9 @@ export function QuizButton({ id, title, visibility, level, total_questions, lang
         </div>
 
         <div className="flex justify-between mt-2 text-sm text-gray-600">
-          <span>Language: {language}</span>
-          <span>Level: {level}</span>
           <span>Questions: {total_questions}</span>
+          <span>{createdAt}</span>
+          <span>Responses: {response_count}</span>
         </div>
       </li>
     </>

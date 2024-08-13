@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken"
 import { cookies } from 'next/headers';
 import { NextResponse } from "next/server"
 
-
 export async function GET(req) {
   await Db();
   const url = new URL(req.url);

@@ -139,7 +139,7 @@ export default function Page({ params }) {
           {/* Answers Summary */}
          { responseDetails.quizDetails.questions && <div className="w-full">
   <div className="collapse collapse-arrow join-item border-base-300 border rounded-md">
-    <input type="checkbox" name="my-accordion-4" defaultChecked />
+    <input type="checkbox" name="my-accordion-4" />
     <div className="collapse-title text-xl font-medium dark:text-gray-200">View your answers <MdVisibility className='inline' /></div>
     <div className="collapse-content">
     <p className='text-sm mb-3'>Some questions may display different details in &quot;View your answers&quot; because they might have been modified.</p>
