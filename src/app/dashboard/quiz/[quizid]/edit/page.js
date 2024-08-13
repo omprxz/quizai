@@ -392,6 +392,8 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
         useExistingTopic: true,
         description: '',
         type: 'single_correct',
+        single_correct: true,
+        multi_correct: false,
         level: 'Easy',
         language: 'English',
         total_questions: 1,
