@@ -26,8 +26,8 @@ export async function POST(req) {
   temperature: 1,
   topP: 0.95,
   topK: 64,
-  maxOutputTokens: 8192,
-  responseMimeType: "text/plain",
+  maxOutputTokens: 20000,
+  responseMimeType: "application/json",
 };
   
   const state = { tries: 0 };
@@ -89,12 +89,12 @@ export async function POST(req) {
             return NextResponse.json({ message: "Title must not exceed 250 characters.", success: false }, { status: 400 });
         }
 
-        if (description && description.length > 1000) {
-            return NextResponse.json({ message: "Description must not exceed 1000 characters.", success: false }, { status: 400 });
+        if (description && description.length > 5000) {
+            return NextResponse.json({ message: "Description must not exceed 5000 characters.", success: false }, { status: 400 });
         }
 
-        if (!Number.isInteger(total_questions) || total_questions < 1 || total_questions > 50) {
-            return NextResponse.json({ message: "Number of questions must be an integer between 1 and 50.", success: false }, { status: 400 });
+        if (!Number.isInteger(total_questions) || total_questions < 1 || total_questions > 30) {
+            return NextResponse.json({ message: "Number of questions must be an integer between 1 and 30.", success: false }, { status: 400 });
         }
 
         if (!level) {
@@ -128,7 +128,7 @@ export async function POST(req) {
         
         const quizMetaData = {
           description,
-          total_questions,
+          total_questions: total_questions + ' (MUST)',
           level,
           type,
           language
@@ -144,7 +144,8 @@ export async function POST(req) {
         
         const quizResponse = await generateQuiz(inputData)
         
-        const quizData = await extractJson(inputData, quizResponse)
+        //const quizData = await extractJson(inputData, quizResponse)
+        const quizData = JSON.parse(quizResponse)
         
         if(quizData.quiz.questions.length == 0){
           return NextResponse.json({

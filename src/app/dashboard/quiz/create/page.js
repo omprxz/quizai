@@ -93,7 +93,7 @@ export default function Page() {
     { value: "technology", text: "Technology" }
 ];
 
-  const maxChars = 1000;
+  const maxChars = 5000;
   const remainingChars = maxChars - formData.description.length;
 
   const handleChange = (event) => {
@@ -148,8 +148,8 @@ export default function Page() {
       return;
     }
 
-    if (total_questions !== '' && (!Number.isInteger(+total_questions) || +total_questions < 1 || +total_questions > 50)) {
-  toast.error('Number of questions must be an integer between 1 and 50.');
+    if (total_questions !== '' && (!Number.isInteger(+total_questions) || +total_questions < 1 || +total_questions > 30)) {
+  toast.error('Number of questions must be an integer between 1 and 30.');
   setLoading(false)
   return;
 }
@@ -172,7 +172,7 @@ export default function Page() {
       
     const processedData = {
       ...formData,
-      total_questions: formData.total_questions ? +formData.total_questions : 10,
+      total_questions: formData.total_questions ? parseInt(+formData.total_questions) : 10,
       type: formData['type'] ? formData['type'] : 'single_correct',
       theme: formData['theme'] ? formData['theme'] : 'autumn',
       duration: formData.duration ? +formData.duration : null
@@ -241,7 +241,7 @@ export default function Page() {
             name="total_questions"
             className="grow text-sm"
             placeholder="Default 10"
-            title='Number of questions must be between 1 and 50.'
+            title='Number of questions must be between 1 and 30.'
             value={formData.total_questions}
             onChange={handleChange}
           />

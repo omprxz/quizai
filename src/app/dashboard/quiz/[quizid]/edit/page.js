@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -8,6 +8,7 @@ import { RiLoader2Fill } from "react-icons/ri";
 import { MdErrorOutline } from "react-icons/md";
 import Link from 'next/link'
 import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
+import { BsStars } from "react-icons/bs";
 import $ from 'jquery';
 import dynamic from 'next/dynamic';
 
@@ -32,7 +33,8 @@ export default function Page({ params }) {
   const [isRotated, setIsRotated] = useState(false);
   const [showCustomSettings, setShowCustomSettings] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [titleErrMsg, setTitleErrMsg] = useState('')
+  const [addQuestionsLoading, setAddQuestionsLoading] = useState(false);
+  const [titleErrMsg, setTitleErrMsg] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -46,6 +48,17 @@ export default function Page({ params }) {
     shuffle_option: false,
     theme: "",
     questions: []
+  });
+  const [aiModalVisible, setAiModalVisible] = useState(false);
+  const [aiFormData, setAiFormData] = useState({
+    useExistingTopic: true,
+    description: '',
+    type: 'single_correct',
+    single_correct: true,
+    multi_correct: false,
+    level: 'Medium',
+    language: 'English',
+    total_questions: 1,
   });
   const [dataStatus, setDataStatus] = useState(0)
   const [dataMsg, setDataMsg] = useState('Loading quiz data, please hold on...')
@@ -118,7 +131,7 @@ export default function Page({ params }) {
         ...question, 
         options: [...question.options, { 
           _id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15), 
-          id: question.options.length + 1, // Assign id sequentially
+          id: question.options.length + 1, 
           text: '' 
         }] 
       } : 
@@ -136,18 +149,14 @@ const handleRemoveOption = (q_id, o_id) => {
           return question;
         }
 
-        // Find the index of the option to be removed
         const optionIndexToRemove = question.options.findIndex(option => option._id === o_id);
 
-        // Filter out the option to be removed
         const updatedOptions = question.options.filter(option => option._id !== o_id);
 
-        // Update correct_answers
         const updatedCorrectAnswers = question.correct_answers
           .filter(answerId => answerId !== optionIndexToRemove + 1)
           .map(answerId => (answerId > optionIndexToRemove + 1 ? answerId - 1 : answerId));
 
-        // Update the ids for the remaining options
         const reindexedOptions = updatedOptions.map((option, index) => ({ ...option, id: index + 1 }));
 
         return {
@@ -319,199 +328,604 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
   useEffect(() => {
     fetchQuizDetails(params.quizid);
   }, []);
+  
+  const handleAiFormChange = (event) => {
+    const { name, type, checked } = event.target;
+
+    if (type === 'checkbox') {
+      setAiFormData((prevData) => {
+        const newCheckboxState = {
+          ...prevData,
+          [name]: checked
+        };
+
+        const newTypeValue = newCheckboxState.single_correct && newCheckboxState.multi_correct
+          ? 'mixed'
+          : newCheckboxState.single_correct
+            ? 'single_correct'
+            : newCheckboxState.multi_correct
+              ? 'multi_correct'
+              : '';
+
+        return {
+          ...newCheckboxState,
+          type: newTypeValue
+        };
+      });
+    } else {
+      setAiFormData((prevData) => ({
+        ...prevData,
+        [name]: event.target.value
+      }));
+    }
+  };
+
+  const handleGenerateQuestions = () => {
+    setAddQuestionsLoading(true);
+    try {
+      
+      const aiData = {
+    oldQuestions: formData.questions.map(question => question.question_text) || [],
+    description: aiFormData.useExistingTopic ? formData.description : aiFormData.description,
+    level: aiFormData.level ? aiFormData.level : "Medium",
+    type: aiFormData.type ? aiFormData.type : "single_correct",
+    language: aiFormData.language || "English",
+    total_questions: parseInt(aiFormData.total_questions) || 1
+};
+      console.log(aiData)
+      if(aiData.description > 5000){
+        toast.error('Description must be less than 5000 characters')
+        setAddQuestionsLoading(false)
+        return null
+      }
+      if(aiData.total_questions > 30 || aiData.total_questions < 1){
+        toast.error('Total number of questions must be between 1 and 30')
+        setAddQuestionsLoading(false)
+        return null
+      }
+      axios.post('/api/quiz/edit/add/questions', aiData).then((res) => {
+      if (res.data.success) {
+        toast.success(res.data.message);
+        setFormData(prev => ({ ...prev, questions: [...prev.questions, ...res.data.questions] }));
+        setAiModalVisible(false);
+      setAiFormData({
+        useExistingTopic: true,
+        description: '',
+        type: 'single_correct',
+        level: 'Easy',
+        language: 'English',
+        total_questions: 1,
+      });
+      }else {
+        toast.error(res.data.message || 'Failed to generate questions');
+      }
+      }).catch((e) => {
+      console.error(e);
+      toast.error(e.response?.data?.message || e?.message);
+      }).finally(() => {
+        setAddQuestionsLoading(false)
+      })
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
   return (
     <>
-    { formData._id && <>
-    <div className='p-4'>
-      <h1 className='font-bold text-primary text-xl px-2'>Edit Quiz</h1>
-      <form className='mt-4 px-2 flex flex-col justify-center items-start w-full gap-y-3 mb-10' onSubmit={handleSubmit}>
-      <div className='w-full'>
-        <label className="input input-bordered border-neutral flex items-center gap-2 text-sm w-full max-w-sm mt-1">
-          Title
-          <input type="text" placeholder="Title (Optional)" name="title" className="text-sm w-full" maxLength='250' value={formData.title} onChange={handleChange} />
+      {aiModalVisible && (
+  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 p-2">
+    <div className="bg-neutral-content dark:bg-neutral rounded-lg py-3 px-4 w-full max-w-xs relative z-30">
+      <button
+        onClick={() => setAiModalVisible(false)}
+        className="absolute top-2 right-2"
+      >
+        <svg
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+      <h2 className="text-lg font-semibold mb-2">Generate Questions with AI</h2>
+      <div className="space-y-2">
+        <label className="label cursor-pointer gap-2">
+          <span className="label-text text-neutral dark:text-neutral-content text-xs">
+            Use Existing Quiz Topic and Details
+          </span>
+          <input
+            type="checkbox"
+            name="useExistingTopic"
+            className="toggle toggle-primary"
+            checked={aiFormData.useExistingTopic}
+            onChange={handleAiFormChange}
+          />
         </label>
-          {
-            titleErrMsg && <p className='text-error text-sm text-end mt-1'>{titleErrMsg}</p>
-          }
-          </div>
-
-        <div className="level">
-          <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Level</p>
+        {!aiFormData.useExistingTopic && (
+          <textarea
+            name="description"
+            value={aiFormData.description}
+            onChange={handleAiFormChange}
+            placeholder="Enter new topic or description (max 5000 chars)"
+            className="textarea textarea-bordered border-neutral text-xs w-full h-20 max-w-xs mb-1"
+            maxLength="5000"
+          ></textarea>
+        )}
+        <div className="type">
+          <p className='mb-1 text-neutral dark:text-neutral-content text-xs'>Type (MCQs)</p>
           <div className="join">
-            <input className="join-item btn" type="radio" name="level" value="Easy" aria-label="Easy" checked={formData.level === 'Easy'} onChange={handleChange} />
-            <input className="join-item btn" type="radio" name="level" value="Medium" aria-label="Medium" checked={formData.level === 'Medium'} onChange={handleChange} />
-            <input className="join-item btn" type="radio" name="level" value="Hard" aria-label="Hard" checked={formData.level === 'Hard'} onChange={handleChange} />
+            <input
+              className="join-item btn btn-sm"
+              type="checkbox"
+              name="single_correct"
+              aria-label="Single Correct"
+              checked={aiFormData.single_correct}
+              onChange={handleAiFormChange}
+            />
+            <input
+              className="join-item btn btn-sm"
+              type="checkbox"
+              name="multi_correct"
+              aria-label="Multi Correct"
+              checked={aiFormData.multi_correct}
+              onChange={handleAiFormChange}
+            />
           </div>
         </div>
-
-        <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-2">
-          Visibility
-          <select className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content" name='visibility' value={formData.visibility} onChange={handleChange}>
-            <option value="public">Public</option>
-            <option value="private">Private</option>
+        <div className="level mb-1">
+          <p className="mb-1 text-neutral dark:text-neutral-content text-xs">Level</p>
+          <div className="join">
+            <input
+              className="join-item btn btn-sm"
+              type="radio"
+              name="level"
+              value="Easy"
+              aria-label="Easy"
+              checked={aiFormData.level === 'Easy'}
+              onChange={handleAiFormChange}
+            />
+            <input
+              className="join-item btn btn-sm"
+              type="radio"
+              name="level"
+              value="Medium"
+              aria-label="Medium"
+              checked={aiFormData.level === 'Medium'}
+              onChange={handleAiFormChange}
+            />
+            <input
+              className="join-item btn btn-sm"
+              type="radio"
+              name="level"
+              value="Hard"
+              aria-label="Hard"
+              checked={aiFormData.level === 'Hard'}
+              onChange={handleAiFormChange}
+            />
+          </div>
+        </div>
+        <label className="input input-sm input-bordered border-neutral flex items-center gap-1 text-xs w-full max-w-xs mt-1">
+          Language
+          <select
+            className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content text-xs select-sm"
+            name="language"
+            value={aiFormData.language}
+            onChange={handleAiFormChange}
+          >
+            <option value="English">English</option>
+            <option value="Mandarin">Mandarin</option>
+            <option value="Spanish">Spanish</option>
+            <option value="Hindi">Hindi</option>
+            <option value="French">French</option>
+            <option value="Arabic">Arabic</option>
+            <option value="Bengali">Bengali</option>
+            <option value="Portuguese">Portuguese</option>
+            <option value="Russian">Russian</option>
+            <option value="Japanese">Japanese</option>
+            <option value="Punjabi">Punjabi</option>
+            <option value="German">German</option>
+            <option value="Javanese">Javanese</option>
+            <option value="Korean">Korean</option>
+            <option value="Telugu">Telugu</option>
           </select>
         </label>
-
-        <label className="input input-bordered border-neutral flex items-center gap-2 w-full max-w-sm text-sm mt-2">
-          Passing
-          <input type="number" name="passing_score" className="text-sm w-full" placeholder="% (Optional)" value={formData.passing_score} onChange={handleChange} />
+        <label className="input input-sm input-bordered border-neutral flex items-center gap-1 text-xs w-full max-w-xs mt-1">
+          Questions
+          <input
+            type="number"
+            name="total_questions"
+            className="grow text-xs input-sm"
+            placeholder="Default 10"
+            title='Number of questions must be between 1 and 30.'
+            value={aiFormData.total_questions}
+            onChange={handleAiFormChange}
+          />
         </label>
-
-        <label className="label cursor-pointer gap-6">
-          <span className="label-text text-neutral dark:text-neutral-content">Shuffle Questions</span>
-          <input type="checkbox" name="shuffle_question" className="toggle toggle-primary" checked={formData.shuffle_question} onChange={handleChange} />
-        </label>
-
-        <label className="label cursor-pointer gap-6">
-          <span className="label-text text-neutral dark:text-neutral-content">Shuffle Options</span>
-          <input type="checkbox" name="shuffle_option" className="toggle toggle-primary" checked={formData.shuffle_option} onChange={handleChange} />
-        </label>
-
-        <label className='w-full flex flex-nowrap flex-row justify-between mt-4' onClick={handleShowCustomSettings}>
-          <span className='text-primary text-sm select-none underline'>More Settings</span>
-          <IoMdSettings className={`text-primary text-2xl transition-transform duration-200 ${isRotated ? 'rotate-90 mb-1.5' : ''}`} />
-        </label>
-
-        {showCustomSettings && (
+      </div>
+      <button
+        onClick={handleGenerateQuestions}
+        className="btn btn-primary btn-sm mt-4 disabled:text-base-100 disabled:bg-primary"
+        disabled={addQuestionsLoading}
+      >
+        {addQuestionsLoading ? (
           <>
-            <label className="input input-bordered border-neutral flex items-center gap-2 text-sm w-full max-w-sm mt-1">
-              Duration
-              <input type="number" name="duration" className="grow text-sm" placeholder="Skip for no limit (in s)" value={formData.duration} onChange={handleChange} />
-            </label>
+            <RiLoader2Fill className="animate-spin" /> Generating...
+          </>
+        ) : (
+          'Add Questions'
+        )}
+      </button>
+    </div>
+  </div>
+)}
+      {formData._id && (
+        <div className="p-4">
+          <h1 className="font-bold text-primary text-xl px-2">Edit Quiz</h1>
+          <form
+            className="mt-4 px-2 flex flex-col justify-center items-start w-full gap-y-3 mb-10"
+            onSubmit={handleSubmit}
+          >
+            <div className="w-full">
+              <label className="input input-bordered border-neutral flex items-center gap-2 text-sm w-full max-w-sm mt-1">
+                Title
+                <input
+                  type="text"
+                  placeholder="Title (Optional)"
+                  name="title"
+                  className="text-sm w-full"
+                  maxLength="250"
+                  value={formData.title}
+                  onChange={handleChange}
+                />
+              </label>
+              {titleErrMsg && (
+                <p className="text-error text-sm text-end mt-1">{titleErrMsg}</p>
+              )}
+            </div>
 
-            <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-1">
-              Language
-              <select className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content" name="language" value={formData.language} onChange={handleChange}>
-                <option value="English">English</option>
-                <option value="Mandarin">Mandarin</option>
-                <option value="Spanish">Spanish</option>
-                <option value="Hindi">Hindi</option>
-                <option value="French">French</option>
-                <option value="Arabic">Arabic</option>
-                <option value="Bengali">Bengali</option>
-                <option value="Portuguese">Portuguese</option>
-                <option value="Russian">Russian</option>
-                <option value="Japanese">Japanese</option>
-                <option value="Punjabi">Punjabi</option>
-                <option value="German">German</option>
-                <option value="Javanese">Javanese</option>
-                <option value="Korean">Korean</option>
-                <option value="Telugu">Telugu</option>
+            <div className="level">
+              <p className="mb-1.5 text-neutral dark:text-neutral-content text-sm">Level</p>
+              <div className="join">
+                <input
+                  className="join-item btn"
+                  type="radio"
+                  name="level"
+                  value="Easy"
+                  aria-label="Easy"
+                  checked={formData.level === 'Easy'}
+                  onChange={handleChange}
+                />
+                <input
+                  className="join-item btn"
+                  type="radio"
+                  name="level"
+                  value="Medium"
+                  aria-label="Medium"
+                  checked={formData.level === 'Medium'}
+                  onChange={handleChange}
+                />
+                <input
+                  className="join-item btn"
+                  type="radio"
+                  name="level"
+                  value="Hard"
+                  aria-label="Hard"
+                  checked={formData.level === 'Hard'}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-2">
+              Visibility
+              <select
+                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+                name="visibility"
+                value={formData.visibility}
+                onChange={handleChange}
+              >
+                <option value="public">Public</option>
+                <option value="private">Private</option>
               </select>
             </label>
 
-            <div className="theme w-full">
-              <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Choose theme</p>
-              <div className='flex flex-row gap-x-4 flex-nowrap overflow-x-scroll max-w-sm rounded-md py-3 px-4 bg-gray-300 dark:bg-gray-800'>
-                {themes.map((theme, index) => (
-                  <label className='flex flex-col justify-center items-center gap-y-3' key={index}>
-                    <div className='rounded' data-theme={theme}>
-                      <div className='flex justify-between items-center w-auto h-10 px-1.5 gap-x-4'>
-                        <p className='text-sm'>{theme}</p>
-                        <div className="flex justify-evenly gap-1">
-                          <div className='h-8 w-2 bg-primary rounded-md'></div>
-                          <div className='h-8 w-2 bg-secondary rounded-md'></div>
-                          <div className='h-8 w-2 bg-accent rounded-md'></div>
-                          <div className='h-8 w-2 bg-neutral rounded-md'></div>
+            <label className="input input-bordered border-neutral flex items-center gap-2 w-full max-w-sm text-sm mt-2">
+              Passing
+              <input
+                type="number"
+                name="passing_score"
+                className="text-sm w-full"
+                placeholder="% (Optional)"
+                value={formData.passing_score}
+                onChange={handleChange}
+              />
+            </label>
+
+            <label className="label cursor-pointer gap-6">
+              <span className="label-text text-neutral dark:text-neutral-content">
+                Shuffle Questions
+              </span>
+              <input
+                type="checkbox"
+                name="shuffle_question"
+                className="toggle toggle-primary"
+                checked={formData.shuffle_question}
+                onChange={handleChange}
+              />
+            </label>
+
+            <label className="label cursor-pointer gap-6">
+              <span className="label-text text-neutral dark:text-neutral-content">
+                Shuffle Options
+              </span>
+              <input
+                type="checkbox"
+                name="shuffle_option"
+                className="toggle toggle-primary"
+                checked={formData.shuffle_option}
+                onChange={handleChange}
+              />
+            </label>
+
+            <label
+              className="w-full flex flex-nowrap flex-row justify-between mt-4"
+              onClick={handleShowCustomSettings}
+            >
+              <span className="text-primary text-sm select-none underline">More Settings</span>
+              <IoMdSettings
+                className={`text-primary text-2xl transition-transform duration-200 ${
+                  isRotated ? 'rotate-90 mb-1.5' : ''
+                }`}
+              />
+            </label>
+
+            {showCustomSettings && (
+              <>
+                <label className="input input-bordered border-neutral flex items-center gap-2 text-sm w-full max-w-sm mt-1">
+                  Duration
+                  <input
+                    type="number"
+                    name="duration"
+                    className="grow text-sm"
+                    placeholder="Skip for no limit (in s)"
+                    value={formData.duration}
+                    onChange={handleChange}
+                  />
+                </label>
+
+                <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-1">
+                  Language
+                  <select
+                    className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+                    name="language"
+                    value={formData.language}
+                    onChange={handleChange}
+                  >
+                    <option value="English">English</option>
+                    <option value="Mandarin">Mandarin</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="French">French</option>
+                    <option value="Arabic">Arabic</option>
+                    <option value="Bengali">Bengali</option>
+                    <option value="Portuguese">Portuguese</option>
+                    <option value="Russian">Russian</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Punjabi">Punjabi</option>
+                    <option value="German">German</option>
+                    <option value="Javanese">Javanese</option>
+                    <option value="Korean">Korean</option>
+                    <option value="Telugu">Telugu</option>
+                  </select>
+                </label>
+
+                <div className="theme w-full">
+                  <p className="mb-1.5 text-neutral dark:text-neutral-content text-sm">
+                    Choose theme
+                  </p>
+                  <div className="flex flex-row gap-x-4 flex-nowrap overflow-x-scroll max-w-sm rounded-md py-3 px-4 bg-gray-300 dark:bg-gray-800">
+                    {themes.map((theme, index) => (
+                      <label
+                        className="flex flex-col justify-center items-center gap-y-3"
+                        key={index}
+                      >
+                        <div className="rounded" data-theme={theme}>
+                          <div className="flex justify-between items-center w-auto h-10 px-1.5 gap-x-4">
+                            <p className="text-sm">{theme}</p>
+                            <div className="flex justify-evenly gap-1">
+                              <div className="h-8 w-2 bg-primary rounded-md"></div>
+                              <div className="h-8 w-2 bg-secondary rounded-md"></div>
+                              <div className="h-8 w-2 bg-accent rounded-md"></div>
+                              <div className="h-8 w-2 bg-neutral rounded-md"></div>
+                            </div>
+                          </div>
                         </div>
+                        <input
+                          type="radio"
+                          value={theme}
+                          name="theme"
+                          className="radio radio-sm"
+                          onChange={handleChange}
+                          checked={formData.theme === theme}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+            <div className="py-3 bg-gray-300 dark:bg-gray-800 rounded-md px-3">
+              <div className="flex flex-row items-center gap-x-2">
+                <h2 className="mt-1 mb-2 font-bold text-primary text-xl">Questions</h2>
+              </div>
+
+              {formData.questions &&
+                formData.questions.map((question, index) => (
+                  <div key={question._id} className="mb-5">
+                    <div className="flex flex-row items-center justify-between w-full">
+                      <h3 className="font-bold text-primary mb-1">Question {index + 1}</h3>
+                      <div>
+                        <AiOutlineMinusCircle
+                          onClick={() => handleRemoveQuestion(question._id)}
+                          className="text-3xl mb-1 text-error"
+                        />
                       </div>
                     </div>
-                    <input type="radio" value={theme} name="theme" className="radio radio-sm" onChange={handleChange} checked={formData.theme === theme} />
-                  </label>
+
+                    <div className="border-b-2 border-t-2 border-neutral rounded-md pt-2 mt-1">
+                      <input
+                        className="input input-bordered border-neutral text-sm w-full max-w-sm mb-2"
+                        type="text"
+                        value={question.question_text}
+                        onChange={(e) => handleQuestionChange(e, question._id)}
+                      />
+                      <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm my-1">
+                        Question Type
+                        <select
+                          className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+                          name="question_type"
+                          value={question.question_type}
+                          onChange={(e) => {
+                            const newTypeValue = e.target.value;
+                            setFormData((prev) => ({
+                              ...prev,
+                              questions: prev.questions.map((q) => {
+                                if (q._id === question._id) {
+                                  const updatedCorrectAnswers =
+                                    newTypeValue === 'single_correct' && q.correct_answers.length > 1
+                                      ? [q.correct_answers[0]]
+                                      : q.correct_answers;
+                                  return {
+                                    ...q,
+                                    question_type: newTypeValue,
+                                    correct_answers: updatedCorrectAnswers,
+                                  };
+                                }
+                                return q;
+                              }),
+                            }));
+                          }}
+                        >
+                          <option value="single_correct">Single Correct</option>
+                          <option value="multi_correct">Multi Correct</option>
+                        </select>
+                      </label>
+                      <div className="mt-1">
+                        {question.options.map((option, ind) => (
+                          <div key={option._id} className="mb-1 flex flex-row items-center gap-x-2">
+                            <input
+                              className="input input-bordered border-neutral text-sm w-full max-w-sm"
+                              type="text"
+                              value={option.text}
+                              onChange={(e) => handleOptionChange(e, question._id, option._id)}
+                            />
+                            <label className="label cursor-pointer gap-6">
+                              <span className="label-text text-neutral dark:text-neutral-content">
+                                Correct
+                              </span>
+                              <input
+                                type="checkbox"
+                                name="correct_answer"
+                                className="toggle toggle-primary"
+                                checked={question.correct_answers.includes(option.id)}
+                                onChange={(e) =>
+                                  handleCorrectAnswerChange(question._id, option._id, e.target.checked)
+                                }
+                              />
+                            </label>
+                            <AiOutlineMinusCircle
+                              className="text-6xl text-error"
+                              onClick={() => handleRemoveOption(question._id, option._id)}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleAddOption(question._id)}
+                        className="btn btn-success btn-sm rounded-full text-white px-3 flex flex-row items-center gap-x-2 mb-2"
+                      >
+                        <AiOutlinePlusCircle /> Add Option
+                      </button>
+                      <label>
+                        <span className="text-sm font-bold">Reason for correct answer</span>
+                        <textarea
+                          className="textarea textarea-bordered border-neutral text-sm w-full h-32 max-w-sm mb-1 mt-1"
+                          type="text"
+                          value={question.reason}
+                          onChange={(e) => handleReasonChange(e, question._id)}
+                          placeholder="Reason (Optional)"
+                        ></textarea>
+                      </label>
+                    </div>
+                  </div>
                 ))}
-              </div>
-            </div>
-          </>
-        )}
-        <div className='py-3 bg-gray-300 dark:bg-gray-800 rounded-md px-3'>
-        <h2 className='mt-1 mb-2 font-bold text-primary text-xl'>Questions</h2>
-        {formData.questions && formData.questions.map((question, index) => (
-          <div key={question._id} className='mb-5'>
-            <div className="flex flex-row items-center justify-between w-full">
-              <h3 className='font-bold text-primary mb-1'>Question {index + 1}</h3>
-              <div>
-                  <AiOutlineMinusCircle onClick={() => handleRemoveQuestion(question._id)} className='text-3xl mb-1 text-error' />
-                
-              </div>
-            </div>
-            
-          <div className='border-b-2 border-t-2 border-neutral rounded-md pt-2 mt-1'>
-            <input className='input input-bordered border-neutral text-sm w-full max-w-sm mb-2' type="text" value={question.question_text} onChange={e => handleQuestionChange(e, question._id)} />
-            <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm my-1">
-              Question Type
-              <select className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content" name="question_type" value={question.question_type} onChange={e => {
-                const newTypeValue = e.target.value;
-                setFormData(prev => ({
-                  ...prev,
-                  questions: prev.questions.map(q => {
-                    if (q._id === question._id) {
-                      const updatedCorrectAnswers = newTypeValue === 'single_correct' && q.correct_answers.length > 1 ? [q.correct_answers[0]] : q.correct_answers;
-                      return { ...q, question_type: newTypeValue, correct_answers: updatedCorrectAnswers };
-                    }
-                    return q;
-                  })
-                }));
-              }}>
-                <option value="single_correct">Single Correct</option>
-                <option value="multi_correct">Multi Correct</option>
-              </select>
-            </label>
-            <div className='mt-1'>
-              {question.options.map((option, ind) => (
-                <div key={option._id} className="mb-1 flex flex-row items-center gap-x-2">
-                  <input className='input input-bordered border-neutral text-sm w-full max-w-sm' type="text" value={option.text} onChange={e => handleOptionChange(e, question._id, option._id)} />
-                  <label className="label cursor-pointer gap-6">
-                    <span className="label-text text-neutral dark:text-neutral-content">Correct</span>
-                    <input type="checkbox" name="correct_answer" className="toggle toggle-primary" checked={question.correct_answers.includes(option.id)} onChange={e => handleCorrectAnswerChange(question._id, option._id, e.target.checked)} />
-                  </label>
-                    <AiOutlineMinusCircle className='text-6xl text-error' onClick={() => handleRemoveOption(question._id, option._id)} />
+                <div className='flex flex-row my-1 gap-x-2'>
+              <button
+                type="button"
+                onClick={handleAddQuestion}
+                className="btn btn-success btn-sm rounded-full text-white px-3 flex flex-row items-center gap-x-2"
+              >
+                <AiOutlinePlusCircle /> Add Question
+              </button>
+               <button
+                  type="button"
+                  onClick={() => setAiModalVisible(true)}
+                  className="btn btn-primary btn-sm rounded-full text-white px-3 flex flex-row items-center gap-x-2"
+                >
+                  <BsStars /> Add with AI
+                </button>
                 </div>
-              ))}
             </div>
-            <button type="button" onClick={() => handleAddOption(question._id)} className='btn btn-success btn-sm rounded-full text-white px-3 flex flex-row items-center gap-x-2 mb-2'>
-              <AiOutlinePlusCircle /> Add Option
-            </button>
-            <label>
-            <span className='text-sm font-bold'>Reason for correct answer</span>
-            <textarea className='textarea textarea-bordered border-neutral text-sm w-full h-32 max-w-sm mb-1 mt-1' type="text" value={question.reason} onChange={e => handleReasonChange(e, question._id)} placeholder="Reason (Optional)" > </textarea>
-            </label>
-          </div>
-          </div>
-        ))}
-        <button type="button" onClick={handleAddQuestion} className='btn btn-success btn-sm rounded-full text-white px-3 flex flex-row items-center gap-x-2'>
-          <AiOutlinePlusCircle /> Add Question
-        </button>
+            <div className="mx-auto mt-4">
+              <button
+                type="submit"
+                className="btn btn-primary disabled:text-base-100 disabled:bg-primary"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    {' '}
+                    <RiLoader2Fill className="animate-spin" /> Saving{' '}
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
+              </button>
+            </div>
+          </form>
         </div>
-        <div className='mx-auto mt-4'>
-          <button type="submit" className='btn btn-primary disabled:text-base-100 disabled:bg-primary' disabled={loading}>
-            {loading ? <> <RiLoader2Fill className='animate-spin' /> Saving </> : 'Save Changes'}
-          </button>
+      )}
+      {dataStatus == 0 ? (
+        <div
+          role="alert"
+          className="alert alert-info mx-auto w-3/4 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2"
+        >
+          <RiLoader2Fill className="animate-spin" />
+          <span className="text-sm">{dataMsg}</span>
         </div>
-      </form>
-    </div>
-    </>
-    }
-    {
-        dataStatus == 0 ? (
-         <div role="alert" className="alert alert-info mx-auto w-3/4 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2">
-          <RiLoader2Fill className='animate-spin' />
-  <span className='text-sm'>{dataMsg}</span>
-</div>
-          ) : (
-          dataStatus == -1 ? (
-            <div className=' mx-auto w-3/4 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2 text-center'>
-            <div role="alert" className="alert alert-error w-full">
-              <MdErrorOutline />
-              <span className='text-sm'>{dataMsg}</span>
-            </div>
-            <br />
-            <br />
-            <Link href='/' className='underline underline-offset-3 text-info'>Go to home</Link>
-            </div>
-            ): ''
-        )
-      }
+      ) : dataStatus == -1 ? (
+        <div className=" mx-auto w-3/4 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2 text-center">
+          <div role="alert" className="alert alert-error w-full">
+            <MdErrorOutline />
+            <span className="text-sm">{dataMsg}</span>
+          </div>
+          <br />
+          <br />
+          <Link href="/" className="underline underline-offset-3 text-info">
+            Go to home
+          </Link>
+        </div>
+      ) : (
+        ''
+      )}
     </>
   );
 }
