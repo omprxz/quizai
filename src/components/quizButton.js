@@ -22,9 +22,10 @@ const useJQueryConfirm = () => {
 
 export function CreateQuizButton() {
   return (
-    <div className='flex justify-center items-center'>
-      <Link href="/dashboard/quiz/create" className='border border-[3px] rounded-md w-[125px] md:w-[145px] h-[125px] md:h-[145px] max-w-[125px] md:max-w-[145px] max-h-[125px] md:max-h-[145px] border-primary inline-block flex items-center justify-center'>
-        <FaPlus className='text-5xl text-primary' />
+    <div className='flex justify-center items-center mt-2'>
+      <Link href="/dashboard/quiz/create" className='border border-[3px] rounded-md w-[125px] md:w-[145px] h-[125px] md:h-[145px] max-w-[125px] md:max-w-[145px] max-h-[125px] md:max-h-[145px] border-black dark:border-white inline-block flex flex-col items-center justify-center gap-2'>
+        <FaPlus className='text-4xl text-black dark:text-white' />
+        <p className='text-black dark:text-white font-bold pt-1.5'>Create Quiz</p>
       </Link>
     </div>
   );

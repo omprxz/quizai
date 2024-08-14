@@ -89,6 +89,7 @@ export default function Page({ params }) {
 };
 
   const handleSubmit = (tOver) => {
+    setIsSubmitted(true)
   let totalCorrect = 0;
   let totalWrong = 0;
   let notAttempted = 0;

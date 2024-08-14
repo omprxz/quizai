@@ -1,22 +1,27 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { IoMdSettings } from "react-icons/io";
 import axios from 'axios';
+import { IoMdSettings } from "react-icons/io";
+import { IoClose } from "react-icons/io5";
 import { RiLoader2Fill } from "react-icons/ri";
+import { LuFilePlus2 } from "react-icons/lu";
 
 export default function Page() {
   const router = useRouter();
-
+  const maxFileSize = 50 * 1024 * 1024;
+  const maxFiles = 2;
   const [isRotated, setIsRotated] = useState(false);
   const [showCustomSettings, setShowCustomSettings] = useState(false);
   const [loading, setLoading] = useState(false)
   
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
-    total_questions: '10',
+    description: 'about resume',
+    useFile: false,
+    files: [],
+    total_questions: '3',
     visibility: 'public',
     level: 'Medium',
     type: 'single_correct',
@@ -30,6 +35,8 @@ export default function Page() {
     shuffle_option: false,
     theme: "autumn"
   });
+  
+  const fileInputRef = useRef(null)
   
   const themes = [
       "autumn",
@@ -95,7 +102,68 @@ export default function Page() {
 
   const maxChars = 5000;
   const remainingChars = maxChars - formData.description.length;
+  
+  const handleFileInputButtonClick = () => {
+    if(fileInputRef.current){
+      if(formData.files.length < maxFiles){
+      fileInputRef.current.click()
+      }else{
+        toast.error(`You can only upload up to ${maxFiles} files.`);
+      }
+    }
+  }
+  
+  const handleFileChange = (e) => {
+  if(formData.files.length == maxFiles){
+    toast.error(`You can only upload up to ${maxFiles} files.`);
+    e.target.value = null;
+    return;
+  }
+  const selectedFiles = Array.from(e.target.files);
 
+  const validFiles = selectedFiles.filter(file => file.size <= maxFileSize);
+  
+  if((selectedFiles.length !== validFiles.length) && validFiles.length !== 0){
+    toast.error(`Files larger than ${maxFileSize/(1024*1024)}MB excluded.`)
+  }
+  
+  const availableSpace = maxFiles - formData.files.length
+  let filesToAdd;
+  if(validFiles.length > availableSpace){
+   filesToAdd = validFiles.slice(0, maxFiles - formData.files.length);
+   toast.error(`You can only upload up to ${maxFiles} files.`);
+  }else{
+    filesToAdd = validFiles
+  }
+
+
+  if (validFiles.length === 0) {
+    if(selectedFiles.length == 1){
+    toast.error('Selected file is too large.(Limit '+maxFileSize/(1024*1024)+'MB)');
+    }else{
+    toast.error('All selected files are too large.(Limit '+maxFileSize/(1024*1024)+'MB)');
+    }
+    e.target.value = null;
+    return;
+  }
+
+  setFormData(prev => ({
+    ...prev,
+    files: [...prev.files, ...filesToAdd]
+  }));
+  e.target.value = null;
+}
+
+const handleFileRemove = (index) => {
+  setFormData(prev => {
+    const updatedFiles = prev.files.filter((_, i) => i !== index);
+    return {
+      ...prev,
+      files: updatedFiles
+    };
+  });
+}
+  
   const handleChange = (event) => {
     const { name, type, checked } = event.target;
 
@@ -135,7 +203,7 @@ export default function Page() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setLoading(true)
-    const { total_questions, duration, passing_score, description } = formData;
+    const { total_questions, duration, passing_score, description, useFile } = formData;
     
     if(!description){
       toast.error('Quiz description is required for creating quizes.')
@@ -169,22 +237,31 @@ export default function Page() {
         setLoading(false)
       return;
       }
-      
+    
+    if(formData.files.length > 0 && parseInt(total_questions) > 10){
+      toast.error("Max questions limit with file upload is 10 only")
+      setLoading(false)
+      return;
+    }
+    
     const processedData = {
       ...formData,
+      files: useFile ? formData.files : [],
       total_questions: formData.total_questions ? parseInt(+formData.total_questions) : 10,
       type: formData['type'] ? formData['type'] : 'single_correct',
       theme: formData['theme'] ? formData['theme'] : 'autumn',
       duration: formData.duration ? +formData.duration : null
     };
-
+    
+    console.log(processedData)
+    
     setLoading(true)
-   axios.post('/api/quiz', processedData)
+   axios.post('/api/quiz', processedData, { headers: { 'Content-Type': 'multipart/form-data' } })
   .then(response => {
     setLoading(false);
     toast.success(response.data.message);
     if(response.data.success){
-      router.push(`/dashboard/quiz/${response.data.data.quizId}/edit`)
+      //router.push(`/dashboard/quiz/${response.data.data.quizId}/edit`)
     }
   })
   .catch(error => {
@@ -204,7 +281,7 @@ export default function Page() {
   }, []);
 
   return (
-    <div className='p-4'>
+    <div className='p-4 pt-2'>
       <h1 className='font-bold text-primary text-xl px-2'>Create Quiz</h1>
       <form className='mt-4 px-2 flex flex-col justify-center items-start w-full gap-y-3 mb-10' onSubmit={handleSubmit}>
         
@@ -233,6 +310,53 @@ export default function Page() {
           ></textarea>
           <p className='text-sm text-neutral dark:text-neutral-content'>{remainingChars}/{maxChars} characters remaining</p>
         </label>
+        
+        <label className="label cursor-pointer gap-6">
+              <span className="label-text text-neutral dark:text-neutral-content">Include files to generate questions</span>
+              <input
+                type="checkbox"
+                name="useFile"
+                className="toggle toggle-primary"
+                checked={formData.useFile}
+                onChange={handleChange}
+              />
+            </label>
+        
+        {formData.useFile && (
+  <div className='w-full max-w-sm border border-neutral rounded-md p-2'>
+    <input
+      type="file"
+      name='files'
+      className='hidden'
+      ref={fileInputRef}
+      onChange={handleFileChange}
+      multiple
+    />
+    <button type='button' className='btn btn-primary w-full' onClick={handleFileInputButtonClick}>
+      <LuFilePlus2 /> Add File
+    </button>
+    <ul className='mt-3 flex flex-col gap-2'>
+      {formData.files.length === 0 ? (
+        <li className='text-neutral dark:text-neutral-content text-sm text-center'>No files selected.</li>
+      ) : (
+        formData.files.map((file, index) => (
+          <li key={index} className='text-sm flex flex-col gap-1 border border-neutral px-3 py-1.5 rounded relative'>
+            <span className='overflow-hidden w-full text-ellipsis whitespace-nowrap'>{file.name}</span>
+            <p className='text-xs flex gap-1'>
+              <span className='uppercase'>{file.type.split('/')[1]}</span>
+              <span className='font-black'>·</span>
+              <span>{file.size < 1024 ? `${file.size} B` : file.size < 1024 * 1024 ? `${(file.size / 1024).toFixed(1)} KB` : `${(file.size / (1024 * 1024)).toFixed(1)} MB`}</span>
+            </p>
+            <IoClose
+              className='absolute top-1/2 -translate-y-1/2 right-3 text-error text-xl cursor-pointer'
+              onClick={() => handleFileRemove(index)}
+            />
+          </li>
+        ))
+      )}
+    </ul>
+  </div>
+)}
 
         <label className="input input-bordered border-neutral flex items-center gap-2 text-sm w-full max-w-sm mt-1">
           Questions

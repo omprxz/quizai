@@ -20,6 +20,7 @@
     "bcryptjs": "^2.4.3",
     "jquery": "^3.7.1",
     "jquery-confirm": "^3.3.4",
+    "jsonrepair": "^3.8.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
     "next": "^13.5.6",
