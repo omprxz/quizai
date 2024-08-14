@@ -18,10 +18,10 @@ export default function Page() {
   
   const [formData, setFormData] = useState({
     title: '',
-    description: 'about resume',
+    description: '',
     useFile: false,
     files: [],
-    total_questions: '3',
+    total_questions: '5',
     visibility: 'public',
     level: 'Medium',
     type: 'single_correct',
@@ -33,15 +33,15 @@ export default function Page() {
     language: 'English',
     shuffle_question: false,
     shuffle_option: false,
-    theme: "autumn"
+    theme: "light"
   });
   
   const fileInputRef = useRef(null)
   
   const themes = [
-      "autumn",
       "light",
       "dark",
+      "autumn",
       "cupcake",
       "bumblebee",
       "emerald",
