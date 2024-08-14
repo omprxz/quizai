@@ -10,7 +10,7 @@ import { LuFilePlus2 } from "react-icons/lu";
 
 export default function Page() {
   const router = useRouter();
-  const maxFileSize = 10 * 1024 * 1024;
+  const maxFileSize = 4 * 1024 * 1024;
   const maxFiles = 2;
   const [isRotated, setIsRotated] = useState(false);
   const [showCustomSettings, setShowCustomSettings] = useState(false);
