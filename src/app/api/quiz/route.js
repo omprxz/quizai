@@ -18,22 +18,7 @@ import { jsonrepair } from 'jsonrepair'
 
 export const maxDuration = 60;
 export const maxFiles = 2;
-export const maxFileSize = 50 * 1024 * 1024;
-
-async function fileToGenerativePart(filePath, mimeType) {
-    try {
-        const fileData = await fs.readFile(filePath);
-        return {
-            inlineData: {
-                data: fileData.toString('base64'),
-                mimeType
-            }
-        };
-    } catch (error) {
-        console.error('Error reading file:', error.message);
-        throw error;
-    }
-}
+export const maxFileSize = 10 * 1024 * 1024;
 
 async function uploadToGemini(path, mimeType) {
   const apiKey = process.env.GEMINI_API_KEY;
