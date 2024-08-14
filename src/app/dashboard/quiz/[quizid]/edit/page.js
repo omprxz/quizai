@@ -267,33 +267,46 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
         if (response.data.success) {
           
           $.confirm({
-    title: 'Share Quiz!',
+    title: 'Quiz Edited!',
     content: `<p style="padding: 10px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;" class="form-control">${url}</p>`,
     buttons: {
-        'submit': {
-            text: 'Share',
-            btnClass: 'btn-primary px-2',
-            action: function () {
-              if(navigator.share){
-                navigator.share({
-                  title: formData['title'],
-                  text: `Check out this quiz: \n${formData['title']}`,
-                  url: url
-                }).catch((error) => {
-                  console.error('Error sharing', error);
-                });
-              }
-              navigator.clipboard.writeText(url).then(()=>{
-                toast.success('Link copied');
-              }).catch((e) => {
-                console.log(e);
-                toast.error('Error copying');
-              });
-            }
-        },
         'cancel': {
           text: 'Cancel',
-          btnClass: 'btn px-2',
+          btnClass: 'px-2',
+        },
+        'copy': {
+            text: 'Copy',
+            btnClass: 'px-2',
+            action: function () {
+              if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+        toast.success('Link copied');
+    }).catch((e) => {
+        console.log(e);
+        toast.error('Error copying');
+    });
+} else {
+    const textArea = document.createElement('textarea');
+    textArea.value = url;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        toast.success('Link copied');
+    } catch (e) {
+        console.log(e);
+        toast.error('Error copying');
+    }
+    document.body.removeChild(textArea);
+}
+            }
+        },
+        'home': {
+            text: 'Home',
+            btnClass: 'px-2',
+            action: function () {
+              router.push('/dashboard')
+            }
         },
     },
     useBootstrap: true,

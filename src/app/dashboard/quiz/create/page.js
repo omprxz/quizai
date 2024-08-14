@@ -7,9 +7,23 @@ import { IoMdSettings } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import { RiLoader2Fill } from "react-icons/ri";
 import { LuFilePlus2 } from "react-icons/lu";
+import $ from 'jquery';
+import dynamic from 'next/dynamic';
+
+const useJQueryConfirm = () => {
+  useEffect(() => {
+    const loadJQueryConfirm = async () => {
+      const jQueryConfirm = (await import('jquery-confirm')).default;
+      const jQueryConfirmCss = await import('jquery-confirm/dist/jquery-confirm.min.css');
+    };
+
+    loadJQueryConfirm();
+  }, []);
+};
 
 export default function Page() {
   const router = useRouter();
+  useJQueryConfirm()
   const maxFileSize = 4 * 1024 * 1024;
   const maxFiles = 2;
   const [isRotated, setIsRotated] = useState(false);
@@ -261,12 +275,44 @@ const handleFileRemove = (index) => {
     setLoading(false);
     toast.success(response.data.message);
     if(response.data.success){
+      
+      $.confirm({
+    title: 'Quiz Created!',
+    content: `<p style="padding: 10px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;" class="form-control">${response?.data?.message || 'Quiz created'}</p>`,
+    buttons: {
+        edit: {
+            text: 'Edit',
+            btnClass: 'px-2',
+            action: function () {
+                router.push('/dashboard/quiz/'+response.data.data.quizId+'/edit');
+            }
+        },
+        view: {
+            text: 'View',
+            btnClass: 'px-2',
+            action: function () {
+                router.push('/dashboard/quiz/'+response.data.data.quizId+'/view');
+            }
+        },
+        home: {
+            text: 'Home',
+            btnClass: 'px-2',
+            action: function () {
+                router.push('/dashboard');
+            }
+        }
+    },
+    useBootstrap: true,
+    theme: 'supervan'
+});
+      
       //router.push(`/dashboard/quiz/${response.data.data.quizId}/edit`)
     }
   })
   .catch(error => {
+    console.log(error)
     setLoading(false);
-    toast.error(error.response.data.message);
+    toast.error(error?.response?.data?.message || error?.message);
   })
   .finally(() => {
     setLoading(false);
