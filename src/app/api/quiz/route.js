@@ -291,8 +291,10 @@ export async function POST(req) {
                     { status: 400 }
                 );
             }
-            
-            const uploadsDir = path.join(process.cwd(), 'tmp')
+            let uploadsDir = path.join(process.cwd(), 'tmp')
+            if(process.env.NODE_ENV == 'production'){
+              uploadsDir = '/tmp'
+            }
     await fs.mkdir(uploadsDir, { recursive: true });
 
     const savedFiles = [];
