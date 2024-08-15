@@ -44,6 +44,8 @@ export default function Page() {
     <div>
       <div className='flex flex-col gap-6 my-4 justify-center items-center px-3 w-full'>
         <CreateQuizButton />
+      <div className='flex flex-col md:flex-row md:flex-wrap gap-y-6 gap-x-4 my-4 justify-center items-center px-3 w-full'>
+        
         {quizList.length > 0 && quizList.map((quiz, index) => (
           <QuizButton
             key={index}
@@ -60,6 +62,7 @@ export default function Page() {
             fetchQuizList={fetchQuizList}
           />
         ))}
+      </div>
       </div>
       <div className={`w-full flex flex-col justify-center items-center px-5 md:px-0 mt-14 ${dataStatus === 1 && 'hidden'}`}>
       <div className={`alert w-full max-w-sm flex flex-col gap-x-1 justify-center items-center text-sm ${dataStatus === 0 ? 'alert-info' : (dataStatus === 404 ? 'alert-info' : 'alert-error')} ${dataStatus === 1 && 'hidden'}`}>
