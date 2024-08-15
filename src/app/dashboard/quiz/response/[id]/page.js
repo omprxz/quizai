@@ -148,7 +148,7 @@ export default function Page({ params }) {
       <div className="collapse-content">
         {responseDetails.quizDetails.createdAt !== responseDetails.quizDetails.updatedAt && (
           <p className='text-sm mb-3'>
-            Some questions may display different details in "View your answers" because they might have been modified.
+            Some questions may display different details in &quot;View your answers&quot; because they might have been modified.
           </p>
         )}
         <div className="flex flex-col justify-center items-center gap-y-3 text-xs">
