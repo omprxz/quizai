@@ -151,7 +151,6 @@ export default function Page({ params }) {
     }));
   };
 
-
   const handleAddQuestion = () => {
     setFormData(prev => ({
       ...prev,
@@ -402,14 +401,22 @@ export default function Page({ params }) {
 
     if (type === 'checkbox') {
       setAiFormData((prevData) => {
+        
+        if(['single_correct', 'multi_correct', 'subjective'].includes(name)){
         const updatedType = checked
           ? [...prevData.type, name]
           : prevData.type.filter((item) => item !== name);
-
-        return {
+          return {
           ...prevData,
           type: updatedType,
         };
+        }
+        const newCheckState = {
+          ...prevData,
+          [name]: checked
+        }
+        return newCheckState
+        
       });
     } else {
       setAiFormData((prevData) => ({
@@ -489,7 +496,7 @@ export default function Page({ params }) {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={4}
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
@@ -532,10 +539,10 @@ export default function Page({ params }) {
                 </div>
               )}
               <div className="type">
-                <p className='mb-1 text-neutral dark:text-neutral-content text-xs'>Type (MCQs)</p>
-                <div className="join">
+                <p className='mb-1 text-neutral dark:text-neutral-content text-xs'>Type</p>
+                <div className="flex flex-wrap gap-2">
                   <input
-                    className="join-item btn btn-sm"
+                    className="btn btn-sm"
                     type="checkbox"
                     name="single_correct"
                     aria-label="Single Correct"
@@ -543,7 +550,7 @@ export default function Page({ params }) {
                     onChange={handleAiFormChange}
                   />
                   <input
-                    className="join-item btn btn-sm"
+                    className="btn btn-sm"
                     type="checkbox"
                     name="multi_correct"
                     aria-label="Multi Correct"
@@ -551,7 +558,7 @@ export default function Page({ params }) {
                     onChange={handleAiFormChange}
                   />
                   <input
-                    className="join-item btn btn-sm"
+                    className="btn btn-sm"
                     type="checkbox"
                     name="subjective"
                     aria-label="Subjective"
@@ -560,7 +567,7 @@ export default function Page({ params }) {
                   />
                 </div>
               </div>
-              <div className="level mb-1">
+              <div className="level mb-2">
                 <p className="mb-1 text-neutral dark:text-neutral-content text-xs">Level</p>
                 <div className="join">
                   <input
@@ -630,6 +637,7 @@ export default function Page({ params }) {
                 />
               </label>
             </div>
+            <div className='w-full flex justify-center'>
             <button
               onClick={handleGenerateQuestions}
               className="btn btn-primary btn-sm mt-4 disabled:text-base-100 disabled:bg-primary"
@@ -640,9 +648,10 @@ export default function Page({ params }) {
                   <RiLoader2Fill className="animate-spin" /> Generating...
                 </>
               ) : (
-                'Add Questions'
+                <> <BsStars /> Generate </>
               )}
             </button>
+            </div>
           </div>
         </div>
       )}

@@ -515,7 +515,7 @@ export default function Page() {
         {showCustomSettings && (
           <>
             <div className="type w-full max-w-sm">
-  <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Type (MCQs)</p>
+  <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Type</p>
   <div className="join">
     <input
       className="join-item btn text-sm"
