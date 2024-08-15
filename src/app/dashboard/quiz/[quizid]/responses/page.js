@@ -1,8 +1,7 @@
 "use client"
 import axios from 'axios';
-import {TdQuiz} from '@/components/table/Td';
+import { TdQuiz } from '@/components/table/Td';
 import { useState, useEffect } from "react";
-import { toast } from 'react-hot-toast';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { useTheme } from '@mui/material/styles';
 
@@ -13,17 +12,27 @@ export default function Page({ params }) {
   const [error, setError] = useState(null);
   const quizid = params.quizid;
 
-  useEffect(() => {
+  const fetchData = (loadingP) => {
+    setIsLoading(loadingP);
     axios.get('/api/quiz/response/all?filter=quizid&id=' + quizid)
       .then(res => {
         setResponses(res.data.data.responses);
         setIsLoading(false);
       })
       .catch((err) => {
-        console.log(err);
         setError(err?.response?.data?.message || err?.message);
         setIsLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchData(true);
+
+    const intervalId = setInterval(() => {
+      fetchData(false);
+    }, 10000);
+
+    return () => clearInterval(intervalId);
   }, [quizid]);
 
   const formatTime = (timeInSeconds) => {
@@ -55,61 +64,62 @@ export default function Page({ params }) {
         <div className="text-center">No responses available</div>
       ) : (
         <div className='w-full flex justify-center items-center select-none'>
-        <PieChart
-  series={[
-    {
-      data: [
-        {
-          id: 0,
-          value: failedPercentage.toFixed(1),
-          label: 'Failed',
-          color: 'hsl(0, 72.2%, 50.6%)',
-        },
-        {
-          id: 1,
-          value: passedPercentage.toFixed(1),
-          label: 'Passed',
-          color: 'hsl(142, 70.6%, 45.3%)',
-        },
-      ],
-      arcLabel: (item) => `${item.value}%`,
-      arcLabelMinAngle: 30,
-      highlightScope: {
-        faded: 'global',
-        highlighted: 'item',
-      },
-      faded: {
-        innerRadius: 30,
-        additionalRadius: -30,
-        color: 'hsl(220, 8.9%, 75%)',
-      },
-      highlighted: {
-        innerRadius: -3,
-        additionalRadius: 3,
-      },
-    },
-  ]}
-  width={400}
-  height={200}
-  slotProps={{
-    pieArcLabel: {
-      sx: {
-        fontSize: '1rem',
-        [theme.breakpoints.down('sm')]: {
-          fontSize: '0.75rem',
-        },
-        fill: '#fff',
-      },
-    },
-    legend: {
-      labelStyle: {
-        fill: 'hsl(220, 8.9%, 46.1%)',
-      },
-    },
-  }}
-/>
-        
-    </div>
+        <div className='w-full max-w-sm'>
+          <PieChart
+            series={[
+              {
+                data: [
+                  {
+                    id: 0,
+                    value: failedPercentage.toFixed(1),
+                    label: 'Failed',
+                    color: 'hsl(0, 72.2%, 50.6%)',
+                  },
+                  {
+                    id: 1,
+                    value: passedPercentage.toFixed(1),
+                    label: 'Passed',
+                    color: 'hsl(142, 70.6%, 45.3%)',
+                  },
+                ],
+                arcLabel: (item) => `${item.value}%`,
+                arcLabelMinAngle: 30,
+                highlightScope: {
+                  faded: 'global',
+                  highlighted: 'item',
+                },
+                faded: {
+                  innerRadius: 30,
+                  additionalRadius: -30,
+                  color: 'hsl(220, 8.9%, 75%)',
+                },
+                highlighted: {
+                  innerRadius: -3,
+                  additionalRadius: 3,
+                },
+              },
+            ]}
+            width={400}
+            height={200}
+            slotProps={{
+              pieArcLabel: {
+                sx: {
+                  fontSize: '1rem',
+                  [theme.breakpoints.down('sm')]: {
+                    fontSize: '0.75rem',
+                  },
+                  fill: '#fff',
+                },
+              },
+              legend: {
+                labelStyle: {
+                  fill: 'hsl(220, 8.9%, 46.1%)',
+                },
+              },
+            }}
+          />
+          </div>
+        </div>
       )}
       <section className='w-full px-3 my-2 pt-3 max-w-full overflow-x-scroll'>
         <table className="table w-full max-w-full text-sm overflow-x-scroll text-center">

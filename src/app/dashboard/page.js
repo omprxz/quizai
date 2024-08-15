@@ -42,7 +42,7 @@ export default function Page() {
   
   return (
     <div>
-      <div className='flex flex-col gap-6 my-4 justify-evenly md:justify-start px-3'>
+      <div className='flex flex-col gap-6 my-4 justify-center items-center px-3 w-full'>
         <CreateQuizButton />
         {quizList.length > 0 && quizList.map((quiz, index) => (
           <QuizButton
@@ -61,11 +61,13 @@ export default function Page() {
           />
         ))}
       </div>
-      <div className={`alert w-4/5 mx-auto mt-14 ${dataStatus === 0 ? 'alert-info' : (dataStatus === 404 ? 'alert-info' : 'alert-error')} ${dataStatus === 1 && 'hidden'}`}>
+      <div className={`w-full flex flex-col justify-center items-center px-5 md:px-0 mt-14 ${dataStatus === 1 && 'hidden'}`}>
+      <div className={`alert w-full max-w-sm flex flex-col gap-x-1 justify-center items-center text-sm ${dataStatus === 0 ? 'alert-info' : (dataStatus === 404 ? 'alert-info' : 'alert-error')} ${dataStatus === 1 && 'hidden'}`}>
         {
-          dataStatus === 0 ? <RiLoader2Fill className='text-2xl animate-spin' /> : (dataStatus === 404 ? '' : <MdErrorOutline className='text-2xl' />)
+          dataStatus === 0 ? <RiLoader2Fill className='animate-spin' /> : (dataStatus === 404 ? '' : <MdErrorOutline className='text-xl' />)
         }
         {dataMsg}
+        </div>
       </div>
     </div>
   );

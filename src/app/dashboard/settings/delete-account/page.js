@@ -36,7 +36,7 @@ export default function DeleteAccountPage() {
         </p>
         <button
           onClick={() => setShowModal(true)}
-          className={`btn btn-error w-full`}
+          className={`btn btn-error w-full text-white`}
           disabled={loading}
         >
           {loading ? 'Deleting...' : 'Delete Account'}

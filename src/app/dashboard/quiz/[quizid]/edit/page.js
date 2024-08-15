@@ -428,14 +428,14 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
   return (
     <>
       {aiModalVisible && (
-  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 p-2">
-    <div className="bg-neutral-content dark:bg-neutral rounded-lg py-3 px-4 w-full max-w-xs relative z-30">
+  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm p-2 z-40 overflow-hidden">
+    <div className="bg-neutral-content dark:bg-neutral shadow-md shadow-neutral rounded-lg py-5 px-4 w-full max-w-xs relative z-30 overflow-auto">
       <button
         onClick={() => setAiModalVisible(false)}
-        className="absolute top-2 right-2"
+        className="absolute top-2.5 right-2.5"
       >
         <svg
-          className="h-5 w-5"
+          className="h-6 w-6 text-primary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -449,7 +449,7 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
           />
         </svg>
       </button>
-      <h2 className="text-lg font-semibold mb-2">Generate Questions with AI</h2>
+      <h2 className="text-lg font-semibold mb-2 mt-1.5">Generate Questions with AI</h2>
       <div className="space-y-2">
         <label className="label cursor-pointer gap-2">
           <span className="label-text text-neutral dark:text-neutral-content text-sm">
@@ -529,7 +529,7 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
         <label className="input input-sm input-bordered border-neutral flex items-center gap-1 text-xs w-full max-w-xs mt-1">
           Language
           <select
-            className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content text-xs select-sm"
+            className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-none text-neutral dark:text-neutral-content text-xs select-sm ms-1"
             name="language"
             value={aiFormData.language}
             onChange={handleAiFormChange}
@@ -581,12 +581,12 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
   </div>
 )}
       {formData._id && (
-        <div className="p-4">
-          <h1 className="font-bold text-primary text-xl px-2">Edit Quiz</h1>
+        <div className="px-1 py-3 w-full flex justify-center">
           <form
-            className="mt-4 px-2 flex flex-col justify-center items-start w-full gap-y-3 mb-10"
+            className="mt-1 px-2 flex flex-col justify-center items-start w-full gap-y-3 mb-10 max-w-sm"
             onSubmit={handleSubmit}
           >
+          <h1 className="font-bold text-primary text-xl px-2">Edit Quiz</h1>
             <div className="w-full">
               <label className="input input-bordered border-neutral flex items-center gap-2 text-sm w-full max-w-sm mt-1">
                 Title
@@ -921,15 +921,15 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
       {dataStatus == 0 ? (
         <div
           role="alert"
-          className="alert alert-info mx-auto w-3/4 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2"
+          className="alert alert-info mx-auto w-3/4 max-w-sm absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2"
         >
-          <RiLoader2Fill className="animate-spin" />
+          <RiLoader2Fill className="animate-spin text-sm" />
           <span className="text-sm">{dataMsg}</span>
         </div>
       ) : dataStatus == -1 ? (
         <div className=" mx-auto w-3/4 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2 text-center">
-          <div role="alert" className="alert alert-error w-full">
-            <MdErrorOutline />
+          <div role="alert" className="alert alert-error w-full max-w-sm">
+            <MdErrorOutline className='text-xl' />
             <span className="text-sm">{dataMsg}</span>
           </div>
           <br />

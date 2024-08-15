@@ -72,14 +72,14 @@ export function QuizButton({ id, title, visibility, createdAt, total_questions, 
   return (
     <>
       <dialog id="deleting" className="modal">
-        <div className="modal-box">
+        <div className="modal-box glass">
           <h3 className="font-bold text-lg">Deleting...</h3>
           <div className='flex justify-center mt-3'>
             <RiLoader2Fill className='text-3xl animate-spin' />
           </div>
         </div>
       </dialog>
-      <li className="flex flex-col gap-3 md:flex-row shadow-md shadow-neutral bg-primary-content px-3 py-4 rounded-md">
+      <li className="flex flex-col gap-3 shadow-md shadow-neutral bg-primary-content px-3 py-4 rounded-md w-full max-w-sm">
         <div className='flex gap-2 items-center'>
           <MdSchool className="text-primary text-xl shrink-0 mr-2" />
           <Link href={`/dashboard/quiz/${id}/view`} className="font-medium text-ellipsis whitespace-nowrap overflow-hidden">

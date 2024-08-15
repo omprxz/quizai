@@ -44,7 +44,7 @@ const Header = () => {
     <>
       {ppOpen && (
         <div ref={menuRef} className="fixed top-12 right-8 p-3 z-20">
-          <div className="rounded-md border p-3 flex flex-col justify-start gap-2 text-sm bg-neutral-content dark:bg-neutral">
+          <div className="rounded p-3 flex flex-col justify-start gap-2 text-sm bg-neutral text-white glass shadow-sm shadow-neutral">
             <Link href='/dashboard/settings'>Settings</Link>
             <hr />
             <button onClick={logOut}>Logout</button>

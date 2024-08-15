@@ -270,12 +270,10 @@ export default function Page({ params }) {
     <button>close</button>
   </form>
 </dialog>
-
       </div>
       
-      
-      <div className="min-h-screen px-4 py-2 pb-12" data-theme={quizDetails.theme}>
-        <div className="flex flex-col items-start justify-center gap-2">
+      <div className="min-h-screen px-4 py-2 pb-12 w-full flex justify-center" data-theme={quizDetails.theme}>
+        <div className="flex flex-col justify-center gap-2 w-full max-w-sm">
           <h1 className="font-bold mt-2 text-2xl">{quizDetails.title ? quizDetails.title : 'No title'}</h1>
           <p className="text-sm text-neutral">Created by {quizDetails.createdBy}</p>
           <div className="breadcrumbs text-xs">
@@ -367,14 +365,14 @@ export default function Page({ params }) {
 }
       {
         dataStatus == 0 ? (
-         <div role="alert" className="alert alert-info mx-auto w-3/4 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2">
+         <div role="alert" className="alert alert-info w-3/4 max-w-sm absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2">
           <RiLoader2Fill className='animate-spin' />
   <span className='text-sm'>{dataMsg}</span>
 </div>
           ) : (
           dataStatus == -1 ? (
-            <div className=' mx-auto w-3/4 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2 text-center'>
-            <div role="alert" className="alert alert-error w-full">
+            <div className='mx-auto w-3/4 absolute top-1/2 -translate-x-1/2 -translate-y-1/2 left-1/2 text-center'>
+            <div role="alert" className="alert alert-error w-full max-w-sm">
               <MdErrorOutline />
               <span className='text-sm'>{dataMsg}</span>
             </div>

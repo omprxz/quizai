@@ -1,5 +1,7 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import Mic from '@/components/Mic';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
@@ -24,8 +26,14 @@ const useJQueryConfirm = () => {
 export default function Page() {
   const router = useRouter();
   useJQueryConfirm()
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
   const maxFileSize = 4 * 1024 * 1024;
-  const maxFiles = 2;
+  const maxFiles = 5;
   const [isRotated, setIsRotated] = useState(false);
   const [showCustomSettings, setShowCustomSettings] = useState(false);
   const [loading, setLoading] = useState(false)
@@ -51,6 +59,7 @@ export default function Page() {
   });
   
   const fileInputRef = useRef(null)
+  const textareaRef = useRef(null)
   
   const themes = [
       "light",
@@ -117,6 +126,23 @@ export default function Page() {
   const maxChars = 5000;
   const remainingChars = maxChars - formData.description.length;
   
+  const handleMic = () => {
+    if (listening) {
+      SpeechRecognition.stopListening();
+      const textarea = textareaRef.current;
+      const cursorPosition = textarea.selectionStart;
+      const newText = 
+        formData.description.slice(0, cursorPosition).trimEnd() + ' ' + 
+        transcript + ' ' +
+        formData.description.slice(cursorPosition).trimStart();
+      setFormData(prev => ({...prev, description: newText}));
+      resetTranscript();
+    } else {
+      resetTranscript();
+      SpeechRecognition.startListening({ continuous: true });
+    }
+  };
+  
   const handleFileInputButtonClick = () => {
     if(fileInputRef.current){
       if(formData.files.length < maxFiles){
@@ -128,47 +154,52 @@ export default function Page() {
   }
   
   const handleFileChange = (e) => {
-  if(formData.files.length == maxFiles){
+  const selectedFiles = Array.from(e.target.files);
+  const existingFilesCount = formData.files.length;
+
+  if (existingFilesCount >= maxFiles) {
     toast.error(`You can only upload up to ${maxFiles} files.`);
     e.target.value = null;
     return;
   }
-  const selectedFiles = Array.from(e.target.files);
 
-  const validFiles = selectedFiles.filter(file => file.size <= maxFileSize);
-  
-  if((selectedFiles.length !== validFiles.length) && validFiles.length !== 0){
-    toast.error(`Files larger than ${maxFileSize/(1024*1024)}MB excluded.`)
-  }
-  
-  const availableSpace = maxFiles - formData.files.length
-  let filesToAdd;
-  if(validFiles.length > availableSpace){
-   filesToAdd = validFiles.slice(0, maxFiles - formData.files.length);
-   toast.error(`You can only upload up to ${maxFiles} files.`);
-  }else{
-    filesToAdd = validFiles
-  }
+  let validFiles = [];
+  let totalSize = formData.files.reduce((acc, file) => acc + file.size, 0);
 
+  for (const file of selectedFiles) {
+    if (file.size > maxFileSize) {
+      toast.error(`File ${file.name} is too large (Limit ${maxFileSize / (1024 * 1024)}MB).`);
+      continue;
+    }
+
+    if (totalSize + file.size <= maxFileSize) {
+      validFiles.push(file);
+      totalSize += file.size;
+    } else {
+      toast.error(`Adding '${file.name.slice(0, 20)}${file.name.length > 20 ? '...' : ''}' would exceed the total size limit of ${maxFileSize / (1024 * 1024)}MB.`);
+    }
+
+    if (validFiles.length + existingFilesCount >= maxFiles) {
+      toast(`You can only upload ${maxFiles} files!`, { icon: '📁'});
+      break;
+    }
+  }
 
   if (validFiles.length === 0) {
-    if(selectedFiles.length == 1){
-    toast.error('Selected file is too large.(Limit '+maxFileSize/(1024*1024)+'MB)');
-    }else{
-    toast.error('All selected files are too large.(Limit '+maxFileSize/(1024*1024)+'MB)');
-    }
+    toast.error('No valid files selected.');
     e.target.value = null;
     return;
   }
 
   setFormData(prev => ({
     ...prev,
-    files: [...prev.files, ...filesToAdd]
+    files: [...prev.files, ...validFiles]
   }));
-  e.target.value = null;
-}
 
-const handleFileRemove = (index) => {
+  e.target.value = null;
+};
+
+  const handleFileRemove = (index) => {
   setFormData(prev => {
     const updatedFiles = prev.files.filter((_, i) => i !== index);
     return {
@@ -328,9 +359,8 @@ const handleFileRemove = (index) => {
 
   return (
     <div className='p-4 pt-2'>
-      <h1 className='font-bold text-primary text-xl px-2'>Create Quiz</h1>
-      <form className='mt-4 px-2 flex flex-col justify-center items-start w-full gap-y-3 mb-10' onSubmit={handleSubmit}>
-        
+      <form className='mt-1 px-2 flex flex-col justify-center items-center w-full gap-y-3 mb-10' onSubmit={handleSubmit}>
+      <h1 className='font-bold text-primary text-xl px-2 w-full max-w-sm text-start'>Create Quiz</h1>
         <label className="input input-bordered border-neutral flex items-center gap-2 text-sm w-full max-w-sm mt-1">
           Title
           <input
@@ -344,20 +374,24 @@ const handleFileRemove = (index) => {
         />
         </label>
 
-        <label className="w-full max-w-sm mt-1">
+        <label className="w-full max-w-sm mt-1 relative">
           <span className="block mb-1.5 text-neutral dark:text-neutral-content text-sm">Describe your topic (Required)</span>
           <textarea
+            ref={textareaRef}
             placeholder="Describe your topic"
             name='description'
-            className="textarea textarea-primary textarea-bordered border-neutral w-full"
+            className="textarea textarea-primary textarea-bordered border-neutral w-full h-36 pe-12"
             value={formData.description}
             onChange={handleChange}
             maxLength={maxChars}
           ></textarea>
+          <div className="absolute right-1.5 bottom-8">
+            <Mic micActive={listening} handleMic={handleMic} />
+          </div>
           <p className='text-sm text-neutral dark:text-neutral-content'>{remainingChars}/{maxChars} characters remaining</p>
         </label>
         
-        <label className="label cursor-pointer gap-6">
+        <label className="label cursor-pointer gap-6 w-full max-w-sm">
               <span className="label-text text-neutral dark:text-neutral-content">Include files to generate questions</span>
               <input
                 type="checkbox"
@@ -431,7 +465,7 @@ const handleFileRemove = (index) => {
             </label>
         
 
-        <div className="level">
+        <div className="level w-full max-w-sm">
           <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Level</p>
           <div className="join">
             <input
@@ -464,7 +498,7 @@ const handleFileRemove = (index) => {
           </div>
         </div>
 
-        <label className='w-full flex flex-nowrap flex-row justify-between mt-4' onClick={handleShowCustomSettings}>
+        <label className='w-full max-w-sm flex flex-nowrap flex-row justify-between mt-4' onClick={handleShowCustomSettings}>
           <span className='text-primary text-sm select-none underline'>More Settings</span>
           <IoMdSettings
             className={`text-primary text-2xl transition-transform duration-200 ${isRotated ? 'rotate-90 mb-1.5' : ''}`}
@@ -473,7 +507,7 @@ const handleFileRemove = (index) => {
 
         {showCustomSettings && (
           <>
-            <div className="type">
+            <div className="type w-full max-w-sm">
   <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Type (MCQs)</p>
   <div className="join">
     <input
@@ -562,7 +596,7 @@ const handleFileRemove = (index) => {
               </select>
             </label>
 
-            <label className="label cursor-pointer gap-6">
+            <label className="label cursor-pointer gap-6 w-full max-w-sm">
               <span className="label-text text-neutral dark:text-neutral-content">Shuffle Questions</span>
               <input
                 type="checkbox"
@@ -573,7 +607,7 @@ const handleFileRemove = (index) => {
               />
             </label>
 
-            <label className="label cursor-pointer gap-6">
+            <label className="label cursor-pointer gap-6 w-full max-w-sm">
               <span className="label-text text-neutral dark:text-neutral-content">Shuffle Options</span>
               <input
                 type="checkbox"
@@ -583,7 +617,7 @@ const handleFileRemove = (index) => {
                 onChange={handleChange}
               />
             </label>
-            <div class="theme w-full">
+            <div class="theme w-full max-w-sm">
             <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Choose theme</p>
             <div className='flex flex-row gap-x-4 flex-nowrap overflow-x-scroll max-w-sm rounded-md py-3 px-4 bg-neutral hide-scrollbar'>
             {

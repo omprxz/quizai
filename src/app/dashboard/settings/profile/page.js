@@ -124,7 +124,7 @@ export default function ProfilePage() {
             </button>
           </div>
         </div>
-
+        <hr />
         <div className="space-y-4">
           <h1 className="text-xl font-semibold text-center text-base-content">Change Password</h1>
           <div className="space-y-4">

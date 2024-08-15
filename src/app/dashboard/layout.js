@@ -5,7 +5,7 @@ const DashboardLayout = ({ children }) => {
   return (
     <>
       <Header />
-      <main className='mt-16'>
+      <main className='mt-20'>
         {children}
       </main>
     </>

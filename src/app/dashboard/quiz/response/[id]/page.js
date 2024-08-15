@@ -90,15 +90,17 @@ export default function Page({ params }) {
             </div>
           </div>
           
-          <div className="alert dark:bg-gray-700 dark:border-gray-600 my-6 shadow-md">
+          <div className='w-full flex justify-center my-6'>
+          <div className="alert dark:bg-gray-700 dark:border-gray-600 shadow-md w-full max-w-sm md:max-w-xs md:py-4 flex flex-col gap-y-1 md:gap-y-2 justify-center items-center">
             <p className="text-gray-600 dark:text-gray-200 font-bold text-xl">
               {`${responseDetails.rank}/${responseDetails.quizResponsesCount}`}
             </p>
             <FaRankingStar className='text-5xl dark:text-gray-400' />
           </div>
-
+          </div>
+          
           {/* Score Breakdown */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="flex flex-col justify-center items-center gap-4 mb-6">
           <div class="flex justify-center gap-4">
             <div className="alert alert-success shadow-md">
               <span className="text-2xl font-bold">{responseDetails.correct}</span>
@@ -120,14 +122,14 @@ export default function Page({ params }) {
               <span className="text-xl font-bold">{responseDetails.percentage.toFixed(2)}%</span>
               <MdOutlineSportsScore className='text-3xl' />
             </div>
-            <div className="alert alert-warning shadow-md">
+            <div className="alert alert-warning shadow-md px-7 md:px-1">
               <span className="text-xl font-bold">
                      {formatTime(responseDetails.timeTaken)}
                   </span>
               <LuTimer className='text-3xl' />
             </div>
            </div>
-          {responseDetails.quizDetails.passing_score !== null && <div className={`alert ${responseDetails.percentage >= responseDetails.quizDetails.passing_score ? 'alert-success' : 'alert-error'} shadow-md text-gray-200`}>
+          {responseDetails.quizDetails.passing_score !== null && <div className={`alert ${responseDetails.percentage >= responseDetails.quizDetails.passing_score ? 'alert-success' : 'alert-error'} shadow-md text-gray-200 w-2/3 md:w-auto md:px-5 md:mx-auto y-1 flex md:flex-row flex-col justify-center items-center`}>
               <span className={`text-2xl font-bold`}>
                       {responseDetails.percentage >= responseDetails.quizDetails.passing_score ? "Passed" : "Failed"}
                   </span>
@@ -142,7 +144,7 @@ export default function Page({ params }) {
     <input type="checkbox" name="my-accordion-4" />
     <div className="collapse-title text-xl font-medium dark:text-gray-200">View your answers <MdVisibility className='inline' /></div>
     <div className="collapse-content">
-    <p className='text-sm mb-3'>Some questions may display different details in &quot;View your answers&quot; because they might have been modified.</p>
+    {responseDetails.quizDetails.createdAt !== responseDetails.quizDetails.updatedAt && <p className='text-sm mb-3'>Some questions may display different details in &quot;View your answers&quot; because they might have been modified.</p>}
     <div class="flex flex-col justify-center items-center gap-y-3 text-xs">
       {responseDetails.quizDetails.questions.map((question, index) => (
               <div className={`rounded-md py-4 w-full border shadow px-3 ${responseDetails.selectedAnswers[question._id] ? (responseDetails.selectedAnswers[question._id].length == 0 ? 'border-yellow-500 shadow-yellow-300 bg-yellow-100' : ((question.correct_answers.length == responseDetails.selectedAnswers[question._id].length && question.correct_answers.every(ans => responseDetails.selectedAnswers[question._id].includes(ans))) ?  'border-green-500 shadow-green-300 bg-green-100' :  'border-red-500 shadow-red-300 bg-red-100 dark:bg-red-200 dark:text-neutral' )) : 'border-yellow-500 shadow-yellow-300 bg-yellow-100'}`} key={question._id}>

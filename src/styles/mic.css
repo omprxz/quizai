@@ -1,0 +1,53 @@
+/* @/styles/mic.css */
+
+.mic-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: hsla(224,84.7%,46.6%,0.179);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.mic-container.active .circle {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.circle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  border: solid 1px hsl(224, 76.3%, 48%);
+  z-index: 5;
+}
+
+.circle:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.circle:nth-child(3) {
+  animation-delay: 1s;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(0.8);
+  }
+}
+
+.mic-icon {
+  font-size: 1.3rem;
+  z-index: 9;
+}

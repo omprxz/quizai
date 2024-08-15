@@ -4,18 +4,6 @@ module.exports = {
     theme: {},
     plugins: [
         require("daisyui"),
-        function ({ addUtilities }) {
-            addUtilities({
-                '.hide-scrollbar': {
-                    /* Firefox */
-                    'scrollbar-width': 'none',
-                    /* Safari and Chrome */
-                    '&::-webkit-scrollbar': {
-                        display: 'none',
-                    },
-                },
-            });
-        },
     ],
     daisyui: {
         themes: [

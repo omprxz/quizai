@@ -55,6 +55,7 @@ export default function Page({ params }) {
         <div className="text-center">No responses available</div>
       ) : (
         <div className='w-full flex justify-center items-center select-none'>
+        <div className='w-full max-w-sm'>
         <PieChart
   series={[
     {
@@ -108,7 +109,7 @@ export default function Page({ params }) {
     },
   }}
 />
-        
+        </div>
     </div>
       )}
       <section className='w-full px-3 my-2 pt-3 max-w-full overflow-x-scroll'>
