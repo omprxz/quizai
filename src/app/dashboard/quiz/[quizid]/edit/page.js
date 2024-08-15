@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { IoMdSettings } from "react-icons/io";
@@ -11,6 +11,8 @@ import { AiOutlinePlusCircle, AiOutlineMinusCircle } from "react-icons/ai";
 import { BsStars } from "react-icons/bs";
 import $ from 'jquery';
 import dynamic from 'next/dynamic';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import Mic from '@/components/Mic';
 
 
 const useJQueryConfirm = () => {
@@ -70,6 +72,64 @@ export default function Page({ params }) {
   const categories = [
     { value: "art", text: "Art" }, { value: "business", text: "Business" }, { value: "comics", text: "Comics" }, { value: "current_events", text: "Current Events" }, { value: "economics", text: "Economics" }, { value: "entertainment", text: "Entertainment" }, { value: "food", text: "Food" }, { value: "general_knowledge", text: "General Knowledge" }, { value: "geography", text: "Geography" }, { value: "history", text: "History" }, { value: "languages", text: "Languages" }, { value: "literature", text: "Literature" }, { value: "math", text: "Math" }, { value: "movies", text: "Movies" }, { value: "music", text: "Music" }, { value: "mythology", text: "Mythology" }, { value: "nature", text: "Nature" }, { value: "philosophy", text: "Philosophy" }, { value: "politics", text: "Politics" }, { value: "psychology", text: "Psychology" }, { value: "religion", text: "Religion" }, { value: "science", text: "Science" }, { value: "space", text: "Space" }, { value: "sports", text: "Sports" }, { value: "technology", text: "Technology" }
   ];
+  
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+  const aiTextareaRef = useRef(null)
+  const reasonTextareaRefs = useRef([]); 
+  const handleReasonMic = (q_id) => {
+    const questionIndex = formData.questions.findIndex(q => q._id === q_id);
+    if (questionIndex === -1) return; 
+
+    if (listening) {
+      SpeechRecognition.stopListening();
+      const textarea = reasonTextareaRefs.current[questionIndex];
+      let newReasonText = formData.questions[questionIndex].reason
+      if(transcript.trim() !== ""){
+         newReasonText = formData.questions[questionIndex].reason.trimEnd() + ' ' + transcript
+      }
+      setFormData(prev => ({
+        ...prev,
+        questions: prev.questions.map((q, i) => 
+          i === questionIndex ? {...q, reason: newReasonText} : q 
+        )
+      }));
+      resetTranscript();
+    } else {
+      resetTranscript();
+      SpeechRecognition.startListening({ continuous: true });
+    }
+  };
+  
+  useEffect(() => {
+    // Update refs when questions change
+    reasonTextareaRefs.current = Array(formData.questions.length)
+      .fill()
+      .map((_, i) => reasonTextareaRefs.current[i] || React.createRef());
+  }, [formData.questions]);
+  
+  const handleMic = () => {
+    if (listening) {
+      SpeechRecognition.stopListening();
+      const textarea = aiTextareaRef.current;
+      const cursorPosition = textarea.selectionStart;
+      let newText = aiFormData.description
+      if(transcript.trim() !== ""){
+       newText = aiFormData.description.slice(0, cursorPosition).trimEnd() + ' ' + 
+        transcript + ' ' +
+        aiFormData.description.slice(cursorPosition).trimStart();
+      }
+      setAiFormData(prev => ({...prev, description: newText}));
+      resetTranscript();
+    } else {
+      resetTranscript();
+      SpeechRecognition.startListening({ continuous: true });
+    }
+  };
 
   const handleChange = (event) => {
     const { name, type, checked } = event.target;
@@ -464,14 +524,20 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
           />
         </label>
         {!aiFormData.useExistingTopic && (
+          <div className='relative'>
           <textarea
             name="description"
+            ref={aiTextareaRef}
             value={aiFormData.description}
             onChange={handleAiFormChange}
             placeholder="Enter new topic or description (max 5000 chars)"
-            className="textarea textarea-bordered border-neutral text-xs w-full h-20 max-w-xs mb-1"
+            className="textarea textarea-bordered border-neutral text-xs w-full h-24 pe-[3.1rem] max-w-xs mb-1"
             maxLength="5000"
           ></textarea>
+          <div className="absolute right-1.5 bottom-4">
+            <Mic micActive={listening} handleMic={handleMic} className="h-[30px] w-[30px]" micClassName="text-[1rem]" />
+          </div>
+          </div>
         )}
         <div className="type">
           <p className='mb-1 text-neutral dark:text-neutral-content text-xs'>Type (MCQs)</p>
@@ -869,16 +935,22 @@ const handleCorrectAnswerChange = (q_id, o_id, checked) => {
                       >
                         <AiOutlinePlusCircle /> Add Option
                       </button>
-                      <label>
-                        <span className="text-sm font-bold">Reason for correct answer</span>
-                        <textarea
-                          className="textarea textarea-bordered border-neutral text-sm w-full h-32 max-w-sm mb-1 mt-1"
-                          type="text"
-                          value={question.reason}
-                          onChange={(e) => handleReasonChange(e, question._id)}
-                          placeholder="Reason (Optional)"
-                        ></textarea>
-                      </label>
+                       <label>
+      <span className="text-sm font-bold">Reason for correct answer</span>
+      <div className='relative'>
+      <textarea
+        className="textarea textarea-bordered border-neutral text-sm w-full h-32 max-w-sm mb-1 mt-1 pe-[3.1rem]"
+        type="text"
+        value={question.reason}
+        onChange={(e) => handleReasonChange(e, question._id)}
+        placeholder="Reason (Optional)"
+        ref={reasonTextareaRefs.current[index]}
+      ></textarea>
+        <div className="absolute right-1.5 bottom-4">
+          <Mic micActive={listening} handleMic={() => handleReasonMic(question._id)} className="h-[30px] w-[30px]" micClassName="text-[1rem]" />
+        </div>
+        </div>
+    </label>
                     </div>
                   </div>
                 ))}

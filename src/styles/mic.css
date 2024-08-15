@@ -1,15 +1,7 @@
 /* @/styles/mic.css */
 
 .mic-container {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
   background-color: hsla(224,84.7%,46.6%,0.179);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  cursor: pointer;
 }
 
 .mic-container.active .circle {
@@ -45,9 +37,4 @@
   100% {
     transform: scale(0.8);
   }
-}
-
-.mic-icon {
-  font-size: 1.3rem;
-  z-index: 9;
 }

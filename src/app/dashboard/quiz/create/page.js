@@ -131,10 +131,13 @@ export default function Page() {
       SpeechRecognition.stopListening();
       const textarea = textareaRef.current;
       const cursorPosition = textarea.selectionStart;
-      const newText = 
+      let newText = formData.description
+      if(transcript.trim() !== ""){
+       newText = 
         formData.description.slice(0, cursorPosition).trimEnd() + ' ' + 
         transcript + ' ' +
         formData.description.slice(cursorPosition).trimStart();
+      }
       setFormData(prev => ({...prev, description: newText}));
       resetTranscript();
     } else {
