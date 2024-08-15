@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+
 const optionSchema = new mongoose.Schema({
   id: {
     type: Number,
@@ -18,9 +19,12 @@ const questionSchema = new mongoose.Schema({
   question_text: {
     type: String,
   },
-  options: [optionSchema],
+  options: {
+    type: [optionSchema],
+    default: []
+  },
   correct_answers: [{
-    type: Number,
+    type: mongoose.Schema.Types.Mixed,
   }],
   reason: {
     type: String
@@ -46,7 +50,7 @@ const responseSchema = new mongoose.Schema({
   },
   selectedAnswers: {
     type: Map,
-    of: [Number],
+    of: [mongoose.Schema.Types.Mixed],
     default: {}
   },
   questions: [questionSchema],

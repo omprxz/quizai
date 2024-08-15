@@ -20,10 +20,10 @@ export async function POST(request) {
     try{
       tokenDetails = jwt.verify(token, process.env.JWT_SECRET)
     }catch(e){
-      console.log(e)
+      console.error(e)
         }
     }catch(err){
-         console.log(err)
+         console.error(err)
         }
 
     if (!data.quizid) {
@@ -152,13 +152,13 @@ export async function GET(req) {
     if (userDetails) {
       responseDetails.username = userDetails.name;
     } else {
-      console.log('User not found for userid:', responseDetails.userid);
+      console.error('User not found for userid:', responseDetails.userid);
       responseDetails.username = "User not found";
     }
     return NextResponse.json(responseDetails);
 
   } catch (error) {
-    console.log('Server ERR:', error);
+    console.error('Server ERR:', error);
     return NextResponse.json({
       message: 'Server error',
       success: false

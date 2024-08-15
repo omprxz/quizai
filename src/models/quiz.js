@@ -18,9 +18,12 @@ const questionSchema = new mongoose.Schema({
   question_text: {
     type: String,
   },
-  options: [optionSchema],
+  options: {
+    type: [optionSchema],
+    default: []
+  },
   correct_answers: [{
-    type: Number,
+    type: mongoose.Schema.Types.Mixed,
   }],
   reason: {
     type: String
@@ -46,7 +49,8 @@ const quizSchema = new mongoose.Schema({
     maxlength: 1000
   },
   type: {
-    type: String,
+    type: [],
+    default: [],
     required: true
   },
   level: {

@@ -100,14 +100,9 @@ export async function PUT(req , { params }) {
   }
   
   formData.total_questions = formData.questions.length
-  let questionType = formData.questions[0].question_type
-  for (const question of formData.questions){
-    if(question.question_type !== questionType){
-      questionType = "mixed"
-      break
-    }
-  }
-  formData.type = questionType
+  
+  const uniqueTypes = [...new Set(formData.questions.map(question => question.question_type))];
+formData.type = uniqueTypes;
   
   formData = filterAndRemoveInvalidIds(formData)
   

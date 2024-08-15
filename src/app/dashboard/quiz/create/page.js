@@ -35,7 +35,7 @@ export default function Page() {
   const maxFileSize = 4 * 1024 * 1024;
   const maxFiles = 5;
   const [isRotated, setIsRotated] = useState(false);
-  const [showCustomSettings, setShowCustomSettings] = useState(false);
+  const [showCustomSettings, setShowCustomSettings] = useState(true);
   const [loading, setLoading] = useState(false)
   
   const [formData, setFormData] = useState({
@@ -46,9 +46,7 @@ export default function Page() {
     total_questions: '5',
     visibility: 'public',
     level: 'Medium',
-    type: 'single_correct',
-    single_correct: 'checked',
-    multi_correct: '',
+    type: ['single_correct', 'subjective'],
     category: '',
     duration: '',
     passing_score: '',
@@ -213,35 +211,34 @@ export default function Page() {
 }
   
   const handleChange = (event) => {
-    const { name, type, checked } = event.target;
-
-    if (type === 'checkbox') {
-      setFormData((prevData) => {
-        const newCheckboxState = {
+  const { name, type, checked } = event.target;
+  if (type === 'checkbox') {
+    setFormData((prevData) => {
+      
+      if(['single_correct', 'multi_correct', 'subjective'].includes(name)){
+        const newTypeValue = checked
+        ? [...prevData.type, name]
+        : prevData.type.filter((item) => item !== name);
+      return {
+        ...prevData,
+        type: newTypeValue
+      };
+      }else{
+        return {
           ...prevData,
           [name]: checked
         };
-
-        const newTypeValue = newCheckboxState.single_correct && newCheckboxState.multi_correct
-          ? 'mixed'
-          : newCheckboxState.single_correct
-            ? 'single_correct'
-            : newCheckboxState.multi_correct
-              ? 'multi_correct'
-              : '';
-
-        return {
-          ...newCheckboxState,
-          type: newTypeValue
-        };
-      });
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: event.target.value
-      }));
-    }
-  };
+      }
+      
+      
+    });
+  } else {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: event.target.value
+    }));
+  }
+};
 
   const handleShowCustomSettings = () => {
     setIsRotated(!isRotated);
@@ -251,6 +248,7 @@ export default function Page() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setLoading(true)
+    try{
     const { total_questions, duration, passing_score, description, useFile } = formData;
     
     if(!description){
@@ -296,7 +294,8 @@ export default function Page() {
       ...formData,
       files: useFile ? formData.files : [],
       total_questions: formData.total_questions ? parseInt(+formData.total_questions) : 10,
-      type: formData['type'] ? formData['type'] : 'single_correct',
+      type: formData.type.length == 0 ? ['single_correct'] : formData.type,
+      shuffle_option: formData.type.some(type => ['single_correct', 'multi_correct'].includes(type)) ? formData.shuffle_option : false,
       theme: formData['theme'] ? formData['theme'] : 'autumn',
       duration: formData.duration ? +formData.duration : null
     };
@@ -344,13 +343,18 @@ export default function Page() {
     }
   })
   .catch(error => {
-    console.log(error)
+    console.error(error)
     setLoading(false);
     toast.error(error?.response?.data?.message || error?.message);
   })
   .finally(() => {
     setLoading(false);
   });
+    }catch(e){
+      setLoading(false)
+      console.error(e)
+      toast.error(e?.message || e?.response?.data?.message || 'Data posting error')
+    }
   };
 
   useEffect(() => {
@@ -514,19 +518,27 @@ export default function Page() {
   <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Type (MCQs)</p>
   <div className="join">
     <input
-      className="join-item btn"
+      className="join-item btn text-sm"
       type="checkbox"
       name="single_correct"
       aria-label="Single Correct"
-      checked={formData.single_correct}
+      checked={formData.type.includes('single_correct')}
       onChange={handleChange}
     />
     <input
-      className="join-item btn"
+      className="join-item btn text-sm"
       type="checkbox"
       name="multi_correct"
       aria-label="Multi Correct"
-      checked={formData.multi_correct}
+      checked={formData.type.includes('multi_correct')}
+      onChange={handleChange}
+    />
+    <input
+      className="join-item btn text-sm"
+      type="checkbox"
+      name="subjective"
+      aria-label="Subjective"
+      checked={formData.type.includes('subjective')}
       onChange={handleChange}
     />
   </div>
@@ -618,6 +630,7 @@ export default function Page() {
                 className="toggle toggle-primary"
                 checked={formData.shuffle_option}
                 onChange={handleChange}
+                disabled={!(formData.type.includes('single_correct') || formData.type.includes('multi_correct'))}
               />
             </label>
             <div class="theme w-full max-w-sm">
