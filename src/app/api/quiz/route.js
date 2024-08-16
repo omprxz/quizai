@@ -514,6 +514,7 @@ export async function GET(req) {
 
 export async function DELETE(req) {
     try {
+      await Db()
         const url = new URL(req.url);
         const id = url.searchParams.get("id");
 
