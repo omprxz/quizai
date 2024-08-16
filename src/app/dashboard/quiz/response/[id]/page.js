@@ -8,6 +8,8 @@ import { MdErrorOutline, MdOutlineSportsScore, MdVisibility, MdLocalPrintshop } 
 import { LuTimer } from "react-icons/lu";
 import { FaRankingStar } from "react-icons/fa6";
 import { FaTimes, FaCheck } from "react-icons/fa";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 export default function Page({ params }) {
   const router = useRouter();
@@ -18,6 +20,7 @@ export default function Page({ params }) {
 
   const resultRef = useRef();
   const accordionToggle = useRef();
+  const accordionDiv = useRef();
   
   useEffect(() => {
     const fetchResponseDetails = async () => {
@@ -45,14 +48,40 @@ export default function Page({ params }) {
   };
 
   const handlePrint = () => {
-    !accordionToggle.current.checked && accordionToggle.current.click()
-    window.print();
+    confirmAlert({
+      title: 'Print Answers!',
+      message: 'Would you like to print the submitted answers?',
+      overlayClassName: "backdrop-blur-sm",
+      buttons: [
+        {
+          label: 'Cancel Print',
+        },
+        {
+          label: 'No',
+          onClick: () => {
+            accordionDiv.current.classList.add('print:hidden');
+            window.print()
+          }
+        },
+        {
+          label: 'Yes',
+          onClick: () => {
+            accordionDiv.current.classList.remove('print:hidden');
+            const accordionState = accordionToggle.current.checked
+            !accordionState && accordionToggle.current.click()
+            window.print()
+          }
+        },
+      ],
+    });
+    
   };
 
   return (
-    <div className="py-2">
+    <div className="py-2 print:p-1">
+    <p className='fixed bottom-0 left-1/2 -translate-x-1/2 text-[0.5rem] text-gray-500 hidden print:block'>{process.env.NEXT_PUBLIC_APP_URL}</p>
       {responseDetails._id ? (
-        <div className="max-w-sm mx-auto pb-4 px-3">
+        <div className="max-w-sm print:max-w-2xl mx-auto pb-4 print:pb-0 px-3">
           <h1 className="text-3xl font-bold text-blue-500 dark:text-blue-400 text-center mb-6">Result Details</h1>
 
           {/* Submission and Quiz Info */}
@@ -100,7 +129,7 @@ export default function Page({ params }) {
             </div>
 
             <div className='w-full flex justify-center my-6'>
-              <div className="alert bg-gray-50 dark:bg-gray-700 shadow-lg w-full max-w-sm md:max-w-xs md:py-4 flex flex-col gap-y-1 md:gap-y-2 justify-center items-center glass">
+              <div className="bg-gray-50 dark:bg-gray-700 shadow-lg w-full max-w-sm md:max-w-xs py-4 rounded-md md:py-4 flex flex-col gap-y-1 md:gap-y-2 justify-center items-center glass">
                 <p className="text-gray-600 dark:text-gray-200 font-bold text-xl">
                   {`${responseDetails.rank}/${responseDetails.quizResponsesCount}`}
                 </p>
@@ -109,7 +138,7 @@ export default function Page({ params }) {
             </div>
 
             {/* Score Breakdown */}
-            <div className="flex flex-col justify-center items-center gap-4 mb-6">
+            <div className="flex flex-col justify-center items-center gap-4 mb-6 print:mb-0">
               <div className="flex justify-center gap-4">
                 <div className="alert alert-success shadow-md">
                   <span className="text-2xl font-bold">{responseDetails.correct}</span>
@@ -137,7 +166,7 @@ export default function Page({ params }) {
                   <LuTimer className='text-3xl' />
                 </div>
               </div>
-              {responseDetails.quizDetails.passing_score !== null && <div className={`alert ${responseDetails.percentage >= responseDetails.quizDetails.passing_score ? 'alert-success text-gray-200' : 'alert-error'} shadow-md w-2/3 md:w-auto md:px-5 md:mx-auto y-1 flex md:flex-row flex-col justify-center items-center`}>
+              {responseDetails.quizDetails.passing_score !== null && <div className={`alert ${responseDetails.percentage >= responseDetails.quizDetails.passing_score ? 'alert-success text-gray-200' : 'alert-error'} shadow-md w-2/3 md:w-auto md:px-5 md:mx-auto flex md:flex-row flex-col justify-center items-center`}>
                 <span className={`text-2xl font-bold`}>
                   {responseDetails.percentage >= responseDetails.quizDetails.passing_score ? "Passed" : "Failed"}
                 </span>
@@ -145,17 +174,23 @@ export default function Page({ params }) {
               </div>
               }
             </div>
-
+ {/*Print Button */}
+            <div className="flex justify-center my-6 print:hidden">
+              <button onClick={handlePrint} className="btn btn-primary px-4">
+                Print <MdLocalPrintshop className='text-xl' />
+              </button>
+            </div>
             {/* Answers Summary */}
             {responseDetails.questions && (
-      <div className="w-full max-w-sm">
-        <div className="collapse collapse-arrow join-item border-base-300 border rounded-md">
+      <div className="w-full flex justify-center" ref={accordionDiv}>
+        <div className="collapse collapse-arrow join-item border border-base-300 rounded-md print:border-none">
           <input type="checkbox" name="my-accordion-4" ref={accordionToggle} />
-          <div className="collapse-title text-xl font-medium dark:text-gray-200">
+          <div className="collapse-title text-xl font-bold dark:text-gray-200 print:hidden">
             View your answers <MdVisibility className='inline' />
           </div>
           <div className="collapse-content">
-            <div className="flex flex-col justify-center items-center gap-y-3 text-xs w-full">
+          <p className='hidden print:block font-bold text-xl mb-2'>Your Answers</p>
+            <div className="flex flex-col justify-center items-center gap-y-3 print:gap-y-5 text-xs w-full">
               {responseDetails.questions.map((question, index) => {
                 const userAnswers = responseDetails.selectedAnswers[question._id] || [];
                 const allCorrect = question.correct_answers.length === userAnswers.length &&
@@ -170,7 +205,7 @@ export default function Page({ params }) {
                 return (
                   <div
                     key={question._id}
-                    className={`rounded-md py-4 border shadow px-3 w-full ${bgColor}`}
+                    className={`rounded-md py-4 border shadow px-3 w-full print:break-inside-avoid ${bgColor}`}
                   >
                     <p className="font-bold text-sm text-gray-500">{index + 1}. {question.question_text}</p>
                     <div className="flex flex-col justify-center items-start gap-4 mt-3">
@@ -214,17 +249,10 @@ export default function Page({ params }) {
       </div>
     )}
 
-            {/*Print Button */}
-            <div className="flex justify-center mt-6">
-              <button onClick={handlePrint} className="btn btn-primary px-4">
-                Print <MdLocalPrintshop className='text-xl' />
-              </button>
-            </div>
-
             {/* Retake Button */}
             {responseDetails.quiz && (
               <div className="mt-6 text-center">
-                <Link href={`/dashboard/quiz/${responseDetails.quizDetails._id}/view`} className="btn btn-primary">
+                <Link href={`/dashboard/quiz/${responseDetails.quizDetails._id}/view`} className="btn btn-primary print:hidden">
                   Give Quiz Again
                 </Link>
               </div>
@@ -235,7 +263,7 @@ export default function Page({ params }) {
         dataStatus === 0 ? (
           <div className="flex items-center justify-center min-h-screen p-4">
             <div className="alert alert-info shadow-lg max-w-md w-full mx-4">
-              <RiLoader2Fill className="animate-spin mr-3 text-2xl" />
+              <RiLoader2Fill className="animate-spin mr-3" />
               <span className="text-sm">{dataMsg}</span>
             </div>
           </div>

@@ -51,7 +51,7 @@ const Header = () => {
           </div>
         </div>
       )}
-      <header className="fixed top-0 w-full bg-base-100 z-10">
+      <header className="fixed top-0 w-full bg-base-100 z-10 print:hidden">
         <div className="navbar flex justify-between items-center px-4 h-16">
           <div className="flex items-center">
             <button onClick={() => router.back()} className="btn btn-ghost btn-circle">
