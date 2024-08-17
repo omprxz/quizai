@@ -60,6 +60,51 @@ export default function Page() {
       setDataMsg(error.response.data.message);
     });
 };
+
+  const fetchQuizList = () => {
+  axios.get('/api/quiz/all')
+    .then((res) => {
+      if (res.data.quizzes.length > 0) {
+        const quizzes = res.data.quizzes;
+        axios.get('/api/quiz/all?filter=response_count')
+          .then((resp) => {
+            if (resp.data.quizzes.length > 0) {
+              const responseCountQuizzes = resp.data.quizzes;
+              const responseCountMap = responseCountQuizzes.reduce((map, quiz) => {
+                map[quiz._id] = quiz.response_count;
+                return map;
+              }, {});
+              
+              const updatedQuizzes = quizzes.map(quiz => ({
+                ...quiz,
+                response_count: responseCountMap[quiz._id] || 0
+              }));
+              
+              setQuizList(updatedQuizzes);
+              setDataStatus(1)
+              setDataMsg('')
+            }
+          })
+          .catch((err) => {
+            console.error('Error fetching response counts:', err);
+          });
+        
+      } else {
+        setDataStatus(-1);
+        setDataMsg('Something went wrong.');
+      }
+    })
+    .catch((error) => {
+      if (error?.response?.status === 404) {
+        setDataStatus(404);
+        setQuizList([]);
+      } else {
+        toast.error(error.response.data.message);
+        setDataStatus(-1);
+      }
+      setDataMsg(error.response.data.message);
+    });
+};
   
   useEffect(() => {
     fetchQuizListFirst();

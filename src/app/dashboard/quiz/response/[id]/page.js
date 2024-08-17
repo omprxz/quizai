@@ -51,7 +51,7 @@ export default function Page({ params }) {
     confirmAlert({
       title: 'Print Answers!',
       message: 'Would you like to print the submitted answers?',
-      overlayClassName: "backdrop-blur-md opacity-90",
+      overlayClassName: "backdrop-blur-xl opacity-90",
       buttons: [
         {
           label: 'Cancel Print',
