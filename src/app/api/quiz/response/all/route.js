@@ -15,7 +15,7 @@ export async function GET(req) {
   let responsesWithDetails
   try{
   let responseDets, quizid
-  quizid = url.searchParams.get('id')
+  quizid = url.searchParams?.get('id')
   if(filter=='quizid'){
     if (!mongoose.isValidObjectId(quizid)) {
       return NextResponse.json({
@@ -34,7 +34,7 @@ export async function GET(req) {
       status: 404
     })
   }
-   responseDets = await Response.find({ quizid })
+   responseDets = await Response.find({ quizid }).sort({ updatedAt: -1 }).select('_id title username userid percentage passing_score timeTaken createdAt')
    
    responsesWithDetails = await Promise.all(
     responseDets.map(async (response) => {
@@ -63,11 +63,17 @@ export async function GET(req) {
     const tokenDetails = jwt.verify(token, process.env.JWT_SECRET)
     
     const userid = tokenDetails?.data?._id || undefined
-   responseDets = await Response.find({ userid})
+    if(!userid){
+      return NextResponse.json({
+        message: 'Invalid user'
+      },{
+        status:403 })
+    }
+   responseDets = await Response.find({ userid }).sort({ updatedAt: -1 }).select('_id quizid percentage passing_score timeTaken createdAt')
    
  responsesWithDetails = await Promise.all(
     responseDets.map(async (response) => {
-      if (response.userid) {
+      if (response.quizid) {
         const qDets = await Quiz.findById(response.quizid).select('title')
         if (qDets) {
           return {

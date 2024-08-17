@@ -51,7 +51,7 @@ export default function Page({ params }) {
     confirmAlert({
       title: 'Print Answers!',
       message: 'Would you like to print the submitted answers?',
-      overlayClassName: "backdrop-blur-sm",
+      overlayClassName: "backdrop-blur-md opacity-90",
       buttons: [
         {
           label: 'Cancel Print',
@@ -213,7 +213,7 @@ export default function Page({ params }) {
                         question.options.map((option) => (
                           <label
                             key={option.id}
-                            className={`${question.correct_answers.includes(option.id) ? 'text-green-500' : 'text-gray-500'} flex flex-row flex-wrap justify-start items-center gap-2`}
+                            className={`${question.correct_answers.includes(option.id) ? 'text-green-500' : 'text-gray-500'} flex flex-row flex-wrap break-words justify-start items-center gap-2`}
                           >
                             <input
                               type={question.question_type === 'single_correct' ? 'radio' : 'checkbox'}

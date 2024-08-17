@@ -28,7 +28,6 @@ const useJQueryConfirm = () => {
 export default function Page({ params }) {
   const router = useRouter();
   const { quizid } = params;
-  const [url, setUrl] = useState(`${process.env.APP_URL}/dashboard/quiz/${quizid}/view`);
   useJQueryConfirm();
 
   const [isRotated, setIsRotated] = useState(false);
@@ -321,8 +320,8 @@ export default function Page({ params }) {
         toast.success(response.data.message);
         if (response.data.success) {
           $.confirm({
-            title: 'Quiz Edited!',
-            content: `<p style="padding: 10px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;" class="form-control">${url}</p>`,
+            title: 'Quiz Updated!',
+            content: `<p style="padding: 10px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;" class="form-control">Quiz has been successfully updated</p>`,
             buttons: {
               'cancel': {
                 text: 'Cancel',
@@ -333,20 +332,20 @@ export default function Page({ params }) {
                 btnClass: 'px-2',
                 action: function () {
                   if (navigator.clipboard) {
-                    navigator.clipboard.writeText(url).then(() => {
-                      toast.success('Link copied');
+                    navigator.clipboard.writeText(`${window.location.origin}/dashboard/quiz/${quizid}/view`).then(() => {
+                      toast.success('Quiz link copied to clipboard!');
                     }).catch((e) => {
                       console.log(e);
                       toast.error('Error copying');
                     });
                   } else {
                     const textArea = document.createElement('textarea');
-                    textArea.value = url;
+                    textArea.value = `${window.location.origin}/dashboard/quiz/${quizid}/view`;
                     document.body.appendChild(textArea);
                     textArea.select();
                     try {
                       document.execCommand('copy');
-                      toast.success('Link copied');
+                      toast.success('Quiz link copied to clipboard!');
                     } catch (e) {
                       console.log(e);
                       toast.error('Error copying');

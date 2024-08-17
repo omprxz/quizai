@@ -11,6 +11,7 @@ export async function GET(req) {
     await Db();
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
+    const filter = url.searchParams.get('filter');
     
     const token = cookieStore.get('token')?.value;
     if (!token) {
@@ -33,9 +34,10 @@ export async function GET(req) {
         status: 403
       });
     }
-
-    let quizDetails = await Quiz.find({ userid: tokenDetails.data._id }).sort({ updatedAt: -1 });
-
+    
+    if(filter == 'response_count'){
+      let quizDetails = await Quiz.find({ userid: tokenDetails.data._id }).sort({ updatedAt: -1 }).select('_id');
+      
     if (quizDetails.length !== 0) {
       quizDetails = await Promise.all(
         quizDetails.map(async (quiz) => {
@@ -56,6 +58,22 @@ export async function GET(req) {
         status: 404
       });
     }
+      
+    }else{
+      let quizDetails = await Quiz.find({ userid: tokenDetails.data._id }).sort({ updatedAt: -1 }).select("-questions");
+      if (quizDetails.length !== 0) {
+      
+      return NextResponse.json({ quizzes: quizDetails, success: true });
+      } else {
+      return NextResponse.json({
+        message: 'You don\'t have any quiz',
+        success: false
+      }, {
+        status: 404
+      });
+    }
+    }
+
   } catch (error) {
     console.log('Server error:', error);
     return NextResponse.json({

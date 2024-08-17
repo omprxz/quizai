@@ -3,11 +3,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { CgSpinnerTwo } from "react-icons/cg";
 
 export default function ProfilePage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(true);
+  const [loadingUP, setLoadingUP] = useState(false);
+  const [loadingCP, setLoadingCP] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -43,13 +46,17 @@ export default function ProfilePage() {
       toast.error('Invalid email address');
       return;
     }
-
+    setLoadingUP(true)
     axios.post('/api/user', { name, email })
       .then((response) => {
+        setLoadingUP(false)
         toast.success(response.data.message);
       })
       .catch((err) => {
+        setLoadingUP(false)
         toast.error(err.response.data.message);
+      }).finally(()=>{
+        setLoadingUP(false)
       });
   };
 
@@ -68,19 +75,23 @@ export default function ProfilePage() {
       toast.error('New passwords do not match');
       return;
     }
-
+    setLoadingCP(true)
     axios.post('/api/password/modify', {
       password: currentPassword,
       newPassword: newPassword,
     })
       .then((response) => {
+        setLoadingCP(false)
         toast.success(response.data.message);
         setCurrentPassword('');
         setNewPassword('');
         setConfirmNewPassword('');
       })
       .catch((err) => {
+        setLoadingCP(false)
         toast.error(err.response.data.message);
+      }).finally(() => {
+        setLoadingCP(false)
       });
   };
 
@@ -89,7 +100,9 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <div className="min-h-screen flex flex-col gap-3 items-center justify-center">
+    <CgSpinnerTwo className='animate-spin text-2xl' />
+    Please wait</div>;
   }
 
   return (
@@ -119,8 +132,11 @@ export default function ProfilePage() {
             <button
               onClick={handleUpdateProfile}
               className="btn btn-primary w-full"
+              disabled={loadingUP}
             >
-              Update Profile
+            {
+              loadingUP ? (<><CgSpinnerTwo className='animate-spin' /> Updating</>) : (<>Update Profile</>)
+            }
             </button>
           </div>
         </div>
@@ -179,8 +195,11 @@ export default function ProfilePage() {
             <button
               onClick={handleChangePassword}
               className="btn btn-primary w-full"
+              disabled={loadingCP}
             >
-              Change Password
+              {
+              loadingCP ? (<><CgSpinnerTwo className='animate-spin' /> Wait</>) : (<>Change Password</>)
+            }
             </button>
           </div>
         </div>

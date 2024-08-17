@@ -375,7 +375,7 @@ const handleSubmit = (tOver) => {
                     ></textarea>
                   ) : (
                     question.options.map((option) => (
-                      <label className="flex flex-row whitespace-break-spaces justify-start w-full items-center gap-2" key={option.id}>
+                      <label className="w-full space-y-2 whitespace-normal break-words" key={option.id}>
                         <input
                           type={question.question_type === 'single_correct' ? 'radio' : 'checkbox'}
                           name={question._id}

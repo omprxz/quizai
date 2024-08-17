@@ -1,16 +1,22 @@
 import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
+import { cookies } from 'next/headers';
 
 export function middleware(request) {
-  const token = request.cookies.get('token');
-  const { pathname } = request.nextUrl;
+  const cookieStore = cookies();
+  const token = cookieStore.get('token')?.value;
+  const { pathname, search } = request.nextUrl;
 
   const dynamicPublicUrls = [
-    /^\/dashboard\/quiz\/[^\/]+\/view$/, /^\/quiz\/response\/[^\/]+/
+    /^\/dashboard\/quiz\/[^\/]+\/view$/, 
+    /^\/dashboard\/quiz\/response\/[^\/]+/,
+    /^\/pub\/[^\/]+/
   ];
-
   const authUrls = [
-    /^\/login\/?$/, /^\/register\/?$/, /^\/password\/reset\/?$/, /^\/?$/
+    /^\/login\/?$/,
+    /^\/social-sign-in\/[^\/]+\/?$/,
+    /^\/register\/?$/, 
+    /^\/password\/reset\/?$/, 
+    /^\/?$/
   ];
 
   const isAuthUrl = authUrls.some((regex) => regex.test(pathname));
@@ -18,13 +24,28 @@ export function middleware(request) {
 
   if (token && isAuthUrl) {
     const url = request.nextUrl.clone();
-    url.pathname = '/dashboard';
+    const urlSearchParams = new URLSearchParams(search);
+    let toRedirect = '/dashboard';
+    if (pathname.includes('/login')) {
+      const target = urlSearchParams?.get('target');
+      toRedirect = target || '/dashboard';
+    }
+
+    url.pathname = toRedirect;
     return NextResponse.redirect(url);
   } else if (!token && !isDynamicPublicUrl && !isAuthUrl) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    return NextResponse.redirect(url);
-  }
+
+    const urlSearchParams = new URLSearchParams(search);
+    const target = urlSearchParams.get('target');
+    if (target && !authUrls.some((regex) => regex.test(target))) {
+      url.search = `target=${encodeURIComponent(pathname + search)}`;
+    } else if (!target) {
+      url.search = `target=${encodeURIComponent(pathname + search)}`;
+    }
+
+    return NextResponse.redirect(url);}
 
   return NextResponse.next();
 }

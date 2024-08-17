@@ -26,7 +26,19 @@ export async function POST(req){
   }
   
   const userDetail = await User.findOne({email})
-  const isValid = await bcrypt.compare(password, userDetail.password)
+  if(!userDetail){
+    return NextResponse.json({
+      message: 'Email doesn\'t exists.'
+    }, {
+      status: 404 })
+  }
+  if(!userDetail?.password){
+    return NextResponse.json({
+      message: 'Password not exists.'
+    }, {
+      status: 404 })
+  }
+  const isValid = await bcrypt.compare(password, userDetail?.password)
   if(isValid){
     const token = jwt.sign({
       data: userDetail
@@ -52,7 +64,6 @@ export async function POST(req){
   }
   
 }
-
 
 export async function GET() {
   return NextResponse.json({ message: 'Method Not Allowed' }, { status: 405 });

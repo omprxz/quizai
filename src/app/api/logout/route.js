@@ -3,7 +3,8 @@ import { cookies } from 'next/headers';
 
 export async function GET(req) {
   const cookieStore = cookies();
-  const response = NextResponse.json(
+  cookieStore.set("token", "", { maxAge: -1 });
+  return NextResponse.json(
     {
       message: "Logged out",
       success: true,
@@ -12,6 +13,4 @@ export async function GET(req) {
       status: 200,
     }
   );
-  cookieStore.set("token", "", { maxAge: -1 });
-  return response;
 }

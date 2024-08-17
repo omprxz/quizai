@@ -6,15 +6,14 @@ import { toast } from 'react-hot-toast';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { useTheme } from '@mui/material/styles';
 
-export default function Page({ params }) {
+export default function Page() {
   const theme = useTheme();
   const [responses, setResponses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const quizid = params.quizid;
 
   useEffect(() => {
-    axios.get('/api/quiz/response/all?filter=user&id=' + quizid)
+    axios.get('/api/quiz/response/all?filter=user')
       .then(res => {
         setResponses(res.data.data.responses);
         setIsLoading(false);
@@ -24,7 +23,7 @@ export default function Page({ params }) {
         setError(err?.response?.data?.message || err?.message);
         setIsLoading(false);
       });
-  }, [quizid]);
+  }, []);
 
   const formatTime = (timeInSeconds) => {
     if (timeInSeconds >= 3600) {
@@ -156,7 +155,8 @@ export default function Page({ params }) {
                     minute: '2-digit',
                     hour12: true
                   }).replace(',', '')} 
-                  id={response._id} 
+                  id={response._id}
+                  quizid={response.quizid}
                 />
               ))
             )}

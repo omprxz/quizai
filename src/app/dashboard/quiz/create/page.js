@@ -35,7 +35,7 @@ export default function Page() {
   const maxFileSize = 4 * 1024 * 1024;
   const maxFiles = 5;
   const [isRotated, setIsRotated] = useState(false);
-  const [showCustomSettings, setShowCustomSettings] = useState(true);
+  const [showCustomSettings, setShowCustomSettings] = useState(false);
   const [loading, setLoading] = useState(false)
   
   const [formData, setFormData] = useState({
@@ -46,7 +46,7 @@ export default function Page() {
     total_questions: '5',
     visibility: 'public',
     level: 'Medium',
-    type: ['single_correct', 'subjective'],
+    type: ['single_correct', 'multi_correct', 'subjective'],
     category: '',
     duration: '',
     passing_score: '',
