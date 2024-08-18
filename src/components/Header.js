@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import axios from 'axios';
 import { useRouter, usePathname } from 'next/navigation';
 import { FaHome, FaArrowLeft } from 'react-icons/fa';
@@ -16,10 +17,16 @@ const Header = () => {
   const [ppOpen, setPpOpen] = useState(false);
   const [userData, setUserData] = useState({});
   const [userImage, setUserImage] = useState('/user.png');
+  const [token, setToken] = useState(null)
   const imgRef = useRef(null);
   const menuRef = useRef(null);
   const [atPath, setAtPath] = useState(0);
   const initialRender = useRef(true);
+  
+  useEffect(() => {
+    setToken(localStorage?.getItem('authToken'))
+  }, [])
+  
 
   useEffect(() => {
     setPpOpen(false);
@@ -64,7 +71,7 @@ const Header = () => {
 
   return (
     <>
-      {ppOpen && (
+      {ppOpen && token && (
         <div ref={menuRef} className="fixed top-12 right-8 p-3 z-20">
           <div className="rounded p-3 flex flex-col justify-start gap-2 text-sm bg-neutral text-white glass shadow-sm shadow-neutral">
             <Link href='/dashboard/settings'>Settings</Link>
@@ -87,19 +94,22 @@ const Header = () => {
               <FaHome className="text-xl" />
             </Link>
           </div>
+          { token &&
           <div className="flex items-center">
             <button onClick={() => {
               setPpOpen((prev) => !prev)
             }} className="btn btn-ghost btn-circle">
-              <img
+              <Image
                 ref={imgRef}
                 src={userImage || '/user.png'}
                 width="30"
                 height="30"
+                alt="User pic"
                 className='dark:shadow-gray-400 shadow-gray-800 shadow rounded-full aspect-square'
               />
             </button>
           </div>
+          }
         </div>
       </header>
     </>

@@ -18,6 +18,16 @@ export default function Page({ params }) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [dataStatus, setDataStatus] = useState(0);
   const [dataMsg, setDataMsg] = useState('Loading quiz data, please hold on...');
+  
+  const formatTime = (timeInSeconds) => {
+    if (timeInSeconds >= 3600) {
+      return `${Math.floor(timeInSeconds / 3600)}h ${Math.floor((timeInSeconds % 3600) / 60)}m ${timeInSeconds % 60}s`;
+    } else if (timeInSeconds >= 60) {
+      return `${Math.floor(timeInSeconds / 60)}m ${timeInSeconds % 60}s`;
+    } else {
+      return `${timeInSeconds}s`;
+    }
+  };
 
   useEffect(() => {
     axios.get('/api/quiz?id=' + params.quizid)
@@ -262,7 +272,7 @@ const handleSubmit = (tOver) => {
         <span class="text-error">Wrong: ${totalWrong}</span><br />
         <span class="text-info">Not Attempted: ${notAttempted}</span><br />
         <span class="text-warning">Percentage Scored: ${percentageScored.toFixed(2)}%</span><br /><br />
-        <span class="text-primary">Time taken: ${timeTaken}s</span><br /><br />
+        <span class="text-primary">Time taken: ${formatTime(timeTaken)}</span><br /><br />
       `);
       document.getElementById('result_summary').showModal();
       setLoading(false);

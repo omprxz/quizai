@@ -222,7 +222,7 @@ export function QuizButton({
           <span>Questions: {total_questions}</span>
           <span>{createdAt}</span>
           <span className='flex gap-0.5 justify-center items-center'>
-            Responses: {!response_count ? (
+            Responses: {!response_count && response_count !== 0 ? (
               <IoMdRefresh className="text-sm animate-spin" />
             ) : (
               response_count
