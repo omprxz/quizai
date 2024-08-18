@@ -8,7 +8,7 @@ const HomePage = () => {
     <div className="min-h-screen bg-gradient-to-r from-blue-900 via-purple-900 to-pink-900">
       <header className="backdrop-blur-lg bg-black/30 shadow-lg fixed w-full z-50">
         <div className="container mx-auto p-5 flex justify-between items-center">
-          <div className="text-2xl font-bold text-white">QuizAI</div>
+          <Link href='/' className="text-2xl font-bold text-white">QuizAI</Link>
           <nav className="space-x-5 text-gray-400">
             <Link href="#features" className="hover:text-white">Features</Link>
             <Link href="#about" className="hover:text-white">About</Link>
