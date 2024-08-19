@@ -1,0 +1,108 @@
+:root {
+  --button-dark-bg: #1C1A1C;
+  --button-light-bg: #E0E0E0;
+  --button-dark-hover-bg: linear-gradient(0deg, #A47CF3, #683FEA);
+  --button-light-hover-bg: linear-gradient(0deg, #7C4DFF, #6200EA);
+  --text-dark-color: #AAAAAA;
+  --text-light-color: #333333;
+  --text-dark-hover-color: #FFFFFF;
+  --text-light-hover-color: #FFFFFF;
+  --shadow-dark-color: rgba(255, 255, 255, 0.2);
+  --shadow-light-color: rgba(0, 0, 0, 0.2);
+}
+
+.aiGenerateButton-btn {
+  border: none;
+  width: 10em;
+  height: 3em;
+  border-radius: 1.5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  background: var(--button-dark-bg);
+  color: var(--text-dark-color);
+  cursor: pointer;
+  transition: all 450ms ease-in-out;
+}
+
+.aiGenerateButton-sparkle {
+  fill: var(--text-dark-color);
+  transition: all 800ms ease;
+}
+
+.aiGenerateButton-text {
+  font-weight: 600;
+  color: var(--text-dark-color);
+  font-size: small;
+}
+
+.aiGenerateButton-btn:hover {
+  background: var(--button-dark-hover-bg);
+  box-shadow: inset 0px 0.5px 0px 0px var(--shadow-dark-color),
+              inset 0px -1px 0px 0px var(--shadow-light-color),
+              0px 0px 0px 2px var(--shadow-dark-color),
+              0px 0px 20px 0px #9917FF;
+  transform: translateY(-1px);
+}
+
+.aiGenerateButton-btn:hover .aiGenerateButton-text {
+  color: var(--text-dark-hover-color);
+}
+
+.aiGenerateButton-btn:hover .aiGenerateButton-sparkle {
+  fill: var(--text-dark-hover-color);
+  transform: scale(1.05);
+}
+
+@media (prefers-color-scheme: light) {
+  .aiGenerateButton-btn {
+    background: var(--button-light-bg);
+    color: var(--text-light-color);
+  }
+
+  .aiGenerateButton-sparkle {
+    fill: var(--text-light-color);
+  }
+
+  .aiGenerateButton-text {
+    color: var(--text-light-color);
+  }
+
+  .aiGenerateButton-btn:hover {
+    background: var(--button-light-hover-bg);
+    box-shadow: inset 0px 0.5px 0px 0px var(--shadow-light-color),
+                inset 0px -1px 0px 0px var(--shadow-dark-color),
+                0px 0px 0px 2px var(--shadow-light-color),
+                0px 0px 40px 0px #6200EA;
+  }
+
+  .aiGenerateButton-btn:hover .aiGenerateButton-text {
+    color: var(--text-light-hover-color);
+  }
+
+  .aiGenerateButton-btn:hover .aiGenerateButton-sparkle {
+    fill: var(--text-light-hover-color);
+  }
+}
+
+@keyframes aiStars {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.aiGenerateButton-sparkle {
+  fill: var(--text-dark-color);
+  transition: all 1s ease;
+}
+
+.aiGenerateButton-sparkle.loadingAi {
+  animation: aiStars 2s ease-in-out infinite;
+}

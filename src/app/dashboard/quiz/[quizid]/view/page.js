@@ -327,6 +327,7 @@ const handleSubmit = (tOver) => {
       </div>
 
       <div className="min-h-screen px-4 py-2 pb-12 w-full flex justify-center" data-theme={quizDetails.theme}>
+      <Link href='/dashboard/settings'>Settings</Link>
         <div className="flex flex-col justify-center gap-2 w-full max-w-sm">
           <h1 className="font-bold text-2xl">{quizDetails.title || 'No title'}</h1>
           <p className="text-sm text-neutral">Created by {quizDetails.createdBy}</p>

@@ -105,7 +105,7 @@ export async function GET(req) {
       if(a.percentage == b.percentage){
         return a.timeTaken - b.timeTaken
       }
-      return a.percentage - b.percentage
+      return b.percentage - a.percentage
     })
     const responseRank = sortedResponses.findIndex(res => res._id == id) + 1
     

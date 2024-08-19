@@ -13,21 +13,20 @@ const Header = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const logOut = useLogout();
+  const { logOut, loggingOut } = useLogout();
   const [ppOpen, setPpOpen] = useState(false);
   const [userData, setUserData] = useState({});
   const [userImage, setUserImage] = useState('/user.png');
-  const [token, setToken] = useState(null)
+  const [token, setToken] = useState(null);
   const imgRef = useRef(null);
   const menuRef = useRef(null);
   const [atPath, setAtPath] = useState(0);
   const initialRender = useRef(true);
   
   useEffect(() => {
-    setToken(localStorage?.getItem('authToken'))
-  }, [])
+    setToken(localStorage?.getItem('authToken'));
+  }, []);
   
-
   useEffect(() => {
     setPpOpen(false);
     if (initialRender.current) {
@@ -62,10 +61,21 @@ const Header = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (loggingOut) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [loggingOut]);
+
   const handleBack = () => {
     router.back();
     if(atPath > 1){
-    setAtPath(p => p - 2);
+      setAtPath(p => p - 2);
     }
   };
 
@@ -80,6 +90,16 @@ const Header = () => {
           </div>
         </div>
       )}
+      
+      {loggingOut && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-30">
+          <div className="text-center">
+            <div className="loading loading-ring loading-lg"></div>
+            <p className="mt-4 text-lg font-medium text-white">Signing you out, please wait...</p>
+          </div>
+        </div>
+      )}
+
       <header className="fixed top-0 w-full bg-base-100 z-10 print:hidden">
         <div className="navbar flex justify-between items-center px-4 h-16">
           {atPath > 1 && (

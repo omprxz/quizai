@@ -52,8 +52,9 @@ const handler = NextAuth({
                     { expiresIn: "10d" }
                 );
                 cookieStore.set("token", token, {
-                    httpOnly: true
-                });
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60
+})
 
                 user.token = token;
                 return true;

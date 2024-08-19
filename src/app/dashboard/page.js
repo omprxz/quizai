@@ -1,14 +1,12 @@
 'use client'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import useLogout from "@/utils/logout";
 import { CreateQuizButton, QuizButton } from "@/components/quizButton";
 import { toast } from 'react-hot-toast';
 import { RiLoader2Fill } from "react-icons/ri";
 import { MdErrorOutline } from "react-icons/md";
 
 export default function Page() {
-  const logOut = useLogout();
   
   const [quizList, setQuizList] = useState([]);
   const [dataStatus, setDataStatus] = useState(0);

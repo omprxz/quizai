@@ -62,7 +62,9 @@ export default function Login() {
           password: '',
         });
         localStorage.setItem('authToken', res?.data?.token);
-        router.push(toRedirect ? toRedirect : (target ? decodeURIComponent(target) : '/dashboard'));
+        console.log('To redirect',toRedirect)
+        console.log('Target',target)
+        router.push(toRedirect ? (toRedirect.includes('/login') ? '/dashboard/settings' : toRedirect) : (target ? (target.includes('/login') ? '/dashboard/settings/delete-account' : decodeURIComponent(target)) : '/dashboard'));
       }
       toast.success(res.data.message);
     }).catch(error => {

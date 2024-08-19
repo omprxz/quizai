@@ -13,6 +13,7 @@ import $ from 'jquery';
 import dynamic from 'next/dynamic';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import Mic from '@/components/Mic';
+import '@/styles/buttonsComponent.css';
 
 const useJQueryConfirm = () => {
   useEffect(() => {
@@ -636,19 +637,29 @@ export default function Page({ params }) {
                 />
               </label>
             </div>
-            <div className='w-full flex justify-center'>
+            <div className='w-full flex justify-center mt-4'>
             <button
               onClick={handleGenerateQuestions}
-              className="btn btn-primary btn-sm mt-4 disabled:text-base-100 disabled:bg-primary"
+              className="aiGenerateButton-btn"
               disabled={addQuestionsLoading}
             >
-              {addQuestionsLoading ? (
-                <>
-                  <RiLoader2Fill className="animate-spin" /> Generating...
-                </>
+            <svg
+        height="24"
+        width="24"
+        fill="#FFFFFF"
+        viewBox="0 0 24 24"
+        data-name="Layer 1"
+        id="Layer_1"
+        className={`aiGenerateButton-sparkle ${addQuestionsLoading ? 'loadingAi' : ''}`}
+      >
+        <path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z"></path>
+      </svg>
+       <span className="aiGenerateButton-text">
+       {addQuestionsLoading ? ('Generating...'
               ) : (
-                <> <BsStars /> Generate </>
+                'Generate'
               )}
+       </span>
             </button>
             </div>
           </div>
@@ -820,7 +831,7 @@ export default function Page({ params }) {
                   <p className="mb-1.5 text-neutral dark:text-neutral-content text-sm">
                     Choose theme
                   </p>
-                  <div className="flex flex-row gap-x-4 flex-nowrap overflow-x-scroll max-w-sm rounded-md py-3 px-4 bg-gray-300 dark:bg-gray-800">
+                  <div className="flex flex-row gap-x-4 flex-nowrap overflow-x-scroll w-full rounded-md py-3 px-4 bg-neutral-content dark:bg-neutral">
                     {themes.map((theme, index) => (
                       <label
                         className="flex flex-col justify-center items-center gap-y-3"

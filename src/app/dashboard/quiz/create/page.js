@@ -11,6 +11,7 @@ import { RiLoader2Fill } from "react-icons/ri";
 import { LuFilePlus2 } from "react-icons/lu";
 import $ from 'jquery';
 import dynamic from 'next/dynamic';
+import {AiGenerateButton} from '@/components/buttons/buttons'
 
 const useJQueryConfirm = () => {
   useEffect(() => {
@@ -518,7 +519,7 @@ export default function Page() {
   <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Type</p>
   <div className="join">
     <input
-      className="join-item btn text-sm"
+      className="join-item btn btn-sm text-sm"
       type="checkbox"
       name="single_correct"
       aria-label="Single Correct"
@@ -526,7 +527,7 @@ export default function Page() {
       onChange={handleChange}
     />
     <input
-      className="join-item btn text-sm"
+      className="join-item btn btn-sm text-sm"
       type="checkbox"
       name="multi_correct"
       aria-label="Multi Correct"
@@ -534,7 +535,7 @@ export default function Page() {
       onChange={handleChange}
     />
     <input
-      className="join-item btn text-sm"
+      className="join-item btn btn-sm text-sm"
       type="checkbox"
       name="subjective"
       aria-label="Subjective"
@@ -635,7 +636,7 @@ export default function Page() {
             </label>
             <div class="theme w-full max-w-sm">
             <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Choose theme</p>
-            <div className='flex flex-row gap-x-4 flex-nowrap overflow-x-scroll max-w-sm rounded-md py-3 px-4 bg-neutral hide-scrollbar'>
+            <div className='flex flex-row gap-x-4 flex-nowrap overflow-x-scroll w-full rounded-md py-3 px-4 bg-neutral-content dark:bg-neutral'>
             {
               themes.map((theme, index) => (
                 <label className='flex flex-col justify-center items-center gap-y-3' key={index}>
@@ -659,18 +660,8 @@ export default function Page() {
           </>
         )}
 
-        <div className='mx-auto mt-4'>
-          <button type="submit" className='btn btn-primary disabled:text-base-100 disabled:bg-primary' disabled={loading}>
-          {
-            loading ?
-             (
-              <>
-              <RiLoader2Fill className='animate-spin' />
-              Creating
-              </>
-              ) : 'Create Quiz'
-          }
-          </button>
+        <div className='mx-auto mt-6'>
+          <AiGenerateButton text={`${loading ? 'Generating Quiz' : 'Generate Quiz'}`} loading={loading} />
         </div>
       </form>
     </div>

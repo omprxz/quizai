@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,18 @@ export default function DeleteAccountPage() {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
-  const logOut = useLogout();
+  const { logOut, loggingOut } = useLogout();
+  
+  useEffect(() => {
+    if (loggingOut) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [loggingOut]);
 
   const handleDelete = () => {
     setLoading(true);
@@ -60,12 +71,23 @@ export default function DeleteAccountPage() {
               </button>
               <button
                 onClick={handleDelete}
-                className={`btn btn-error ${loading ? 'loading' : ''}`}
+                className={`btn btn-error disabled:bg-error`}
                 disabled={loading}
               >
+                <span className={`${loading ? 'loading' : ''}`}>
                 {loading ? 'Deleting...' : 'Delete'}
+                </span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+      
+      {loggingOut && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-30">
+          <div className="text-center">
+            <div className="loading loading-ring loading-lg"></div>
+            <p className="mt-4 text-lg font-medium text-white">Signing you out, please wait...</p>
           </div>
         </div>
       )}

@@ -51,8 +51,9 @@ export async function POST(req){
       status:200
     })
     cookieStore.set("token", token, {
-      httpOnly: true
-    })
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60
+})
     return response
   }else{
     return NextResponse.json({
