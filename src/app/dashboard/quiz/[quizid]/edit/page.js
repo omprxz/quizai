@@ -480,8 +480,8 @@ export default function Page({ params }) {
   return (
     <>
       {aiModalVisible && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm p-2 z-40 overflow-hidden">
-          <div className="bg-neutral-content dark:bg-neutral shadow-md shadow-neutral rounded-lg py-5 px-4 w-full max-w-xs relative z-30 overflow-auto">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-80 backdrop-blur-sm p-2 z-40 overflow-hidden">
+          <div className="bg-base-100 shadow-md shadow-neutral rounded-lg py-5 px-4 w-full max-w-xs relative z-30 overflow-auto">
             <button
               onClick={() => setAiModalVisible(false)}
               className="absolute top-2.5 right-2.5"
@@ -504,7 +504,7 @@ export default function Page({ params }) {
             <h2 className="text-lg font-semibold mb-2 mt-1.5">Generate Questions with AI</h2>
             <div className="space-y-2">
               <label className="label cursor-pointer gap-2">
-                <span className="label-text text-neutral dark:text-neutral-content text-sm">
+                <span className="label-text  text-base-1000 text-sm">
                   Use Existing Quiz Topic and Details
                 </span>
                 <input
@@ -539,7 +539,7 @@ export default function Page({ params }) {
                 </div>
               )}
               <div className="type">
-                <p className='mb-1 text-neutral dark:text-neutral-content text-xs'>Type</p>
+                <p className='mb-1  text-base-1000 text-xs'>Type</p>
                 <div className="flex flex-wrap gap-2">
                   <input
                     className="btn btn-sm"
@@ -568,7 +568,7 @@ export default function Page({ params }) {
                 </div>
               </div>
               <div className="level mb-2">
-                <p className="mb-1 text-neutral dark:text-neutral-content text-xs">Level</p>
+                <p className="mb-1  text-base-1000 text-xs">Level</p>
                 <div className="join">
                   <input
                     className="join-item btn btn-sm"
@@ -602,7 +602,7 @@ export default function Page({ params }) {
               <label className="input input-sm input-bordered border-neutral flex items-center gap-1 text-xs w-full max-w-xs mt-1">
                 Language
                 <select
-                  className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-none text-neutral dark:text-neutral-content text-xs select-sm ms-1"
+                  className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-none  text-base-1000 text-xs select-sm ms-1"
                   name="language"
                   value={aiFormData.language}
                   onChange={handleAiFormChange}
@@ -692,7 +692,7 @@ export default function Page({ params }) {
             </div>
 
             <div className="level">
-              <p className="mb-1.5 text-neutral dark:text-neutral-content text-sm">Level</p>
+              <p className="mb-1.5  text-base-1000 text-sm">Level</p>
               <div className="join">
                 <input
                   className="join-item btn"
@@ -727,7 +727,7 @@ export default function Page({ params }) {
             <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-2">
               Visibility
               <select
-                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none  text-base-1000"
                 name="visibility"
                 value={formData.visibility}
                 onChange={handleChange}
@@ -750,7 +750,7 @@ export default function Page({ params }) {
             </label>
 
             <label className="label cursor-pointer gap-6">
-              <span className="label-text text-neutral dark:text-neutral-content">
+              <span className="label-text  text-base-1000">
                 Shuffle Questions
               </span>
               <input
@@ -763,7 +763,7 @@ export default function Page({ params }) {
             </label>
 
             <label className="label cursor-pointer gap-6">
-              <span className="label-text text-neutral dark:text-neutral-content">
+              <span className="label-text  text-base-1000">
                 Shuffle Options
               </span>
               <input
@@ -804,7 +804,7 @@ export default function Page({ params }) {
                 <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-1">
                   Language
                   <select
-                    className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+                    className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none  text-base-1000"
                     name="language"
                     value={formData.language}
                     onChange={handleChange}
@@ -828,10 +828,10 @@ export default function Page({ params }) {
                 </label>
 
                 <div className="theme w-full">
-                  <p className="mb-1.5 text-neutral dark:text-neutral-content text-sm">
+                  <p className="mb-1.5  text-base-1000 text-sm">
                     Choose theme
                   </p>
-                  <div className="flex flex-row gap-x-4 flex-nowrap overflow-x-scroll w-full rounded-md py-3 px-4 bg-neutral-content dark:bg-neutral">
+                  <div className="flex flex-row gap-x-4 flex-nowrap overflow-x-scroll w-full rounded-md py-3 px-4 bg-base-200">
                     {themes.map((theme, index) => (
                       <label
                         className="flex flex-col justify-center items-center gap-y-3"
@@ -862,7 +862,7 @@ export default function Page({ params }) {
                 </div>
               </>
             )}
-            <div className="py-3 bg-gray-300 dark:bg-gray-800 rounded-md px-3">
+            <div className="py-3 bg-base-200 rounded-md px-3">
               <div className="flex flex-row items-center gap-x-2">
                 <h2 className="mt-1 mb-2 font-bold text-primary text-xl">Questions</h2>
                 <button
@@ -893,7 +893,7 @@ export default function Page({ params }) {
       <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm my-1">
         Question Type
         <select
-          className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+          className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none  text-base-1000"
           name="question_type"
           value={question.question_type}
           onChange={(e) => {
@@ -955,7 +955,7 @@ export default function Page({ params }) {
                 onChange={(e) => handleOptionChange(e, question._id, option._id)}
               />
               <label className="label cursor-pointer gap-6">
-                <span className="label-text text-neutral dark:text-neutral-content">
+                <span className="label-text  text-base-1000">
                   Correct
                 </span>
                 <input
@@ -1030,7 +1030,7 @@ export default function Page({ params }) {
             <div className="mx-auto mt-4">
               <button
                 type="submit"
-                className="btn btn-primary disabled:text-base-100 disabled:bg-primary"
+                className="btn btn-primary disabled: text-base-1000 disabled:bg-primary"
                 disabled={loading}
               >
                 {loading ? (

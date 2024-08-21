@@ -383,7 +383,7 @@ export default function Page() {
         </label>
 
         <label className="w-full max-w-sm mt-1 relative">
-          <span className="block mb-1.5 text-neutral dark:text-neutral-content text-sm">Describe your topic (Required)</span>
+          <span className="block mb-1.5 text-base-1000 text-sm">Describe your topic (Required)</span>
           <textarea
             ref={textareaRef}
             placeholder="Describe your topic"
@@ -396,11 +396,11 @@ export default function Page() {
           <div className="absolute right-1.5 bottom-8">
             <Mic micActive={listening} handleMic={handleMic} />
           </div>
-          <p className='text-sm text-neutral dark:text-neutral-content'>{remainingChars}/{maxChars} characters remaining</p>
+          <p className='text-sm text-base-1000'>{remainingChars}/{maxChars} characters remaining</p>
         </label>
         
         <label className="label cursor-pointer gap-6 w-full max-w-sm">
-              <span className="label-text text-neutral dark:text-neutral-content">Include files to generate questions</span>
+              <span className="label-text text-base-1000">Include files to generate questions</span>
               <input
                 type="checkbox"
                 name="useFile"
@@ -425,7 +425,7 @@ export default function Page() {
     </button>
     <ul className='mt-3 flex flex-col gap-2'>
       {formData.files.length === 0 ? (
-        <li className='text-neutral dark:text-neutral-content text-sm text-center'>No files selected.</li>
+        <li className='text-base-1000 text-sm text-center'>No files selected.</li>
       ) : (
         formData.files.map((file, index) => (
           <li key={index} className='text-sm flex flex-col gap-1 border border-neutral px-3 py-1.5 rounded relative'>
@@ -462,7 +462,7 @@ export default function Page() {
         <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-2">
               Visibility
               <select
-                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-base-1000"
                 name='visibility'
                 value={formData.visibility}
                 onChange={handleChange}
@@ -474,7 +474,7 @@ export default function Page() {
         
 
         <div className="level w-full max-w-sm">
-          <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Level</p>
+          <p className='mb-1.5 text-base-1000 text-sm'>Level</p>
           <div className="join">
             <input
               className="join-item btn"
@@ -516,7 +516,7 @@ export default function Page() {
         {showCustomSettings && (
           <>
             <div className="type w-full max-w-sm">
-  <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Type</p>
+  <p className='mb-1.5 text-base-1000 text-sm'>Type</p>
   <div className="join">
     <input
       className="join-item btn btn-sm text-sm"
@@ -548,7 +548,7 @@ export default function Page() {
             <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-1">
               Category
               <select
-                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-base-1000"
                 name='category'
                 value={formData.category}
                 onChange={handleChange}
@@ -589,7 +589,7 @@ export default function Page() {
             <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-1">
               Language
               <select
-                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-neutral dark:text-neutral-content"
+                className="grow select select-neutral select-bordered border-neutral border-r-0 rounded-bl-none rounded-tl-none text-base-1000"
                 name="language"
                 value={formData.language}
                 onChange={handleChange}
@@ -613,7 +613,7 @@ export default function Page() {
             </label>
 
             <label className="label cursor-pointer gap-6 w-full max-w-sm">
-              <span className="label-text text-neutral dark:text-neutral-content">Shuffle Questions</span>
+              <span className="label-text text-base-1000">Shuffle Questions</span>
               <input
                 type="checkbox"
                 name="shuffle_question"
@@ -624,7 +624,7 @@ export default function Page() {
             </label>
 
             <label className="label cursor-pointer gap-6 w-full max-w-sm">
-              <span className="label-text text-neutral dark:text-neutral-content">Shuffle Options</span>
+              <span className="label-text text-base-1000">Shuffle Options</span>
               <input
                 type="checkbox"
                 name="shuffle_option"
@@ -635,8 +635,8 @@ export default function Page() {
               />
             </label>
             <div class="theme w-full max-w-sm">
-            <p className='mb-1.5 text-neutral dark:text-neutral-content text-sm'>Choose theme</p>
-            <div className='flex flex-row gap-x-4 flex-nowrap overflow-x-scroll w-full rounded-md py-3 px-4 bg-neutral-content dark:bg-neutral'>
+            <p className='mb-1.5 text-base-1000 text-sm'>Choose theme</p>
+            <div className='flex flex-row gap-x-4 flex-nowrap overflow-x-scroll w-full rounded-md py-3 px-4 bg-base'>
             {
               themes.map((theme, index) => (
                 <label className='flex flex-col justify-center items-center gap-y-3' key={index}>
