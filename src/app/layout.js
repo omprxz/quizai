@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${inter.className} min-h-screen`}>
       <ReduxProvider>
-        {/*<Eruda />*/}
+        {<Eruda />}
         <ScrollToTop />
         <Analytics />
         <Toaster position="top-center" />

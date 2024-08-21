@@ -33,7 +33,8 @@ export default function Page({ params }) {
     axios.get('/api/quiz?id=' + params.quizid)
       .then((res) => {
         setLoggedIn(res.data.loggedIn);
-
+        setTimeout(()=>{
+              console.log(res)}, 5000)
         axios.get('/api/user/any?id=' + res.data.quiz.userid)
           .then((resp) => {
             let quiz = { ...res.data.quiz, createdBy: resp.data.data.name };
@@ -53,6 +54,7 @@ export default function Page({ params }) {
             
             setDataStatus(1);
             setQuizDetails(quiz);
+            
           })
           .catch((err) => {
             let quiz = { ...res.data.quiz, createdBy: 'Unnamed' };
@@ -327,7 +329,6 @@ const handleSubmit = (tOver) => {
       </div>
 
       <div className="min-h-screen px-4 py-2 pb-12 w-full flex justify-center" data-theme={quizDetails.theme}>
-      <Link href='/dashboard/settings'>Settings</Link>
         <div className="flex flex-col justify-center gap-2 w-full max-w-sm">
           <h1 className="font-bold text-2xl">{quizDetails.title || 'No title'}</h1>
           <p className="text-sm text-neutral">Created by {quizDetails.createdBy}</p>

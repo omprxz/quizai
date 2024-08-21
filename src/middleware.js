@@ -5,7 +5,6 @@ export function middleware(request) {
   const cookieStore = cookies();
   const token = cookieStore.get('token')?.value;
   const { pathname, search } = request.nextUrl;
-
   const dynamicPublicUrls = [
     /^\/dashboard\/quiz\/[^\/]+\/view$/, 
     /^\/dashboard\/quiz\/response\/[^\/]+/,
@@ -24,28 +23,32 @@ export function middleware(request) {
 
   if (token && isAuthUrl) {
     const url = request.nextUrl.clone();
+    url.search=''
     const urlSearchParams = new URLSearchParams(search);
     let toRedirect = '/dashboard';
     if (pathname.includes('/login')) {
-      const target = urlSearchParams?.get('target');
+      const target = urlSearchParams.get('target');
       toRedirect = target || '/dashboard';
     }
-
     url.pathname = toRedirect;
     return NextResponse.redirect(url);
   } else if (!token && !isDynamicPublicUrl && !isAuthUrl) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
+    url.search = ''
 
     const urlSearchParams = new URLSearchParams(search);
     const target = urlSearchParams.get('target');
+    urlSearchParams.delete('target');
+    const modifiedSearch = urlSearchParams.toString();
     if (target && !authUrls.some((regex) => regex.test(target))) {
-      url.search = `target=${encodeURIComponent(pathname + search)}`;
+      url.search = `target=${encodeURIComponent(pathname + (modifiedSearch ? '?' + modifiedSearch : ''))}`;
     } else if (!target) {
-      url.search = `target=${encodeURIComponent(pathname + search)}`;
+      url.search = `target=${encodeURIComponent(pathname + (modifiedSearch ? '?' + modifiedSearch : ''))}`;
     }
 
-    return NextResponse.redirect(url);}
+    return NextResponse.redirect(url);
+  }
 
   return NextResponse.next();
 }

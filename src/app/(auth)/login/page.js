@@ -19,7 +19,7 @@ export default function Login() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    target && target !== "" ? dispatch(addPath(decodeURIComponent(target))) : dispatch(dropPath());
+    target && target !== "" ? dispatch(addPath(target)) : dispatch(dropPath());
   }, [target, session]);
 
   const toRedirect = useSelector((state) => state.authRedirectPath.value);
@@ -40,7 +40,7 @@ export default function Login() {
     setloading(true);
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.exec(formData.email)) {
+   /* if (!emailRegex.exec(formData.email)) {
       toast.error("Invalid email");
       setloading(false);
       return;
@@ -50,7 +50,7 @@ export default function Login() {
       setloading(false);
       return;
     }
-
+*/
     axios.post('/api/login', JSON.stringify(formData), {
       headers: {
         'Content-Type': 'application/json',
@@ -62,9 +62,21 @@ export default function Login() {
           password: '',
         });
         localStorage.setItem('authToken', res?.data?.token);
-        console.log('To redirect',toRedirect)
-        console.log('Target',target)
-        router.push(toRedirect ? (toRedirect.includes('/login') ? '/dashboard/settings' : toRedirect) : (target ? (target.includes('/login') ? '/dashboard/settings/delete-account' : decodeURIComponent(target)) : '/dashboard'));
+          let finalRedirect = target ? target : toRedirect || '/dashboard';
+
+        const authUrls = [
+    /^\/login\/?$/,
+    /^\/social-sign-in\/[^\/]+\/?$/,
+    /^\/register\/?$/, 
+    /^\/password\/reset\/?$/, 
+    /^\/?$/
+];
+
+        finalRedirect = authUrls.some((regex) => regex.test(finalRedirect)) 
+            ? '/dashboard' 
+            : finalRedirect;
+        router.push('social-auth/sign-in?target='+finalRedirect);
+        
       }
       toast.success(res.data.message);
     }).catch(error => {
@@ -79,7 +91,6 @@ export default function Login() {
     <div className='min-h-screen pt-7 w-full flex justify-center'>
       <form className='flex flex-col items-center w-full max-w-sm justify-start md:justify-center gap-y-4 px-4 pb-8' onSubmit={handleSubmit}>
         <h1 className='text-center font-bold mb-5 text-2xl'>Log into QuizAI</h1>
-        
         <label className="input input-bordered flex items-center gap-2 min-w-full w-full max-w-sm">Email
           <input type="email" className="grow" placeholder=""
             name="email"

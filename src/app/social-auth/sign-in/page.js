@@ -15,16 +15,31 @@ export default function Page(){
   const target = searchParams?.get('target') || '';
   
   useEffect(() => {
-    target && target !== "" ? dispatch(addPath(decodeURIComponent(target))) : dispatch(dropPath());
+    target && target !== "" ? dispatch(addPath(target)) : dispatch(dropPath());
   }, [target, session]);
+  if(target){
+   let finalRedirect = target ? target : toRedirect || '/dashboard';
+
+        const authUrls = [
+    /^\/login\/?$/,
+    /^\/social-sign-in\/[^\/]+\/?$/,
+    /^\/register\/?$/, 
+    /^\/password\/reset\/?$/, 
+    /^\/?$/
+];
+
+        finalRedirect = authUrls.some((regex) => regex.test(finalRedirect)) 
+            ? '/dashboard' 
+            : finalRedirect;
+            router.push(finalRedirect)
+  }
   
   useEffect(() => {
     if (session) {
       const token = session?.accessToken;
       if(token){
       localStorage.setItem('authToken', token);
-      router.push(toRedirect ? toRedirect : '/dashboard');
-      
+      router.push(toRedirect || '/dashboard');
       }
     }
   }, [session, toRedirect]);
