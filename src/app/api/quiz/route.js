@@ -34,7 +34,6 @@ async function uploadToGemini(path, mimeType) {
   });
 
   const file = uploadResult.file;
-  console.log(file);
   return file;
 }
 
@@ -318,7 +317,6 @@ export async function POST(req) {
         const inputData = `#### Input Data For Quiz Generation:\n\n\`\`\`json${JSON.stringify(
             quizMetaData
         )}\`\`\``;
-        console.log(inputData)
         let quizResponse
         //return NextResponse.json({message: 'success'})
         if(filesUsed){
@@ -326,7 +324,6 @@ export async function POST(req) {
         }else{
          quizResponse = await generateQuiz(inputData, false, []);
         }
-        console.log(quizResponse)
         let quizData
         try{
          quizData = JSON.parse(quizResponse);

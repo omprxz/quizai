@@ -110,7 +110,7 @@ export default function Page() {
   
   return (
     <div>
-      <div className='flex flex-col gap-6 my-4 justify-center items-start px-5 w-full'>
+      <div className='flex flex-col gap-6 my-4 justify-center items-center px-5 w-full'>
         <CreateQuizButton />
       <div className='flex flex-col md:flex-row md:flex-wrap gap-y-6 gap-x-4 my-4 justify-center items-center w-full'>
         

@@ -15,6 +15,7 @@ export default function Login() {
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
   const target = searchParams?.get('target') || '';
+  const config = JSON.parse(process.env.CONFIG)
 
   const { data: session } = useSession();
 
@@ -40,7 +41,7 @@ export default function Login() {
     setloading(true);
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-   /* if (!emailRegex.exec(formData.email)) {
+    if (!emailRegex.exec(formData.email)) {
       toast.error("Invalid email");
       setloading(false);
       return;
@@ -50,7 +51,6 @@ export default function Login() {
       setloading(false);
       return;
     }
-*/
     axios.post('/api/login', JSON.stringify(formData), {
       headers: {
         'Content-Type': 'application/json',
@@ -64,13 +64,8 @@ export default function Login() {
         localStorage.setItem('authToken', res?.data?.token);
           let finalRedirect = target ? target : toRedirect || '/dashboard';
 
-        const authUrls = [
-    /^\/login\/?$/,
-    /^\/social-sign-in\/[^\/]+\/?$/,
-    /^\/register\/?$/, 
-    /^\/password\/reset\/?$/, 
-    /^\/?$/
-];
+       
+  const authUrls = config.authUrls.map((pattern) => new RegExp(pattern));
 
         finalRedirect = authUrls.some((regex) => regex.test(finalRedirect)) 
             ? '/dashboard' 

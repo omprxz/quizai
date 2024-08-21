@@ -10,11 +10,9 @@ const AuthSync = () => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const toRedirect = useSelector((state) => state.authRedirectPath.value);
+  const config = JSON.parse(process.env.CONFIG)
 
-  const dynamicPublicUrls = [
-    /^\/dashboard\/quiz\/[^\/]+\/view$/,
-    /^\/dashboard\/quiz\/response\/[^\/]+/,
-  ];
+  const dynamicPublicUrls = config.dynamicPublicUrls.map((pattern) => new RegExp(pattern));
   const isDynamicPublicUrl = dynamicPublicUrls.some((regex) =>
     regex.test(pathname)
   );
