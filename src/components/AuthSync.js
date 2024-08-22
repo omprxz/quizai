@@ -61,7 +61,7 @@ const AuthSync = () => {
   return (
     <>
     {loggingOut && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-70 z-30">
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-70 z-50">
           <div className="text-center">
             <div className="loading loading-ring loading-lg"></div>
             <p className="mt-4 text-lg font-medium text-white">Signing you out, please wait...</p>

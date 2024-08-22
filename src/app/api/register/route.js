@@ -18,15 +18,18 @@ export async function POST(req) {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
+try{
   const newUser = new User({
     name,
     email,
     password: hashedPassword,
   });
-
   await newUser.save();
 
   return NextResponse.json({ message: 'User registered successfully', success: true }, { status: 201 });
+}catch(e){
+   return NextResponse.json({ message: 'Something went wrong', error: e.message || e, success: false }, { status: 403 });
+}
 }
 
 export async function GET() {

@@ -10,6 +10,7 @@ import useLogout from "@/utils/logout";
 import { signIn, useSession } from 'next-auth/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetAtPath, modifyAtPath } from '@/reduxStates/atPathSlice';
+import { Feedback } from '@/components/forms'
 
 const Header = () => {
   const router = useRouter();
@@ -22,6 +23,7 @@ const Header = () => {
   const isAuthUrl = authUrls.some((regex) => regex.test(pathname));
   const { logOut, loggingOut } = useLogout();
   const [ppOpen, setPpOpen] = useState(false);
+  const [fbOpen, setFbOpen] = useState(true);
   const [userData, setUserData] = useState({});
   const [userImage, setUserImage] = useState('/user.png');
   const [token, setToken] = useState(null);
@@ -36,7 +38,7 @@ const Header = () => {
     }
     return 'light';
 });
-const [feedbackPublic, setFeedbackPublic] = useState(false)
+const [feedbackPublic, setFeedbackPublic] = useState(true)
   
   useEffect(() => {
     setToken(localStorage?.getItem('authToken'));
@@ -114,7 +116,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   return (
     <div className='mb-16'>
       {ppOpen && token && (
-        <div ref={menuRef} className="fixed top-12 right-8 p-3 z-20">
+        <div ref={menuRef} className="fixed top-12 right-8 p-3 z-50">
           <div className="rounded p-3 flex flex-col justify-start gap-2 text-sm bg-neutral text-white glass shadow-sm shadow-neutral">
             <Link href='/dashboard/settings'>Settings</Link>
             <hr />
@@ -124,15 +126,21 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
       )}
       
       {loggingOut && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-70 z-30">
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-70 z-50">
           <div className="text-center">
             <div className="loading loading-ring loading-lg"></div>
             <p className="mt-4 text-lg font-medium text-white">Signing you out, please wait...</p>
           </div>
         </div>
       )}
+      
+      {
+  <div className={`fixed top-0 left-0 z-10 transition-all duration-[400ms] w-full h-full justify-center items-center backdrop-blur-sm px-4 ${fbOpen ? 'flex opacity-100 scale-100' : 'opacity-0 scale-0 pointer-events-none'}`}>
+    <Feedback setFbOpen={setFbOpen} />
+  </div>
+}
 
-      <header className="fixed top-0 w-full bg-base-100 z-20 print:hidden">
+      <header className="fixed top-0 w-full bg-base-100 z-40 print:hidden">
         <div className="navbar flex justify-between items-center px-4 h-16">
           {atPath > 1 && (
             <div className="flex items-center">
@@ -169,7 +177,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
           </div>
           {
             feedbackPublic &&
-            <FaRegCircleQuestion className='text-xl' />
+            <FaRegCircleQuestion className='text-xl' onClick={()=>setFbOpen(prev => !prev)} />
           }
           { token &&
           <div className="flex items-center">

@@ -48,7 +48,7 @@ export default function Page(){
   }, [session, toRedirect]);
   
   return (
-    <div className='fixed h-full top-0 left-0 w-full z-10'>
+    <div className='fixed h-full top-0 left-0 w-full z-50'>
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="loading loading-ring loading-lg"></div>
