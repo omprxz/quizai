@@ -457,7 +457,7 @@ export async function GET(req) {
             );
         }
 
-        const quizDetails = await Quiz.findById(id).select('-questions.correct_answers -questions.reason');
+        const quizDetails = await Quiz.findById(id)//.select('-questions.correct_answers -questions.reason');
         if (quizDetails) {
             let loggedIn = false;
             let tokenDetails;

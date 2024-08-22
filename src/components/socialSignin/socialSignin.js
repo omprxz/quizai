@@ -21,12 +21,12 @@ export default function SocialSigninButton({toRedirect}){
         </div>
         <div className="flex flex-row flex-nowrap gap-3 border-2 border-neutral rounded-full p-3 justify-center items-center">
           <button type="button" onClick={() => handleSignIn('github')}>
-            <FaGithub className='text-black dark:text-white text-xl' />
+            <FaGithub className='text-base-1000 text-xl' />
           </button>
         </div>
         <div className="flex flex-row flex-nowrap gap-3 border-2 border-neutral rounded-full p-3 justify-center items-center">
           <button type="button" onClick={() => handleSignIn('twitter')}>
-            <FaXTwitter className='text-black dark:text-white text-xl' />
+            <FaXTwitter className='text-base-1000 text-xl' />
           </button>
         </div>
     </div>

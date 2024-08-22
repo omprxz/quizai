@@ -82,13 +82,13 @@ export default function Page({ params }) {
     <p className='fixed bottom-0 left-1/2 -translate-x-1/2 text-[0.5rem] text-gray-500 hidden print:block'>{process.env.NEXT_PUBLIC_APP_URL}</p>
       {responseDetails._id ? (
         <div className="max-w-sm print:max-w-2xl mx-auto pb-4 print:pb-0 px-3">
-          <h1 className="text-3xl font-bold text-blue-500 dark:text-blue-400 text-center mb-6">Result Details</h1>
+          <h1 className="text-3xl font-bold text-blue-600 text-center mb-6">Result Details</h1>
 
           {/* Submission and Quiz Info */}
           <div ref={resultRef}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="bg-blue-50 dark:bg-blue-900 rounded-md p-4 border border-blue-200 dark:border-blue-800">
-                <p className="text-gray-600 dark:text-gray-400">
+              <div className="bg-blue-900 rounded-md p-4 border-blue-800">
+                <p className="text-gray-400">
                   <span className="font-semibold">Submitted on:</span>{' '}
                   {new Date(responseDetails.createdAt).toLocaleString('en-US', {
                     day: '2-digit',
@@ -99,28 +99,28 @@ export default function Page({ params }) {
                     hour12: false
                   }).replace(',', '')}
                 </p>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-400">
                   <span className="font-semibold">Submitted by:</span>{' '}
                   {responseDetails.username}
                 </p>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-md p-4 shadow-lg">
-                <p className="text-gray-600 dark:text-gray-400">
+              <div className="bg-gray-700 rounded-md p-4 shadow-lg">
+                <p className="text-gray-400">
                   <span className="font-semibold">Quiz Title:</span>{' '}
                   {responseDetails.quiz ? (
-                    <Link href={`/dashboard/quiz/${responseDetails.quizDetails._id}/view`} className="text-blue-500 dark:text-blue-400 hover:underline">
+                    <Link href={`/dashboard/quiz/${responseDetails.quizDetails._id}/view`} className="text-blue-400 hover:underline">
                       {responseDetails.quizDetails.title}
                     </Link>
                   ) : (
                     responseDetails.quizDetails.title
                   )}
                 </p>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-400">
                   <span className="font-semibold">Total Questions:</span>{' '}
                   {responseDetails.total_questions}
                 </p>
-                {responseDetails.quizDetails.passing_score !== null && <p className="text-gray-600 dark:text-gray-400">
+                {responseDetails.quizDetails.passing_score !== null && <p className="text-gray-400">
                     <span className="font-semibold">Passing Score:</span>{' '}
                     {responseDetails.quizDetails.passing_score == 0 ? 0 : responseDetails.quizDetails.passing_score.toFixed(2)}%
                   </p>
@@ -129,11 +129,11 @@ export default function Page({ params }) {
             </div>
 
             <div className='w-full flex justify-center my-6'>
-              <div className="bg-gray-50 dark:bg-gray-700 shadow-lg w-full max-w-sm md:max-w-xs py-4 rounded-md md:py-4 flex flex-col gap-y-1 md:gap-y-2 justify-center items-center glass">
-                <p className="text-gray-600 dark:text-gray-200 font-bold text-xl">
+              <div className="bg-gray-700 shadow-lg w-full max-w-sm md:max-w-xs py-4 rounded-md md:py-4 flex flex-col gap-y-1 md:gap-y-2 justify-center items-center glass">
+                <p className="text-gray-200 font-bold text-xl">
                   {`${responseDetails.rank}/${responseDetails.quizResponsesCount}`}
                 </p>
-                <FaRankingStar className='text-5xl dark:text-gray-400' />
+                <FaRankingStar className='text-5xl text-gray-400' />
               </div>
             </div>
 
@@ -185,7 +185,7 @@ export default function Page({ params }) {
       <div className="w-full flex justify-center" ref={accordionDiv}>
         <div className="collapse collapse-arrow join-item border border-base-300 rounded-md print:border-none">
           <input type="checkbox" name="my-accordion-4" ref={accordionToggle} />
-          <div className="collapse-title text-xl font-bold dark:text-gray-200 print:hidden">
+          <div className="collapse-title text-xl font-bold text-base-1000 print:hidden">
             View your answers <MdVisibility className='inline' />
           </div>
           <div className="collapse-content">
@@ -199,7 +199,7 @@ export default function Page({ params }) {
                 const bgColor = question.question_type !== 'subjective' ? (
                   isSkipped ? 'border-yellow-500 shadow-yellow-300 bg-yellow-100' :
                   allCorrect ? 'border-green-500 shadow-green-300 bg-green-100' :
-                  'border-red-500 shadow-red-300 bg-red-100 dark:bg-red-200 dark:text-neutral'
+                  'border-red-500 shadow-red-300 bg-red-200 text-base-1000'
                 ) : '';
 
                 return (
@@ -237,7 +237,7 @@ export default function Page({ params }) {
                         </>
                       )}
                       {question.reason && (
-                        <p className="text-sm text-gray-600 dark:text-gray-500 whitespace-break-spaces">Reason: {question.reason}</p>
+                        <p className="text-sm text-gray-500 whitespace-break-spaces">Reason: {question.reason}</p>
                       )}
                     </div>
                   </div>

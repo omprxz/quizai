@@ -20,7 +20,8 @@ export const metadata = {
   viewport: "width=device-width, initial-scale=1",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children }){
+    
   return (
     <html lang="en" data-theme='light'>
       <head>
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
         <AuthSync />
         <Authprovider>
           <ProgressBarProvider>
+            <Header />
             {children}
           </ProgressBarProvider>
         </Authprovider>
