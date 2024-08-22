@@ -140,8 +140,8 @@ const [feedbackPublic, setFeedbackPublic] = useState(true)
   </div>
 }
 
-      <header className="fixed bottom-0 w-full bg-base-100 z-40 print:hidden">
-        <div className="navbar flex justify-around items-center px-4 h-16">
+      <header className="fixed bottom-0 w-full backdrop-blur z-40 border-t-[1.5px] border-base print:hidden">
+        <div className="navbar flex justify-around items-center h-16">
           {atPath > 1 && (
             <div className="flex items-center">
               <button onClick={handleBack} className="btn btn-ghost btn-circle">
