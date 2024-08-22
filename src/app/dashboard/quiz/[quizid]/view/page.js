@@ -30,11 +30,9 @@ export default function Page({ params }) {
   };
 
   useEffect(() => {
-    axios.get('/api/quiz?id=' + params.quizid)
+    axios.get('/api/quiz?filter=view&id=' + params.quizid)
       .then((res) => {
         setLoggedIn(res.data.loggedIn);
-        setTimeout(()=>{
-              console.log(res)}, 5000)
         axios.get('/api/user/any?id=' + res.data.quiz.userid)
           .then((resp) => {
             let quiz = { ...res.data.quiz, createdBy: resp.data.data.name };
@@ -181,7 +179,9 @@ const handleSubmit = (tOver) => {
   }
 
   setLoading(true);
-
+  axios.get('/api/quiz?id=' + params.quizid).then((res) => {
+    setQuizDetails({...res?.data?.quiz})
+    }).then(quizData => {
   let subjectiveAnswers = [];
   quizDetails.questions.forEach((question) => {
     if (question.question_type === 'subjective') {
@@ -286,6 +286,7 @@ const handleSubmit = (tOver) => {
       setLoading(false);
       setIsSubmitted(false);
     });
+    })
 };
 
   if (dataStatus === 0) {

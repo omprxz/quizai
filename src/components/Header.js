@@ -23,7 +23,7 @@ const Header = () => {
   const isAuthUrl = authUrls.some((regex) => regex.test(pathname));
   const { logOut, loggingOut } = useLogout();
   const [ppOpen, setPpOpen] = useState(false);
-  const [fbOpen, setFbOpen] = useState(true);
+  const [fbOpen, setFbOpen] = useState(false);
   const [userData, setUserData] = useState({});
   const [userImage, setUserImage] = useState('/user.png');
   const [token, setToken] = useState(null);
@@ -116,7 +116,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(true)
   return (
     <div className='mb-16'>
       {ppOpen && token && (
-        <div ref={menuRef} className="fixed top-12 right-8 p-3 z-50">
+        <div ref={menuRef} className="fixed bottom-14 right-2 p-3 z-50">
           <div className="rounded p-3 flex flex-col justify-start gap-2 text-sm bg-neutral text-white glass shadow-sm shadow-neutral">
             <Link href='/dashboard/settings'>Settings</Link>
             <hr />
@@ -140,8 +140,8 @@ const [feedbackPublic, setFeedbackPublic] = useState(true)
   </div>
 }
 
-      <header className="fixed top-0 w-full bg-base-100 z-40 print:hidden">
-        <div className="navbar flex justify-between items-center px-4 h-16">
+      <header className="fixed bottom-0 w-full bg-base-100 z-40 print:hidden">
+        <div className="navbar flex justify-around items-center px-4 h-16">
           {atPath > 1 && (
             <div className="flex items-center">
               <button onClick={handleBack} className="btn btn-ghost btn-circle">

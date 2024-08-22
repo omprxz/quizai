@@ -36,8 +36,8 @@ export default function RootLayout({ children }){
         <AuthSync />
         <Authprovider>
           <ProgressBarProvider>
-            <Header />
             {children}
+            <Header />
           </ProgressBarProvider>
         </Authprovider>
         </ReduxProvider>

@@ -433,6 +433,7 @@ export async function GET(req) {
         await Db();
         const url = new URL(req.url);
         const id = url.searchParams.get("id");
+        const filter = url?.searchParams?.get("filter");
 
         if (!id) {
             return NextResponse.json(
@@ -456,8 +457,12 @@ export async function GET(req) {
                 }
             );
         }
-
-        const quizDetails = await Quiz.findById(id)//.select('-questions.correct_answers -questions.reason');
+        let quizDetails
+        if(filter === 'view'){
+          quizDetails = await Quiz.findById(id).select('-questions.correct_answers -questions.reason');
+        }else{
+          quizDetails = await Quiz.findById(id)
+        }
         if (quizDetails) {
             let loggedIn = false;
             let tokenDetails;
