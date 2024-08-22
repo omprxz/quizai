@@ -8,10 +8,13 @@ import { FaHome, FaArrowLeft } from 'react-icons/fa';
 import { FaRegCircleQuestion } from "react-icons/fa6";
 import useLogout from "@/utils/logout";
 import { signIn, useSession } from 'next-auth/react';
+import { useDispatch, useSelector } from 'react-redux';
+import { resetAtPath, modifyAtPath } from '@/reduxStates/atPathSlice';
 
 const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const dispatch = useDispatch()
   const { data: session } = useSession();
   
   const config = JSON.parse(process.env.CONFIG);
@@ -24,7 +27,7 @@ const Header = () => {
   const [token, setToken] = useState(null);
   const imgRef = useRef(null);
   const menuRef = useRef(null);
-  const [atPath, setAtPath] = useState(0);
+  const atPath = useSelector((state) => state.atPath.value);
   const initialRender = useRef(true);
   const ISSERVER = typeof window === "undefined";
   const [theme, setTheme] = useState(() => {
@@ -37,14 +40,14 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   
   useEffect(() => {
     setToken(localStorage?.getItem('authToken'));
-  }, [router, pathname]);
+  }, [router, pathname, loggingOut]);
   
   useEffect(() => {
     setPpOpen(false);
     if (initialRender.current) {
       initialRender.current = false;
     } else {
-      setAtPath(p => p + 1);
+      dispatch(modifyAtPath(atPath+1));
     }
   }, [pathname]);
 
@@ -93,7 +96,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   const handleBack = () => {
     router.back();
     if(atPath > 1){
-      setAtPath(p => p - 2);
+      dispatch(modifyAtPath(atPath-2));
     }
   };
   
@@ -129,7 +132,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
         </div>
       )}
 
-      <header className="fixed top-0 w-full bg-base-100 z-10 print:hidden">
+      <header className="fixed top-0 w-full bg-base-100 z-20 print:hidden">
         <div className="navbar flex justify-between items-center px-4 h-16">
           {atPath > 1 && (
             <div className="flex items-center">

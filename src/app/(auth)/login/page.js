@@ -64,14 +64,12 @@ export default function Login() {
         localStorage.setItem('authToken', res?.data?.token);
           let finalRedirect = target ? target : toRedirect || '/dashboard';
 
-       
   const authUrls = config.authUrls.map((pattern) => new RegExp(pattern));
 
         finalRedirect = authUrls.some((regex) => regex.test(finalRedirect)) 
             ? '/dashboard' 
             : finalRedirect;
         router.push('social-auth/sign-in?target='+finalRedirect);
-        
       }
       toast.success(res.data.message);
     }).catch(error => {

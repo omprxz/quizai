@@ -5,6 +5,7 @@ import { signOut, useSession } from 'next-auth/react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { dropPath } from '@/reduxStates/authRedirectPathSlice';
+import { resetAtPath } from '@/reduxStates/atPathSlice';
 import { useState } from 'react';
 
 export default function useLogout() {
@@ -21,6 +22,7 @@ export default function useLogout() {
         dispatch(dropPath());
         toast.success(res.data.message);
         router.push('/login');
+        dispatch(resetAtPath());
       })
       .catch((error) => {
         console.error(error);
