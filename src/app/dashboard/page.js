@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CreateQuizButton, QuizButton } from "@/components/quizButton";
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast';
 import { RiLoader2Fill } from "react-icons/ri";
 import { MdErrorOutline } from "react-icons/md";
 
@@ -52,7 +52,7 @@ export default function Page() {
         setDataStatus(404);
         setQuizList([]);
       } else {
-        toast.error(error.response.data.message);
+        showToast.error(error.response.data.message);
         setDataStatus(-1);
       }
       setDataMsg(error.response.data.message);
@@ -97,7 +97,7 @@ export default function Page() {
         setDataStatus(404);
         setQuizList([]);
       } else {
-        toast.error(error.response.data.message);
+        showToast.error(error.response.data.message);
         setDataStatus(-1);
       }
       setDataMsg(error.response.data.message);

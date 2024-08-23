@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from 'next/navigation';
-import { toast } from "react-hot-toast";
+import showToast from '@/components/showToast';
 import { signOut, useSession } from 'next-auth/react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
@@ -20,13 +20,13 @@ export default function useLogout() {
       .then((res) => {
         localStorage.removeItem('authToken');
         dispatch(dropPath());
-        toast.success(res.data.message);
+        showToast.success(res.data.message);
         router.push('/login');
         dispatch(resetAtPath());
       })
       .catch((error) => {
         console.error(error);
-        toast.error("Failed to logout");
+        showToast.error("Failed to logout");
       })
       .finally(() => {
         setLoggingOut(false);

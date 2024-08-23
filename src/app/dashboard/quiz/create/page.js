@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import Mic from '@/components/Mic';
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast'
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { IoMdSettings } from "react-icons/io";
@@ -150,7 +150,7 @@ export default function Page() {
       if(formData.files.length < maxFiles){
       fileInputRef.current.click()
       }else{
-        toast.error(`You can only upload up to ${maxFiles} files.`);
+        showToast.error(`You can only upload up to ${maxFiles} files.`);
       }
     }
   }
@@ -160,7 +160,7 @@ export default function Page() {
   const existingFilesCount = formData.files.length;
 
   if (existingFilesCount >= maxFiles) {
-    toast.error(`You can only upload up to ${maxFiles} files.`);
+    showToast.error(`You can only upload up to ${maxFiles} files.`);
     e.target.value = null;
     return;
   }
@@ -170,7 +170,7 @@ export default function Page() {
 
   for (const file of selectedFiles) {
     if (file.size > maxFileSize) {
-      toast.error(`File ${file.name} is too large (Limit ${maxFileSize / (1024 * 1024)}MB).`);
+      showToast.error(`File ${file.name} is too large (Limit ${maxFileSize / (1024 * 1024)}MB).`);
       continue;
     }
 
@@ -178,7 +178,7 @@ export default function Page() {
       validFiles.push(file);
       totalSize += file.size;
     } else {
-      toast.error(`Adding '${file.name.slice(0, 20)}${file.name.length > 20 ? '...' : ''}' would exceed the total size limit of ${maxFileSize / (1024 * 1024)}MB.`);
+      showToast.error(`Adding '${file.name.slice(0, 20)}${file.name.length > 20 ? '...' : ''}' would exceed the total size limit of ${maxFileSize / (1024 * 1024)}MB.`);
     }
 
     if (validFiles.length + existingFilesCount >= maxFiles) {
@@ -188,7 +188,7 @@ export default function Page() {
   }
 
   if (validFiles.length === 0) {
-    toast.error('No valid files selected.');
+    showToast.error('No valid files selected.');
     e.target.value = null;
     return;
   }
@@ -253,40 +253,40 @@ export default function Page() {
     const { total_questions, duration, passing_score, description, useFile } = formData;
     
     if(!description){
-      toast.error('Quiz description is required for creating quizes.')
+      showToast.error('Quiz description is required for creating quizes.')
       setLoading(false)
       return
     }
     if(description.length < 10){
-      toast.error('Atleast 10 characters required for quiz description.')
+      showToast.error('Atleast 10 characters required for quiz description.')
       setLoading(false)
       return;
     }
 
     if (total_questions !== '' && (!Number.isInteger(+total_questions) || +total_questions < 1 || +total_questions > 30)) {
-  toast.error('Number of questions must be an integer between 1 and 30.');
+  showToast.error('Number of questions must be an integer between 1 and 30.');
   setLoading(false)
   return;
 }
     if (duration && (!Number.isInteger(+duration) || +duration < 30 || +duration > 36000)) {
-      toast.error('Duration must be an integer between 30 and 36000 seconds or null.');
+      showToast.error('Duration must be an integer between 30 and 36000 seconds or null.');
       setLoading(false)
       return;
     }
     
     if (passing_score &&  (+passing_score > 100 || +passing_score < 0)) {
-      toast.error('Passing score must be between 0 and 100 or exactly 0.');
+      showToast.error('Passing score must be between 0 and 100 or exactly 0.');
       setLoading(false)
       return;
     }
     if(!Number.isInteger(+passing_score)){
-        toast.error('Passing score must be an integer.');
+        showToast.error('Passing score must be an integer.');
         setLoading(false)
       return;
       }
     
     if(formData.files.length > 0 && parseInt(total_questions) > 10){
-      toast.error("Max questions limit with file upload is 10 only")
+      showToast.error("Max questions limit with file upload is 10 only")
       setLoading(false)
       return;
     }
@@ -307,7 +307,7 @@ export default function Page() {
    axios.post('/api/quiz', processedData, { headers: { 'Content-Type': 'multipart/form-data' } })
   .then(response => {
     setLoading(false);
-    toast.success(response.data.message);
+    showToast.success(response.data.message);
     if(response.data.success){
       
       $.confirm({
@@ -346,7 +346,7 @@ export default function Page() {
   .catch(error => {
     console.error(error)
     setLoading(false);
-    toast.error(error?.response?.data?.message || error?.message);
+    showToast.error(error?.response?.data?.message || error?.message);
   })
   .finally(() => {
     setLoading(false);
@@ -354,7 +354,7 @@ export default function Page() {
     }catch(e){
       setLoading(false)
       console.error(e)
-      toast.error(e?.message || e?.response?.data?.message || 'Data posting error')
+      showToast.error(e?.message || e?.response?.data?.message || 'Data posting error')
     }
   };
 

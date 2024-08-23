@@ -36,8 +36,8 @@ const AuthSync = () => {
             params.delete("target");
 
             const targetUrl = `${pathname}${
-              pathname && params.toString()
-                ? "?" + params.toString()
+              params.toString()
+                ? "%3F" + encodeURIComponent(params.toString())
                 : ""
             }`;
 

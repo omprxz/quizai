@@ -82,7 +82,7 @@ export default function Page({ params }) {
     <p className='fixed bottom-0 left-1/2 -translate-x-1/2 text-[0.5rem] text-gray-500 hidden print:block'>{process.env.NEXT_PUBLIC_APP_URL}</p>
       {responseDetails._id ? (
         <div className="max-w-sm print:max-w-2xl mx-auto pb-4 print:pb-0 px-3">
-          <h1 className="text-3xl font-bold text-blue-600 text-center mb-6">Result Details</h1>
+          <h1 className="text-3xl font-bold text-blue-600 text-center mb-6 mt-3">Result Details</h1>
 
           {/* Submission and Quiz Info */}
           <div ref={resultRef}>
@@ -109,7 +109,7 @@ export default function Page({ params }) {
                 <p className="text-gray-400">
                   <span className="font-semibold">Quiz Title:</span>{' '}
                   {responseDetails.quiz ? (
-                    <Link href={`/dashboard/quiz/${responseDetails.quizDetails._id}/view`} className="text-blue-400 hover:underline">
+                    <Link href={`/dashboard/quiz/${responseDetails.quizid}/view`} className="text-blue-400 hover:underline">
                       {responseDetails.quizDetails.title}
                     </Link>
                   ) : (
@@ -120,9 +120,9 @@ export default function Page({ params }) {
                   <span className="font-semibold">Total Questions:</span>{' '}
                   {responseDetails.total_questions}
                 </p>
-                {responseDetails.quizDetails.passing_score !== null && <p className="text-gray-400">
+                {responseDetails.passing_score !== null && <p className="text-gray-400">
                     <span className="font-semibold">Passing Score:</span>{' '}
-                    {responseDetails.quizDetails.passing_score == 0 ? 0 : responseDetails.quizDetails.passing_score.toFixed(2)}%
+                    {responseDetails.passing_score ? "NULL" : ( responseDetails.passing_score === 0 ? 0 : responseDetails.passing_score.toFixed(2))}%
                   </p>
                 }
               </div>
@@ -166,11 +166,11 @@ export default function Page({ params }) {
                   <LuTimer className='text-3xl' />
                 </div>
               </div>
-              {responseDetails.quizDetails.passing_score !== null && <div className={`alert ${responseDetails.percentage >= responseDetails.quizDetails.passing_score ? 'alert-success text-gray-200' : 'alert-error'} shadow-md w-2/3 md:w-auto md:px-5 md:mx-auto flex md:flex-row flex-col justify-center items-center`}>
+              {responseDetails.passing_score !== null && <div className={`alert ${responseDetails.percentage >= responseDetails.passing_score ? 'alert-success text-gray-200' : 'alert-error'} shadow-md w-2/3 md:w-auto md:px-5 md:mx-auto flex md:flex-row flex-col justify-center items-center`}>
                 <span className={`text-2xl font-bold`}>
                   {responseDetails.percentage >= responseDetails.quizDetails.passing_score ? "Passed" : "Failed"}
                 </span>
-                {responseDetails.percentage >= responseDetails.quizDetails.passing_score ? (<FaCheck className="text-3xl" />) : (<FaTimes className="text-3xl" />)}
+                {responseDetails.percentage >= responseDetails.passing_score ? (<FaCheck className="text-3xl" />) : (<FaTimes className="text-3xl" />)}
               </div>
               }
             </div>
@@ -192,34 +192,30 @@ export default function Page({ params }) {
           <p className='hidden print:block font-bold text-xl mb-2'>Your Answers</p>
             <div className="flex flex-col justify-center items-center gap-y-3 print:gap-y-5 text-xs w-full">
               {responseDetails.questions.map((question, index) => {
-                const userAnswers = responseDetails.selectedAnswers[question._id] || [];
-                const allCorrect = question.correct_answers.length === userAnswers.length &&
-                  question.correct_answers.every(ans => userAnswers.includes(ans));
-                const isSkipped = userAnswers.length === 0;
-                const bgColor = question.question_type !== 'subjective' ? (
-                  isSkipped ? 'border-yellow-500 shadow-yellow-300 bg-yellow-100' :
-                  allCorrect ? 'border-green-500 shadow-green-300 bg-green-100' :
-                  'border-red-500 shadow-red-300 bg-red-200 text-base-1000'
-                ) : '';
+                const userAnswers = question.selected_answers;
 
                 return (
                   <div
                     key={question._id}
-                    className={`rounded-md py-4 border shadow px-3 w-full print:break-inside-avoid ${bgColor}`}
+                    className={`rounded-md py-4 border shadow px-3 w-full print:break-inside-avoid`}
                   >
-                    <p className="font-bold text-sm text-gray-500">{index + 1}. {question.question_text}</p>
+                    <p className="font-bold text-sm">{index + 1}. {question.question_text}</p>
                     <div className="flex flex-col justify-center items-start gap-4 mt-3">
+                      
+                      {question?.result && (
+                        <p className={`text-sm whitespace-break-spaces ${question.result === 'skipped' ? 'text-yellow-600' : (question.result === 'correct' ? 'text-green-500' : 'text-red-500')}`}>Result: <span className='capitalize'>{question.result}</span></p>
+                      )}
                       {question.question_type !== 'subjective' ? (
                         question.options.map((option) => (
                           <label
                             key={option.id}
-                            className={`${question.correct_answers.includes(option.id) ? 'text-green-500' : 'text-gray-500'} flex flex-row flex-wrap break-words justify-start items-center gap-2`}
+                            className={`${question.correct_answers.includes(option.id) ? 'text-green-500' : ( userAnswers.includes(option.id) ? 'text-red-500' : 'text-gray-500')} flex flex-row flex-wrap break-words justify-start items-center gap-2`}
                           >
                             <input
                               type={question.question_type === 'single_correct' ? 'radio' : 'checkbox'}
                               name={question._id}
                               value={option.id}
-                              disabled={true}
+                              readOnly
                               checked={userAnswers.includes(option.id)}
                             /> {option.text}
                           </label>
@@ -227,17 +223,17 @@ export default function Page({ params }) {
                       ) : (
                         <>
                           <p
-                            className="textarea textarea-bordered w-full text-sm md:text-base p-2 h-24"
+                            className="textarea textarea-bordered w-full text-sm md:text-base p-2 h-auto"
                           >{userAnswers.join(', ') || "Not Attempted"}</p>
                           {question.correct_answers[0] && (
-                            <p className="text-sm text-green-500 whitespace-break-spaces">
-                              Correct Answer: {question.correct_answers[0]}
+                            <p className="text-sm whitespace-break-spaces">
+                              Correct Answer: <p className='whitespace-break-spaces text-green-500 text-sm'>{question.correct_answers[0]}</p>
                             </p>
                           )}
                         </>
                       )}
-                      {question.reason && (
-                        <p className="text-sm text-gray-500 whitespace-break-spaces">Reason: {question.reason}</p>
+                      {question?.reason && (
+                        <p className="text-sm whitespace-break-spaces">Reason: <p className='whitespace-break-spaces'>{question.reason}</p></p>
                       )}
                     </div>
                   </div>
@@ -252,7 +248,7 @@ export default function Page({ params }) {
             {/* Retake Button */}
             {responseDetails.quiz && (
               <div className="mt-6 text-center">
-                <Link href={`/dashboard/quiz/${responseDetails.quizDetails._id}/view`} className="btn btn-primary print:hidden">
+                <Link href={`/dashboard/quiz/${responseDetails.quizid}/view`} className="btn btn-primary print:hidden">
                   Give Quiz Again
                 </Link>
               </div>

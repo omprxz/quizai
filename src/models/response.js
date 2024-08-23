@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-
 const optionSchema = new mongoose.Schema({
   id: {
     type: Number,
@@ -26,6 +25,14 @@ const questionSchema = new mongoose.Schema({
   correct_answers: [{
     type: mongoose.Schema.Types.Mixed,
   }],
+  selected_answers: [{
+    type: mongoose.Schema.Types.Mixed,
+    default: []
+  }],
+  result: {
+    type: String,
+    default: 'skipped'
+  },
   reason: {
     type: String
   }
@@ -40,18 +47,9 @@ const responseSchema = new mongoose.Schema({
     type: String,
     default: 'Unknown'
   },
-  passing_score: {
-    type: Number,
-    default: 0
-  },
   quizid: {
     type: String,
     required: true
-  },
-  selectedAnswers: {
-    type: Map,
-    of: [mongoose.Schema.Types.Mixed],
-    default: {}
   },
   questions: [questionSchema],
   correct: {
@@ -73,6 +71,10 @@ const responseSchema = new mongoose.Schema({
   percentage: {
     type: Number,
     default: 0
+  },
+  passing_score: {
+    type: Number,
+    default: null
   },
   timeTaken: {
     type: Number,

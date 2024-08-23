@@ -1,13 +1,13 @@
 "use client";
 import { FaGlobe, FaChartPie } from "react-icons/fa6";
-import { FcPlus } from "react-icons/fc";
+import { FaPlus } from "react-icons/fa6";
 import { MdSchool, MdEdit, MdVisibility, MdBarChart } from 'react-icons/md';
 import { IoLinkOutline } from 'react-icons/io5';
 import { useState, useEffect } from 'react';
 import Link from "next/link";
 import $ from 'jquery';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast'
 import { RiLoader2Fill, RiDeleteBinFill, RiLock2Fill, RiGlobalFill, RiLoader4Line } from "react-icons/ri";
 import { IoMdRefresh } from "react-icons/io";
 import Select from 'react-select';
@@ -27,7 +27,7 @@ export function CreateQuizButton() {
   return (
     <div className='flex justify-center items-center mt-2'>
       <Link href="/dashboard/quiz/create" className='border border-[3px] rounded-md w-[125px] md:w-[145px] h-[125px] md:h-[145px] max-w-[125px] md:max-w-[145px] max-h-[125px] md:max-h-[145px] border-base inline-block flex flex-col items-center justify-center gap-2'>
-        <FcPlus className='text-5xl text-black dark:text-white' />
+        <FaPlus className='text-5xl' />
         <p className='text-base font-bold pt-1.5'>Create Quiz</p>
       </Link>
     </div>
@@ -60,11 +60,11 @@ export function QuizButton({
           action: function () {
             document.getElementById('deleting').showModal();
             axios.delete('/api/quiz?id=' + id).then((res) => {
-              toast.success(res.data.message);
+              showToast.success(res.data.message);
               if (res.status !== 201) {
                 fetchQuizList();
               }
-            }).catch(err => toast.error(err.response?.data?.message || err.message || 'Unable to delete quiz')).finally(() => document.getElementById('deleting').close());
+            }).catch(err => showToast.error(err.response?.data?.message || err.message || 'Unable to delete quiz')).finally(() => document.getElementById('deleting').close());
           },
         },
         cancel: {
@@ -79,7 +79,7 @@ export function QuizButton({
 
   const handleCopyClick = () => {
     navigator.clipboard.writeText(`${window.location.origin}/dashboard/quiz/${id}/view`);
-    toast.success('Quiz link copied to clipboard!');
+    showToast.success('Quiz link copied to clipboard!');
   };
 
   const handleVisibilityChange = (selectedOption) => {
@@ -91,11 +91,11 @@ export function QuizButton({
 
     axios.patch('/api/quiz/patch/visibility', { id, visibility: newVisibility })
       .then(response => {
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
       })
       .catch(error => {
         setCurrentVisibility(oldVisibility);
-        toast.error(error.response?.data?.message || error.message || 'Unable to change visibility');
+        showToast.error(error.response?.data?.message || error.message || 'Unable to change visibility');
       })
       .finally(() => setIsRequesting(false));
   };
@@ -208,7 +208,7 @@ export function QuizButton({
   classNamePrefix="react-select"
 />
 { isRequesting && <>
-      <p className='w-full h-full bg-gray-700 absolute top-0 left-0 mix-blend-lighten dark:mix-blend-darken'></p>
+      <p className='w-full h-full bg-black absolute top-0 left-0 mix-blend-saturation blur-lg'></p>
       <div className='absolute top-0 left-0 w-full h-full'>
         <div className='flex w-full h-full justify-center items-center'>
           <span className='loading loading-ring loading-sm'></span>

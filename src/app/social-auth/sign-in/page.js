@@ -19,7 +19,7 @@ export default function Page(){
     target && target !== "" ? dispatch(addPath(target)) : dispatch(dropPath());
   }, [target, session]);
   if(target){
-   let finalRedirect = target ? target : toRedirect || '/dashboard';
+   let finalRedirect = target || toRedirect || '/dashboard';
 
         const authUrls = [
     /^\/login\/?$/,

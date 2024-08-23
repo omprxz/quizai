@@ -29,7 +29,7 @@ export function middleware(request) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.search = '';
-
+    
     const urlSearchParams = new URLSearchParams(search);
     const target = urlSearchParams.get('target');
     urlSearchParams.delete('target');

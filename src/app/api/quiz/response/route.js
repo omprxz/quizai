@@ -6,6 +6,13 @@ import User from '@/models/user';
 import Db from '@/utils/db'
 import jwt from 'jsonwebtoken'
 import { cookies } from 'next/headers';
+const natural = require('natural');
+const { JaroWinklerDistance } = natural;
+
+async function checkAnswer(userAnswer, correctAnswer) {
+  const similarityScore = await JaroWinklerDistance(userAnswer ?? '', correctAnswer ?? '');
+  return { score: similarityScore, correct: similarityScore > 0.7 };
+}
 
 export async function POST(request) {
   let tokenDetails
@@ -13,52 +20,135 @@ export async function POST(request) {
     await Db();
     const cookieStore = cookies()
 
-    const data = await request.json();
-    
-    try{
-    const token = cookieStore.get('token').value
+    let {timeTaken, selectedAnswers, username, quizid} = await request.json();
+    let userid
+    const token = cookieStore.get('token')?.value
+    if(token){
     try{
       tokenDetails = jwt.verify(token, process.env.JWT_SECRET)
+      if(!username){
+        userid = tokenDetails?.data?._id
+      }
     }catch(e){
       console.error(e)
         }
-    }catch(err){
-         console.error(err)
-        }
+    }
+        
+    if(!username && !userid){
+      return NextResponse.json({message: 'Name must be provided.'}, {status: 403})
+    }
 
-    if (!data.quizid) {
+    if (!quizid) {
       return NextResponse.json({ message: 'Quiz ID is missing.' }, { status: 400 });
     }
     
-    const quizDetails = await Quiz.findById(data.quizid)
+    let quizDetails = await Quiz.findById(quizid).lean()
+    
     if(!quizDetails){
       return NextResponse.json({
         message: 'Quiz not found'
       },{
-        status:403
+        status:404
         })
     }
+    
+    let totalCorrect = 0;
+  let totalWrong = 0;
+  let notAttempted = 0;
+  let percentageScored = 0;
+  let totalQuestions = quizDetails.questions.length;
+  
+  for (const question of quizDetails.questions) {
+  if (question.question_type === 'subjective') {
+    if (
+      selectedAnswers[question._id] &&
+      selectedAnswers[question._id]?.[0] !== null &&
+      selectedAnswers[question._id]?.[0].trim() !== ""
+    ) {
+      const { score, correct } = await checkAnswer(
+        selectedAnswers[question._id]?.[0],
+        question.correct_answers?.[0]
+      );
+      if (correct) {
+        question.result = 'correct';
+        totalCorrect++;
+      } else {
+        question.result = 'wrong';
+        totalWrong++;
+      }
+    } else {
+      question.result = 'skipped';
+      notAttempted++;
+    }
+  } else {
+    const correctAnswers = question.correct_answers;
+    const userAnswers = selectedAnswers[question._id] || [];
 
-    const response = new Response({
-      userid: tokenDetails?.data?._id ? tokenDetails?.data?._id : null,
-      username: data.username || 'Unknown',
-      quizid: data.quizid,
-      selectedAnswers: data.selectedAnswers || {},
-      passing_score: quizDetails.passing_score,
-      questions: quizDetails.questions,
-      correct: data.correct || 0,
-      wrong: data.wrong || 0,
-      notAttempted: data.notAttempted || 0,
-      total_questions: data.total_questions,
-      percentage: data.percentage || 0,
-      timeTaken: data.timeTaken || null
-    });
+    if (userAnswers.length === 0) {
+      question.result = 'skipped';
+      notAttempted++;
+    } else if (question.question_type === 'single_correct') {
+      const correct =
+        correctAnswers.length === 1 &&
+        correctAnswers?.[0] === userAnswers?.[0];
+      if (correct) {
+        question.result = 'correct';
+        totalCorrect++;
+      } else {
+        question.result = 'wrong';
+        totalWrong++;
+      }
+    } else if (question.question_type === 'multi_correct') {
+      const correctSet = new Set(correctAnswers);
+      const userSet = new Set(userAnswers);
 
-    const saveResponse = await response.save();
+      if (
+        userSet.size === correctSet.size &&
+        [...userSet].every((answer) => correctSet.has(answer))
+      ) {
+        question.result = 'correct';
+        totalCorrect++;
+      } else {
+        question.result = 'wrong';
+        totalWrong++;
+      }
+    }
+  }
+  question.selected_answers = selectedAnswers[question._id] || []
+}
 
-    return NextResponse.json({ message: 'Answer saved successfully.', data: {
-      responseId: saveResponse._id
-    }, success: true }, { status: 201 });
+percentageScored = (totalCorrect / totalQuestions) * 100;
+
+const newResponse = await Response({
+  userid,
+  username,
+  quizid,
+  questions: quizDetails.questions,
+  correct: totalCorrect,
+  wrong: totalWrong,
+  notAttempted: notAttempted,
+  total_questions: totalQuestions,
+  passing_score: quizDetails?.passing_score,
+  percentage: percentageScored,
+  timeTaken
+})
+
+const saveResponse = await newResponse.save()
+const responseId = saveResponse._id
+
+return NextResponse.json({
+  message: 'Result evaluated',
+  success: true,
+  data: {
+    totalCorrect,
+    totalWrong,
+    notAttempted,
+    percentageScored,
+    timeTaken,
+    responseId
+  },
+});
+    
   } catch (error) {
     console.error('Error saving response:', error);
     return NextResponse.json({ message: 'Internal server error.' }, { status: 500 });
@@ -90,7 +180,7 @@ export async function GET(req) {
       });
     }
 
-    let responseDetails = await Response.findById(id);
+    let responseDetails = await Response.findById(id).lean();
     if (!responseDetails) {
       return NextResponse.json({
         message: 'Response not found',
@@ -99,7 +189,6 @@ export async function GET(req) {
         status: 404
       });
     }
-    responseDetails = {...responseDetails._doc}
     const responseDetailsByQuiz = await Response.find({quizid: responseDetails.quizid}).select("_id percentage timeTaken")
     const sortedResponses = responseDetailsByQuiz.sort((a, b) => {
       if(a.percentage == b.percentage){
@@ -111,18 +200,10 @@ export async function GET(req) {
     
     responseDetails.quizResponsesCount = responseDetailsByQuiz.length
     responseDetails.rank = responseRank || 0
-    let quizDetails = await Quiz.findById(responseDetails.quizid);
+    let quizDetails = await Quiz.findById(responseDetails.quizid).select('_id title').lean();
     if (quizDetails) {
-      quizDetails = {...quizDetails._doc}
       responseDetails.quiz = true
-      quizDetails.title = quizDetails.title || "No title";
-      if(quizDetails.passing_score !== null){
-        if(quizDetails.passing_score == 0){
-        quizDetails.passing_score = 0
-        }else{
-        quizDetails.passing_score = quizDetails.passing_score
-        }
-      }
+      quizDetails.title = quizDetails?.title || "No title";
       responseDetails.quizDetails = quizDetails
     } else {
       responseDetails.quizTitle = "Quiz not found";
@@ -155,6 +236,7 @@ export async function GET(req) {
       console.error('User not found for userid:', responseDetails.userid);
       responseDetails.username = "User not found";
     }
+    console.log(responseDetails)
     return NextResponse.json(responseDetails);
 
   } catch (error) {

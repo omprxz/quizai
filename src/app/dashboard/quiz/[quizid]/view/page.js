@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { toast } from "react-hot-toast";
+import showToast from '@/components/showToast';
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { BiSolidCategory } from "react-icons/bi";
@@ -17,6 +17,8 @@ export default function Page({ params }) {
   const [quizDetails, setQuizDetails] = useState({});
   const [loggedIn, setLoggedIn] = useState(false);
   const [dataStatus, setDataStatus] = useState(0);
+  const [oldTheme, setOldTheme] = useState(localStorage?.getItem('theme') || '')
+  const [quizTheme, setQuizTheme] = useState(localStorage?.getItem('theme') || 'light')
   const [dataMsg, setDataMsg] = useState('Loading quiz data, please hold on...');
   
   const formatTime = (timeInSeconds) => {
@@ -28,11 +30,24 @@ export default function Page({ params }) {
       return `${timeInSeconds}s`;
     }
   };
+  
+  useEffect(() => {
+    document.querySelector('html').setAttribute('data-theme', quizTheme);
+
+    return () => {
+      if (oldTheme) {
+        document.querySelector('html').setAttribute('data-theme', oldTheme);
+      } else {
+        document.querySelector('html').removeAttribute('data-theme');
+      }
+    };
+  }, [quizTheme, oldTheme]);
 
   useEffect(() => {
     axios.get('/api/quiz?filter=view&id=' + params.quizid)
       .then((res) => {
         setLoggedIn(res.data.loggedIn);
+        setQuizTheme(res?.data?.quiz?.theme)
         axios.get('/api/user/any?id=' + res.data.quiz.userid)
           .then((resp) => {
             let quiz = { ...res.data.quiz, createdBy: resp.data.data.name };
@@ -158,11 +173,6 @@ export default function Page({ params }) {
 
 const handleSubmit = (tOver) => {
   setIsSubmitted(true);
-  let totalCorrect = 0;
-  let totalWrong = 0;
-  let notAttempted = 0;
-  let percentageScored = 0;
-  let totalQuestions = quizDetails.questions.length;
   let timeTaken;
 
   if (tOver) {
@@ -174,120 +184,38 @@ const handleSubmit = (tOver) => {
   }
 
   if (!loggedIn && username === '') {
-    toast.error('Name required since you are not logged in');
+    showToast.error('Name required since you are not logged in');
     return;
   }
 
-  setLoading(true);
-  axios.get('/api/quiz?id=' + params.quizid).then((res) => {
-    setQuizDetails({...res?.data?.quiz})
-    }).then(quizData => {
-  let subjectiveAnswers = [];
-  quizDetails.questions.forEach((question) => {
-    if (question.question_type === 'subjective') {
-      
-      if (selectedAnswers[question._id] && selectedAnswers[question._id]?.[0] != null && selectedAnswers[question._id]?.[0].trim() !== "") {
-    console.log(selectedAnswers[question._id]);
-    subjectiveAnswers.push({
-        correct: question.correct_answers?.[0],
-        user: selectedAnswers[question._id]?.[0],
-        questionId: question._id
-    });
-} else {
-    notAttempted++;
-}
-      
-    } else {
-      const correctAnswers = question.correct_answers;
-      const userAnswers = selectedAnswers[question._id] || [];
-
-      if (userAnswers.length === 0) {
-        notAttempted++;
-      } else if (question.question_type === 'single_correct') {
-        const correct = correctAnswers.length === 1 && correctAnswers?.[0] === userAnswers?.[0];
-        if (correct) {
-          totalCorrect++;
-        } else {
-          totalWrong++;
-        }
-      } else if (question.question_type === 'multi_correct') {
-        const correctSet = new Set(correctAnswers);
-        const userSet = new Set(userAnswers);
-
-        if (userSet.size === correctSet.size && [...userSet].every(answer => correctSet.has(answer))) {
-          totalCorrect++;
-        } else {
-          totalWrong++;
-        }
-      }
-    }
-  });
-
-  const handleSubjectiveAnswers = () => {
-    if (subjectiveAnswers.length === 0) {
-      return Promise.resolve();
-    }
-
-    return axios.post('/api/quiz/response/check-similarity/subjective', { answers: subjectiveAnswers })
-      .then(response => {
-        response.data.data.forEach(ans => {
-          if (ans.score >= 0.7) {
-            totalCorrect++;
-          } else {
-            totalWrong++;
-          }
-        });
-      })
-      .catch(error => {
-        notAttempted += subjectiveAnswers.length;
-        console.error('Error:', error.response ? error.response.data : error.message);
-      });
-  };
-
-  handleSubjectiveAnswers()
-    .then(() => {
-     percentageScored = (totalCorrect / totalQuestions) * 100;
-
-      const data = {
+  const data = {
         quizid: quizDetails._id,
-        passing_score: quizDetails.passing_score,
         username,
         selectedAnswers: selectedAnswers,
-        correct: totalCorrect,
-        wrong: totalWrong,
-        notAttempted: notAttempted,
-        total_questions: quizDetails.total_questions,
-        percentage: percentageScored,
         timeTaken: timeTaken,
       };
-
-      return axios.post('/api/quiz/response', data);
-    })
-    .then(response => {
-      toast.success(response.data.message);
-      if (response.data.success) {
-        setResponseId(response.data.data.responseId);
-      }
+  setLoading(true);
+  axios.post('/api/quiz/response', data).then((res) => {
+      showToast.success(res?.data?.message);
+      setResponseId(res?.data?.data?.responseId);
       setResultContent(`
         <br />
-        <span class="text-success">Correct: ${totalCorrect}</span><br />
-        <span class="text-error">Wrong: ${totalWrong}</span><br />
-        <span class="text-info">Not Attempted: ${notAttempted}</span><br />
-        <span class="text-warning">Percentage Scored: ${percentageScored.toFixed(2)}%</span><br /><br />
-        <span class="text-primary">Time taken: ${formatTime(timeTaken)}</span><br /><br />
+        <span class="text-success">Correct: ${res?.data?.data?.totalCorrect}</span><br />
+        <span class="text-error">Wrong: ${res?.data?.data?.totalWrong}</span><br />
+        <span class="text-info">Not Attempted: ${res?.data?.data?.notAttempted}</span><br />
+        <span class="text-warning">Percentage Scored: ${res?.data?.data?.percentageScored.toFixed(2)}%</span><br /><br />
+        <span class="text-primary">Time taken: ${formatTime(res?.data?.data?.timeTaken)}</span><br /><br />
       `);
       document.getElementById('result_summary').showModal();
       setLoading(false);
       setIsSubmitted(true);
-    })
-    .catch(error => {
-      console.error('Error submitting quiz:', error.response?.data || error.message);
-      toast.error(error.response?.data?.message || 'An error occurred');
+}).catch(error => {
+      console.error('Error submitting quiz:', error?.response?.data || error?.message);
+      showToast.error(error.response?.data?.message || 'An error occurred');
       setLoading(false);
       setIsSubmitted(false);
     });
-    })
-};
+}
 
   if (dataStatus === 0) {
     return (
@@ -313,7 +241,7 @@ const handleSubmit = (tOver) => {
   return (
     <>
       <div>
-        <dialog id="result_summary" className="modal" data-theme={quizDetails.theme}>
+        <dialog id="result_summary" className="modal">
           <div className="modal-box">
             <h3 className="font-bold text-lg">Result</h3>
             <div dangerouslySetInnerHTML={{ __html: resultContent }} />
@@ -329,7 +257,7 @@ const handleSubmit = (tOver) => {
         </dialog>
       </div>
 
-      <div className="min-h-screen px-4 py-2 pb-12 w-full flex justify-center" data-theme={quizDetails.theme}>
+      <div className="min-h-screen px-4 py-2 pb-12 w-full flex justify-center">
         <div className="flex flex-col justify-center gap-2 w-full max-w-sm">
           <h1 className="font-bold text-2xl">{quizDetails.title || 'No title'}</h1>
           <p className="text-sm text-base-1000">Created by {quizDetails.createdBy}</p>

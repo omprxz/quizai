@@ -155,7 +155,7 @@ export default function Page({ params }) {
                   name={response.username} 
                   score={response.percentage} 
                   result={response.passing_score !== null ? (response.percentage >= response.passing_score ? 'Passed' : 'Failed') : 'Passed'} 
-                  passing_score={response.passing_score !== null ? (response.passing_score === 0 ? 0 : (response.passing_score ? response.passing_score : 'N/A')) : 0} 
+                  passing_score={response.passing_score !== null ? (response.passing_score === 0 ? 0 : (response?.passing_score ? response.passing_score : 'N/A')) : "N/A"} 
                   timeTaken={formatTime(response.timeTaken)} 
                   submitted={new Date(response.createdAt).toLocaleString('en-US', {
                     day: '2-digit',

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast'
 import Link from "next/link"
 import { useRouter } from 'next/navigation';
 
@@ -22,13 +22,13 @@ export default function Reset() {
 const handleSendOtp = async () => {
   setloading(true)
   if(!formData.email){
-    toast.error("Email not provided")
+    showToast.error("Email not provided")
     setloading(false)
     return;
   }
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if(!emailRegex.exec(formData.email)){
-    toast.error("Invalid email")
+    showToast.error("Invalid email")
     setloading(false)
     return;
   }
@@ -41,9 +41,9 @@ const handleSendOtp = async () => {
     if(res.data.success){
       setOtpSent(true)
     }
-    toast.success(res.data.message)
+    showToast.success(res.data.message)
   } catch (error) {
-    toast.error(error.response.data.message);
+    showToast.error(error.response.data.message);
   } finally{
   setloading(false)
   }
@@ -66,9 +66,9 @@ const handlePasswordChange = async () => {
       router.push('/login');
       setOtpSent(false)
     }
-    toast.success(res.data.message)
+    showToast.success(res.data.message)
   }catch(e){
-    toast.error(e.response.data.message)
+    showToast.error(e.response.data.message)
   } finally {
     setloading(false)
   }

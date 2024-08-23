@@ -2,7 +2,7 @@
 import axios from 'axios';
 import {TdUser} from '@/components/table/Td';
 import { useState, useEffect } from "react";
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast'
 import { PieChart } from '@mui/x-charts/PieChart';
 import { useTheme } from '@mui/material/styles';
 

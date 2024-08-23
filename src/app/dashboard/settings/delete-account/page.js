@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast'
 import { useRouter } from 'next/navigation';
 import useLogout from "@/utils/logout";
 
@@ -26,12 +26,12 @@ export default function DeleteAccountPage() {
     setLoading(true);
     axios.delete('/api/user/delete-account')
       .then((response) => {
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
         setShowModal(false)
         logOut();
       })
       .catch((err) => {
-        toast.error(err?.response?.data?.message || err?.message || 'Failed to delete account');
+        showToast.error(err?.response?.data?.message || err?.message || 'Failed to delete account');
       })
       .finally(() => {
         setLoading(false);

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import axios from 'axios';
 import { useRouter, usePathname } from 'next/navigation';
 import { FaHome, FaArrowLeft } from 'react-icons/fa';
-import { FaRegCircleQuestion } from "react-icons/fa6";
+import { FaRegCircleQuestion, FaRegCircleUser } from "react-icons/fa6";
 import useLogout from "@/utils/logout";
 import { signIn, useSession } from 'next-auth/react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -34,11 +34,11 @@ const Header = () => {
   const ISSERVER = typeof window === "undefined";
   const [theme, setTheme] = useState(() => {
     if (!ISSERVER) {
-        return localStorage.getItem('theme') || 'light';
+        return localStorage.getItem('theme') || '';
     }
-    return 'light';
+    return '';
 });
-const [feedbackPublic, setFeedbackPublic] = useState(true)
+const [feedbackPublic, setFeedbackPublic] = useState(false)
   
   useEffect(() => {
     setToken(localStorage?.getItem('authToken'));
@@ -92,7 +92,9 @@ const [feedbackPublic, setFeedbackPublic] = useState(true)
   useEffect(() => {
     localStorage.setItem('theme', theme)
     const localTheme = localStorage.getItem('theme')
+    if(localTheme){
     document.querySelector('html').setAttribute('data-theme', localTheme)
+    }
   }, [theme])
   
   const handleBack = () => {
@@ -116,7 +118,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(true)
   return (
     <div className='mb-16'>
       {ppOpen && token && (
-        <div ref={menuRef} className="fixed bottom-14 right-2 p-3 z-50">
+        <div ref={menuRef} className="fixed bottom-16 right-2 p-3 z-50">
           <div className="rounded p-3 flex flex-col justify-start gap-2 text-sm bg-neutral text-white glass shadow-sm shadow-neutral">
             <Link href='/dashboard/settings'>Settings</Link>
             <hr />
@@ -184,14 +186,17 @@ const [feedbackPublic, setFeedbackPublic] = useState(true)
             <button onClick={() => {
               setPpOpen((prev) => !prev)
             }} className="btn btn-ghost btn-circle">
-              <Image
+              {userImage || userImage !== '/user.png' ?
+               <FaRegCircleUser className='text-xl' /> :
+                <Image
                 ref={imgRef}
                 src={userImage || '/user.png'}
                 width="30"
                 height="30"
-                alt="User pic"
+                alt={userImage}
                 className='dark:shadow-gray-400 shadow-gray-800 shadow rounded-full aspect-square'
               />
+              }
             </button>
           </div>
           }

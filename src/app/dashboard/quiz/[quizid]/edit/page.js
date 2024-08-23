@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast'
 import { useRouter } from 'next/navigation';
 import { IoMdSettings } from "react-icons/io";
 import axios from 'axios';
@@ -170,7 +170,7 @@ export default function Page({ params }) {
 
   const handleRemoveQuestion = (q_id) => {
     if (formData.questions.length === 1) {
-      toast.error('At least one question is needed');
+      showToast.error('At least one question is needed');
       return;
     }
     setFormData(prev => ({ ...prev, questions: prev.questions.filter(question => question._id !== q_id) }));
@@ -202,7 +202,7 @@ export default function Page({ params }) {
       const updatedQuestions = prev.questions.map(question => {
         if (question._id === q_id) {
           if (question.options.length <= 2) {
-            toast.error('At least two options are needed for each question');
+            showToast.error('At least two options are needed for each question');
             return question;
           }
 
@@ -265,45 +265,45 @@ export default function Page({ params }) {
     const { title, duration, passing_score, questions } = formData;
 
     if (title === '') {
-      toast.error('Title must not be empty');
+      showToast.error('Title must not be empty');
       setLoading(false);
       return;
     }
     if (title.length > 250) {
-      toast.error('Max title chars limit is 250');
+      showToast.error('Max title chars limit is 250');
       setLoading(false);
       return;
     }
 
     if (duration && (!Number.isInteger(+duration) || +duration < 30 || +duration > 36000)) {
-      toast.error('Duration must be an integer between 30 and 36000 seconds or null.');
+      showToast.error('Duration must be an integer between 30 and 36000 seconds or null.');
       setLoading(false);
       return;
     }
     if (passing_score && (+passing_score > 100 || +passing_score < 0)) {
-      toast.error('Passing score must be between 0 and 100 or exactly 0.');
+      showToast.error('Passing score must be between 0 and 100 or exactly 0.');
       setLoading(false);
       return;
     }
     if (!Number.isInteger(+passing_score)) {
-      toast.error('Passing score must be an integer.');
+      showToast.error('Passing score must be an integer.');
       setLoading(false);
       return;
     }
 
     for (const question of questions) {
       if (question.question_text.trim() === '') {
-        toast.error('Question text cannot be empty.');
+        showToast.error('Question text cannot be empty.');
         setLoading(false);
         return;
       }
       if (question.question_type !== 'subjective' && question.options.some(option => ["", null, undefined].includes(option.text))) {
-        toast.error("Any option text cannot be empty.");
+        showToast.error("Any option text cannot be empty.");
         setLoading(false);
         return;
       }
       if (question.question_type !== 'subjective' && question.correct_answers.length === 0) {
-        toast.error("At least one correct answer required for each MCQ question.");
+        showToast.error("At least one correct answer required for each MCQ question.");
         setLoading(false);
         return;
       }
@@ -318,7 +318,7 @@ export default function Page({ params }) {
     setLoading(true);
     axios.put('/api/quiz/edit/' + quizid, processedData)
       .then(response => {
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
         if (response.data.success) {
           $.confirm({
             title: 'Quiz Updated!',
@@ -334,10 +334,10 @@ export default function Page({ params }) {
                 action: function () {
                   if (navigator.clipboard) {
                     navigator.clipboard.writeText(`${window.location.origin}/dashboard/quiz/${quizid}/view`).then(() => {
-                      toast.success('Quiz link copied to clipboard!');
+                      showToast.success('Quiz link copied to clipboard!');
                     }).catch((e) => {
                       console.log(e);
-                      toast.error('Error copying');
+                      showToast.error('Error copying');
                     });
                   } else {
                     const textArea = document.createElement('textarea');
@@ -346,10 +346,10 @@ export default function Page({ params }) {
                     textArea.select();
                     try {
                       document.execCommand('copy');
-                      toast.success('Quiz link copied to clipboard!');
+                      showToast.success('Quiz link copied to clipboard!');
                     } catch (e) {
                       console.log(e);
-                      toast.error('Error copying');
+                      showToast.error('Error copying');
                     }
                     document.body.removeChild(textArea);
                   }
@@ -370,7 +370,7 @@ export default function Page({ params }) {
       })
       .catch((error) => {
         console.log(error);
-        toast.error(error.response.data.message);
+        showToast.error(error.response.data.message);
       })
       .finally(() => {
         setLoading(false);
@@ -441,18 +441,18 @@ export default function Page({ params }) {
       };
       console.log(aiData);
       if (aiData.description.length > 5000) {
-        toast.error('Description must be less than 5000 characters');
+        showToast.error('Description must be less than 5000 characters');
         setAddQuestionsLoading(false);
         return null;
       }
       if (aiData.total_questions > 30 || aiData.total_questions < 1) {
-        toast.error('Total number of questions must be between 1 and 30');
+        showToast.error('Total number of questions must be between 1 and 30');
         setAddQuestionsLoading(false);
         return null;
       }
       axios.post('/api/quiz/edit/add/questions', aiData).then((res) => {
         if (res.data.success) {
-          toast.success(res.data.message);
+          showToast.success(res.data.message);
           setFormData(prev => ({ ...prev, questions: [...prev.questions, ...res.data.questions] }));
           setAiModalVisible(false);
           setAiFormData({
@@ -464,11 +464,11 @@ export default function Page({ params }) {
             total_questions: 1,
           });
         } else {
-          toast.error(res.data.message || 'Failed to generate questions');
+          showToast.error(res.data.message || 'Failed to generate questions');
         }
       }).catch((e) => {
         console.error(e);
-        toast.error(e.response?.data?.message || e?.message);
+        showToast.error(e.response?.data?.message || e?.message);
       }).finally(() => {
         setAddQuestionsLoading(false);
       });

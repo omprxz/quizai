@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast'
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { CgSpinnerTwo } from "react-icons/cg";
 
@@ -27,7 +27,7 @@ export default function ProfilePage() {
         setLoading(false);
       })
       .catch(() => {
-        toast.error('Failed to load user data');
+        showToast.error('Failed to load user data');
         setLoading(false);
       });
   }, []);
@@ -38,23 +38,23 @@ export default function ProfilePage() {
 
   const handleUpdateProfile = () => {
     if (!name.trim()) {
-      toast.error('Name is required');
+      showToast.error('Name is required');
       return;
     }
 
     if (!isValidEmail(email)) {
-      toast.error('Invalid email address');
+      showToast.error('Invalid email address');
       return;
     }
     setLoadingUP(true)
     axios.post('/api/user', { name, email })
       .then((response) => {
         setLoadingUP(false)
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
       })
       .catch((err) => {
         setLoadingUP(false)
-        toast.error(err.response.data.message);
+        showToast.error(err.response.data.message);
       }).finally(()=>{
         setLoadingUP(false)
       });
@@ -62,17 +62,17 @@ export default function ProfilePage() {
 
   const handleChangePassword = () => {
     if (!currentPassword) {
-      toast.error('Current password is required');
+      showToast.error('Current password is required');
       return;
     }
 
     if (!newPassword) {
-      toast.error('New password is required');
+      showToast.error('New password is required');
       return;
     }
 
     if (newPassword !== confirmNewPassword) {
-      toast.error('New passwords do not match');
+      showToast.error('New passwords do not match');
       return;
     }
     setLoadingCP(true)
@@ -82,14 +82,14 @@ export default function ProfilePage() {
     })
       .then((response) => {
         setLoadingCP(false)
-        toast.success(response.data.message);
+        showToast.success(response.data.message);
         setCurrentPassword('');
         setNewPassword('');
         setConfirmNewPassword('');
       })
       .catch((err) => {
         setLoadingCP(false)
-        toast.error(err.response.data.message);
+        showToast.error(err.response.data.message);
       }).finally(() => {
         setLoadingCP(false)
       });

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast'
 import Link from "next/link"
 import { useRouter } from 'next/navigation';
 import SocialSigninButton from '@/components/socialSignin/socialSignin'
@@ -26,7 +26,7 @@ const handleSubmit = async (e) => {
   setloading(true)
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if(!emailRegex.exec(formData.email)){
-    toast.error("Invalid email")
+    showToast.error("Invalid email")
     setloading(false)
     return;
   }
@@ -44,9 +44,9 @@ const handleSubmit = async (e) => {
   })
     router.push('/login');
     }
-    toast.success(res.data.message)
+    showToast.success(res.data.message)
   } catch (error) {
-    toast.error(error.response.data.message);
+    showToast.error(error.response.data.message);
   } finally{
   setloading(false)
   }

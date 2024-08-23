@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { dropPath, addPath } from '@/reduxStates/authRedirectPathSlice';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import showToast from '@/components/showToast'
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import SocialSigninButton from '@/components/socialSignin/socialSignin';
@@ -42,12 +42,12 @@ export default function Login() {
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.exec(formData.email)) {
-      toast.error("Invalid email");
+      showToast.error("Invalid email");
       setloading(false);
       return;
     }
     if (!formData.password) {
-      toast.error("Password can not be empty");
+      showToast.error("Password can not be empty");
       setloading(false);
       return;
     }
@@ -71,10 +71,10 @@ export default function Login() {
             : finalRedirect;
         router.push('social-auth/sign-in?target='+finalRedirect);
       }
-      toast.success(res.data.message);
+      showToast.success(res.data.message);
     }).catch(error => {
       console.log(error);
-      toast.error(error?.response?.data?.message || error?.message || error || 'Unable to login.');
+      showToast.error(error?.response?.data?.message || error?.message || error || 'Unable to login.');
     }).finally(() => {
       setloading(false);
     });
