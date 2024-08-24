@@ -122,7 +122,7 @@ export default function Page({ params }) {
                 </p>
                 {responseDetails.passing_score !== null && <p className="text-gray-400">
                     <span className="font-semibold">Passing Score:</span>{' '}
-                    {responseDetails.passing_score ? "NULL" : ( responseDetails.passing_score === 0 ? 0 : responseDetails.passing_score.toFixed(2))}%
+                    {responseDetails.passing_score === null ? "NULL" : ( responseDetails.passing_score === '0%' ? 0 : (`${responseDetails.passing_score.toFixed(2)}%`))}
                   </p>
                 }
               </div>
@@ -205,8 +205,8 @@ export default function Page({ params }) {
                       {question?.result && (
                         <p className={`text-sm whitespace-break-spaces ${question.result === 'skipped' ? 'text-yellow-600' : (question.result === 'correct' ? 'text-green-500' : 'text-red-500')}`}>Result: <span className='capitalize'>{question.result}</span></p>
                       )}
-                      {question.question_type !== 'subjective' ? (
-                        question.options.map((option) => (
+                      {question.question_type !== 'subjective' ? (<>
+                        {question.options.map((option) => (
                           <label
                             key={option.id}
                             className={`${question.correct_answers.includes(option.id) ? 'text-green-500' : ( userAnswers.includes(option.id) ? 'text-red-500' : 'text-gray-500')} flex flex-row flex-wrap break-words justify-start items-center gap-2`}
@@ -219,7 +219,11 @@ export default function Page({ params }) {
                               checked={userAnswers.includes(option.id)}
                             /> {option.text}
                           </label>
-                        ))
+                        ))}
+                        {question?.reason && (
+                        <p className="text-sm whitespace-break-spaces">Reason: <p className='whitespace-break-spaces'>{question.reason}</p></p>
+                      )}
+                        </>
                       ) : (
                         <>
                           <p
@@ -232,9 +236,7 @@ export default function Page({ params }) {
                           )}
                         </>
                       )}
-                      {question?.reason && (
-                        <p className="text-sm whitespace-break-spaces">Reason: <p className='whitespace-break-spaces'>{question.reason}</p></p>
-                      )}
+                      
                     </div>
                   </div>
                 );

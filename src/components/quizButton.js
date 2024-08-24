@@ -26,7 +26,7 @@ const useJQueryConfirm = () => {
 export function CreateQuizButton() {
   return (
     <div className='flex justify-center items-center mt-2'>
-      <Link href="/dashboard/quiz/create" className='border border-[3px] rounded-md w-[125px] md:w-[145px] h-[125px] md:h-[145px] max-w-[125px] md:max-w-[145px] max-h-[125px] md:max-h-[145px] border-base inline-block flex flex-col items-center justify-center gap-2'>
+      <Link href="/dashboard/quiz/create" className='border border-[3px] rounded-md w-[125px] md:w-[145px] h-[125px] md:h-[145px] max-w-[125px] md:max-w-[145px] max-h-[125px] md:max-h-[145px] border-base inline-block flex flex-col items-center justify-center gap-2 bg-gradient-to-b from-transparent to-primary-content dark:to-neutral'>
         <FaPlus className='text-5xl' />
         <p className='text-base font-bold pt-1.5'>Create Quiz</p>
       </Link>
@@ -125,23 +125,23 @@ export function QuizButton({
 
         <div className="flex items-center justify-center gap-4 mt-2">
         
-          <button onClick={handleDeleteClick} className="text-red-500 hover:text-red-700 transition duration-200 ease-in-out">
+          <button onClick={handleDeleteClick} className="text-red-500 hover:text-red-700 hover:scale-125 transition duration-200 ease-in-out">
             {isDeleting ? (
               <RiLoader2Fill className="text-xl animate-spin" />
             ) : (
               <RiDeleteBinFill className="text-xl" />
             )}
           </button>
-          <Link href={`/dashboard/quiz/${id}/edit`} className="text-gray-500 hover:text-primary transition duration-200 ease-in-out">
+          <Link href={`/dashboard/quiz/${id}/edit`} className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-200 ease-in-out">
             <MdEdit className="text-xl" />
           </Link>
-          <Link href={`/dashboard/quiz/${id}/view`} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary transition duration-200 ease-in-out">
+          <Link href={`/dashboard/quiz/${id}/view`} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-200 ease-in-out">
             <MdVisibility className="text-xl" />
           </Link>
-          <button onClick={handleCopyClick} className="text-gray-500 hover:text-primary transition duration-200 ease-in-out">
+          <button onClick={handleCopyClick} className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-200 ease-in-out">
             <IoLinkOutline className="text-xl" />
           </button>
-          <Link href={`/dashboard/quiz/${id}/responses`} className="text-gray-500 hover:text-primary transition duration-200 ease-in-out">
+          <Link href={`/dashboard/quiz/${id}/responses`} className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-200 ease-in-out">
             <FaChartPie className="text-xl" />
           </Link>
           <div className='relative pe-2'>

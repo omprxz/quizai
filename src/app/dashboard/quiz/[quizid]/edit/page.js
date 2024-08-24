@@ -983,6 +983,9 @@ export default function Page({ params }) {
           </button>
         </div>
       ) : (
+        
+         <label>
+        <span className="text-sm font-bold">Correct answer</span>
         <textarea
           className="textarea textarea-bordered border-neutral text-sm w-full h-32 max-w-sm mb-1 mt-1 pe-[3.1rem]"
           placeholder="Enter the correct answer"
@@ -996,8 +999,10 @@ export default function Page({ params }) {
             }))
           }
         ></textarea>
+      </label>
+        
       )}
-
+    { question.question_type !== 'subjective' &&
       <label>
         <span className="text-sm font-bold">Reason for correct answer</span>
         <textarea
@@ -1007,6 +1012,7 @@ export default function Page({ params }) {
           onChange={(e) => handleReasonChange(e, question._id)}
         ></textarea>
       </label>
+    }
     </div>
   </div>
   <div className="pt-4">

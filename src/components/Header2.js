@@ -97,16 +97,6 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
     }
   }, [theme])
   
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setTheme(mediaQuery.matches ? 'luxury' : 'autumn');
-
-    const handler = (e) => setTheme(e.matches ? 'luxury' : 'autumn');
-    mediaQuery.addEventListener('change', handler);
-
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
-  
   const handleBack = () => {
     router.back();
     if(atPath > 1){
@@ -116,9 +106,9 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   
   const handleThemeChange = (e) => {
     if(e.target.checked){
-      setTheme("luxury")
+      setTheme("dark")
     }else{
-      setTheme("autumn")
+      setTheme("light")
     }
   }
   if(pathname == '/'){
@@ -128,7 +118,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   return (
     <div className='mb-16'>
       {ppOpen && token && (
-        <div ref={menuRef} className="fixed bottom-16 right-6 p-3 z-50">
+        <div ref={menuRef} className="fixed bottom-16 right-2 p-3 z-50">
           <div className="rounded p-3 flex flex-col justify-start gap-2 text-sm bg-neutral text-white glass shadow-sm shadow-neutral">
             <Link href='/dashboard/settings'>Settings</Link>
             <hr />
@@ -154,7 +144,6 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
 
       <header className="fixed bottom-0 w-full backdrop-blur z-40 border-t-[1.5px] border-base print:hidden">
         <div className="navbar flex justify-around items-center h-16">
-        
           {atPath > 1 && (
             <div className="flex items-center">
               <button onClick={handleBack} className="btn btn-ghost btn-circle">
@@ -164,7 +153,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
           )}
           {
             <label className="swap swap-rotate">
-  <input type="checkbox" checked={theme=== 'luxury'} onChange={handleThemeChange} />
+  <input type="checkbox" checked={theme=== 'dark'} onChange={handleThemeChange} />
 
   <svg
     className="swap-on h-6 w-6 fill-current"

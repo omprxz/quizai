@@ -18,6 +18,7 @@ export default function Page({ params }) {
       .then(res => {
         setResponses(res.data.data.responses);
         setIsLoading(false);
+        setError(null)
       })
       .catch((err) => {
         setError(err?.response?.data?.message || err?.message);
@@ -30,7 +31,7 @@ export default function Page({ params }) {
 
     const intervalId = setInterval(() => {
       fetchData(false);
-    }, 10000);
+    }, 20000);
 
     return () => clearInterval(intervalId);
   }, [quizid]);
@@ -53,7 +54,7 @@ export default function Page({ params }) {
 
   return (
     <>
-      <h1 className='font-black px-3 text-xl mb-3 pt-2'>All responses</h1>
+      <h1 className='font-bold px-3 text-2xl mb-3 mt-2 py-3 text-center'>All responses</h1>
       {isLoading ? (
         <div className='flex justify-center items-center w-full'>
           <div className="skeleton h-48 w-48 rounded-full flex justify-center items-center text-sm">Loading...</div>
@@ -61,7 +62,7 @@ export default function Page({ params }) {
       ) : error ? (
         <div className="text-center text-error">{error}</div>
       ) : total === 0 ? (
-        <div className="text-center">No responses available</div>
+        <div className="text-center">No responses.</div>
       ) : (
         <div className='w-full flex justify-center items-center select-none'>
         <div className='w-full max-w-sm'>
@@ -121,7 +122,7 @@ export default function Page({ params }) {
           </div>
         </div>
       )}
-      <section className='w-full px-3 my-2 pt-3 max-w-full overflow-x-scroll'>
+      <section className='w-full px-3 my-2 pt-3 pb-6 max-w-full overflow-x-scroll'>
         <table className="table w-full max-w-full text-sm overflow-x-scroll text-center">
           <thead>
             <tr>
@@ -141,21 +142,21 @@ export default function Page({ params }) {
                   Loading...
                 </td>
               </tr>
-            ) : error ? (
+            ) : (error ? (
               <tr>
                 <td colSpan="7" className="border text-center text-error">
                   {error}
                 </td>
               </tr>
             ) : (
-              responses.length > 0 &&
+              responses.length > 0 ? (
               responses.map((response, index) => (
                 <TdQuiz 
                   key={index} 
                   name={response.username} 
                   score={response.percentage} 
                   result={response.passing_score !== null ? (response.percentage >= response.passing_score ? 'Passed' : 'Failed') : 'Passed'} 
-                  passing_score={response.passing_score !== null ? (response.passing_score === 0 ? 0 : (response?.passing_score ? response.passing_score : 'N/A')) : "N/A"} 
+                  passing_score={response.passing_score !== null ? (response.passing_score === 0 ? 0 : (response?.passing_score ? response.passing_score : 'N/A')) : "N/A"}
                   timeTaken={formatTime(response.timeTaken)} 
                   submitted={new Date(response.createdAt).toLocaleString('en-US', {
                     day: '2-digit',
@@ -167,8 +168,12 @@ export default function Page({ params }) {
                   }).replace(',', '')} 
                   id={response._id} 
                 />
-              ))
-            )}
+              ))) : (<tr>
+                <td colSpan="7" className="border text-center">
+                  Loading...
+                </td>
+              </tr>)
+            ))}
           </tbody>
         </table>
       </section>

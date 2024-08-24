@@ -375,7 +375,7 @@ export default function Page() {
           type="text"
           placeholder="Title (Optional)"
           name="title"
-          className="text-sm"
+          className="text-sm placeholder:text-neutral"
           maxLength='250'
           value={formData.title}
           onChange={handleChange}

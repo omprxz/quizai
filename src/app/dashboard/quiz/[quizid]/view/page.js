@@ -202,8 +202,8 @@ const handleSubmit = (tOver) => {
         <br />
         <span class="text-success">Correct: ${res?.data?.data?.totalCorrect}</span><br />
         <span class="text-error">Wrong: ${res?.data?.data?.totalWrong}</span><br />
-        <span class="text-info">Not Attempted: ${res?.data?.data?.notAttempted}</span><br />
-        <span class="text-warning">Percentage Scored: ${res?.data?.data?.percentageScored.toFixed(2)}%</span><br /><br />
+        <span class="text-warning">Not Attempted: ${res?.data?.data?.notAttempted}</span><br />
+        <span class="text-info">Percentage Scored: ${res?.data?.data?.percentageScored.toFixed(2)}%</span><br /><br />
         <span class="text-primary">Time taken: ${formatTime(res?.data?.data?.timeTaken)}</span><br /><br />
       `);
       document.getElementById('result_summary').showModal();

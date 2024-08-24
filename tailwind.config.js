@@ -11,14 +11,16 @@ module.exports = {
     plugins: [
         require("daisyui"),
     ],
+    darkMode: ['class', '[data-theme="luxury"]'],
     daisyui: {
         themes: [
-            "light", "dark", "autumn", "cupcake", "bumblebee", "emerald", 
-            "corporate", "synthwave", "retro", "cyberpunk", "valentine", 
-            "halloween", "garden", "forest", "aqua", "lofi", "pastel", 
-            "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", 
-            "business", "acid", "lemonade", "night", "coffee", "winter", 
-            "dim", "nord", "sunset"
-        ]
+            "autumn", {
+              "luxury": {
+                ...require("daisyui/src/theming/themes")["luxury"],
+                error: "hsl(0, 84.2%, 60.2%)",
+              }
+            }
+        ],
+        darkTheme: "luxury",
     }
 };
