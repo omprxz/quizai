@@ -47,7 +47,7 @@ export default function Page({ params }) {
     language: '',
     shuffle_question: false,
     shuffle_option: false,
-    theme: "",
+    theme: '',
     questions: []
   });
   const [aiModalVisible, setAiModalVisible] = useState(false);
@@ -63,8 +63,17 @@ export default function Page({ params }) {
   const [dataMsg, setDataMsg] = useState('Loading quiz data, please hold on...');
 
   const themes = [
-    "autumn", "light", "dark", "cupcake", "bumblebee", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", "business", "acid", "lemonade", "night", "coffee", "winter", "dim", "nord", "sunset",
-  ];
+    "autumn",
+    "luxury",
+    "light",
+    "dark",
+    "coffee",
+    "corporate",
+    "retro",
+    "black",
+    "valentine",
+    "night"
+  ]
   const categories = [
     { value: "art", text: "Art" }, { value: "business", text: "Business" }, { value: "comics", text: "Comics" }, { value: "current_events", text: "Current Events" }, { value: "economics", text: "Economics" }, { value: "entertainment", text: "Entertainment" }, { value: "food", text: "Food" }, { value: "general_knowledge", text: "General Knowledge" }, { value: "geography", text: "Geography" }, { value: "history", text: "History" }, { value: "languages", text: "Languages" }, { value: "literature", text: "Literature" }, { value: "math", text: "Math" }, { value: "movies", "text": "Movies" }, { value: "music", text: "Music" }, { value: "mythology", text: "Mythology" }, { value: "nature", text: "Nature" }, { value: "philosophy", text: "Philosophy" }, { value: "politics", text: "Politics" }, { value: "psychology", text: "Psychology" }, { value: "religion", text: "Religion" }, { value: "science", text: "Science" }, { value: "space", text: "Space" }, { value: "sports", text: "Sports" }, { value: "technology", text: "Technology" }
   ];
@@ -680,7 +689,7 @@ export default function Page({ params }) {
                   type="text"
                   placeholder="Title (Optional)"
                   name="title"
-                  className="text-sm w-full"
+                  className="text-sm w-full "
                   maxLength="250"
                   value={formData.title}
                   onChange={handleChange}
@@ -742,7 +751,7 @@ export default function Page({ params }) {
               <input
                 type="number"
                 name="passing_score"
-                className="text-sm w-full"
+                className="text-sm w-full "
                 placeholder="% (Optional)"
                 value={formData.passing_score}
                 onChange={handleChange}
@@ -794,11 +803,12 @@ export default function Page({ params }) {
                   <input
                     type="number"
                     name="duration"
-                    className="grow text-sm"
-                    placeholder="Skip for no limit (in s)"
+                    className="grow text-sm "
+                    placeholder="Leave empty for unlimited"
                     value={formData.duration}
                     onChange={handleChange}
                   />
+                  (in s)
                 </label>
 
                 <label className="input input-bordered border-neutral flex items-center gap-2 pe-0 text-sm w-full max-w-sm mt-1">
@@ -868,9 +878,9 @@ export default function Page({ params }) {
                 <button
                   type="button"
                   onClick={() => setAiModalVisible(true)}
-                  className="btn btn-primary btn-sm rounded-full text-white px-3 flex flex-row items-center gap-x-2"
+                  className="btn btn-primary btn-sm rounded-full px-3 flex flex-row items-center gap-x-2"
                 >
-                  <BsStars /> Add Questions with AI
+                  <BsStars className='text-blue-600' /> Add Questions with AI
                 </button>
               </div>
 
@@ -883,7 +893,7 @@ export default function Page({ params }) {
     </div>
     <div className="collapse-content">
       <input
-        className="input input-bordered border-neutral text-sm w-full max-w-sm mb-2 mt-1"
+        className="input input-bordered border-neutral text-sm w-full max-w-sm mb-2 mt-1 "
         type="text"
         placeholder="Enter Question"
         value={question.question_text}
@@ -948,7 +958,7 @@ export default function Page({ params }) {
           {question.options.map((option, ind) => (
             <div key={option._id} className="mb-1 flex flex-row items-center gap-x-2">
               <input
-                className="input input-bordered border-neutral text-sm w-full max-w-sm"
+                className="input input-bordered border-neutral text-sm w-full max-w-sm "
                 type="text"
                 placeholder={`Option ${ind + 1}`}
                 value={option.text}
@@ -987,8 +997,8 @@ export default function Page({ params }) {
          <label>
         <span className="text-sm font-bold">Correct answer</span>
         <textarea
-          className="textarea textarea-bordered border-neutral text-sm w-full h-32 max-w-sm mb-1 mt-1 pe-[3.1rem]"
-          placeholder="Enter the correct answer"
+          className="textarea textarea-bordered border-neutral text-sm w-full h-32 max-w-sm mb-1 mt-1 pe-[3.1rem] "
+          placeholder="Describe the correct answer"
           value={question.correct_answers[0]}
           onChange={(e) =>
             setFormData(prev => ({
@@ -1006,7 +1016,7 @@ export default function Page({ params }) {
       <label>
         <span className="text-sm font-bold">Reason for correct answer</span>
         <textarea
-          className="textarea textarea-bordered border-neutral text-sm w-full h-32 max-w-sm mb-1 mt-1 pe-[3.1rem]"
+          className="textarea textarea-bordered border-neutral text-sm w-full h-32 max-w-sm mb-1 mt-1 pe-[3.1rem] "
           placeholder="Reason (Optional)"
           value={question.reason}
           onChange={(e) => handleReasonChange(e, question._id)}

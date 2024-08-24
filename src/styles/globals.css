@@ -3,8 +3,18 @@
 @tailwind utilities;
 
 html{
-  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 }
 html * {
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s ease-in-out;
 }
+[data-theme="luxury"] input[type="number"]::placeholder,
+[data-theme="luxury"] input[type="password"]::placeholder,
+[data-theme="luxury"] input[type="email"]::placeholder,
+[data-theme="luxury"] input[type="url"]::placeholder,
+[data-theme="luxury"] input[type="text"]::placeholder,
+[data-theme="luxury"] textarea::placeholder {
+    color: oklch(var(--nc));
+    opacity: 0.6;
+}
+

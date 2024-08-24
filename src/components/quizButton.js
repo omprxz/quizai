@@ -125,23 +125,23 @@ export function QuizButton({
 
         <div className="flex items-center justify-center gap-4 mt-2">
         
-          <button onClick={handleDeleteClick} className="text-red-500 hover:text-red-700 hover:scale-125 transition duration-200 ease-in-out">
+          <button onClick={handleDeleteClick} className="text-red-500 hover:text-red-700 hover:scale-125 transition duration-500 ease-in-out">
             {isDeleting ? (
               <RiLoader2Fill className="text-xl animate-spin" />
             ) : (
-              <RiDeleteBinFill className="text-xl" />
+              <RiDeleteBinFill className="text-xl hover:scale-125 transition duration-500 ease-in-out" />
             )}
           </button>
-          <Link href={`/dashboard/quiz/${id}/edit`} className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-200 ease-in-out">
+          <Link href={`/dashboard/quiz/${id}/edit`} className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-500 ease-in-out">
             <MdEdit className="text-xl" />
           </Link>
           <Link href={`/dashboard/quiz/${id}/view`} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-200 ease-in-out">
             <MdVisibility className="text-xl" />
           </Link>
-          <button onClick={handleCopyClick} className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-200 ease-in-out">
+          <button onClick={handleCopyClick} className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-500 ease-in-out">
             <IoLinkOutline className="text-xl" />
           </button>
-          <Link href={`/dashboard/quiz/${id}/responses`} className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-200 ease-in-out">
+          <Link href={`/dashboard/quiz/${id}/responses`} className="text-primary hover:text-neutral dark:hover:text-neutral-content hover:scale-125 transition duration-500 ease-in-out">
             <FaChartPie className="text-xl" />
           </Link>
           <div className='relative pe-2'>

@@ -145,11 +145,11 @@ export default function ProfilePage() {
           <h1 className="text-xl font-semibold text-center text-base-content">Change Password</h1>
           <div className="space-y-4">
             <div className="relative flex items-center gap-x-2.5">
-              <label className="block text-sm font-medium text-base-content">Current</label>
               <input
                 type={showCurrentPassword ? 'text' : 'password'}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder='Current Password'
                 className="input input-bordered w-full"
               />
               <button
@@ -161,12 +161,12 @@ export default function ProfilePage() {
               </button>
             </div>
             <div className="relative flex items-center gap-x-2.5">
-              <label className="block text-sm font-medium text-base-content">New Pass</label>
               <input
                 type={showNewPassword ? 'text' : 'password'}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="input input-bordered w-full"
+                placeholder='New Password'
               />
               <button
                 type="button"
@@ -177,12 +177,12 @@ export default function ProfilePage() {
               </button>
             </div>
             <div className="relative flex items-center gap-x-2.5">
-              <label className="block text-sm font-medium text-base-content">Confirm</label>
               <input
                 type={showConfirmNewPassword ? 'text' : 'password'}
                 value={confirmNewPassword}
                 onChange={(e) => setConfirmNewPassword(e.target.value)}
                 className="input input-bordered w-full"
+                placeholder='Confirm New Password'
               />
               <button
                 type="button"

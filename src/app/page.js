@@ -23,7 +23,7 @@ const HomePage = () => {
           <h1 className="text-5xl font-extrabold text-white drop-shadow-lg mb-5">Welcome to QuizAI</h1>
           <p className="text-lg text-gray-300 mb-10">Your Ultimate Platform for Creating and Participating in Quizzes</p>
           <p className="text text-gray-300 mb-10">Generate, Learn, Ace</p>
-          <Link href="/login" className="btn btn-primary shadow-lg transform transition hover:scale-105">Get Started</Link>
+          <Link href="/register" className="btn btn-primary shadow-lg transform transition hover:scale-105">Get Started</Link>
         </div>
       </section>
 
@@ -65,7 +65,7 @@ const HomePage = () => {
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-10">Contact Us</h2>
           <p className="max-w-lg mx-auto text-lg mb-5 text-white">Have any questions? Feel free to reach out to us at <a href="mailto:omprxz@gmail.com" className="text-white underline">omprxz@gmail.com</a>.</p>
-          <Link href="/login" className="btn btn-primary shadow-lg transform transition hover:scale-105 mt-4">Get Started</Link>
+          <Link href="/register" className="btn btn-primary shadow-lg transform transition hover:scale-105 mt-4">Get Started</Link>
         </div>
       </section>
 

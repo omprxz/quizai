@@ -8,7 +8,8 @@ import { cookies } from 'next/headers';
 export async function POST(req){
   await Db()
   const cookieStore = cookies();
-  const { email, password } = await req.json()
+  let { email, password } = await req.json()
+  email = email.toLowerCase();
   
   if(!email){
     return NextResponse.json({

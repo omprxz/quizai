@@ -54,45 +54,23 @@ export default function Page() {
     language: 'English',
     shuffle_question: false,
     shuffle_option: false,
-    theme: "light"
+    theme: 'luxury'
   });
   
   const fileInputRef = useRef(null)
   const textareaRef = useRef(null)
   
   const themes = [
+      "autumn",
+      "luxury",
       "light",
       "dark",
-      "autumn",
-      "cupcake",
-      "bumblebee",
-      "emerald",
-      "corporate",
-      "synthwave",
-      "retro",
-      "cyberpunk",
-      "valentine",
-      "halloween",
-      "garden",
-      "forest",
-      "aqua",
-      "lofi",
-      "pastel",
-      "fantasy",
-      "wireframe",
-      "black",
-      "luxury",
-      "dracula",
-      "cmyk",
-      "business",
-      "acid",
-      "lemonade",
-      "night",
       "coffee",
-      "winter",
-      "dim",
-      "nord",
-      "sunset",
+      "corporate",
+      "retro",
+      "black",
+      "valentine",
+      "night"
     ]
   const categories = [
     { value: "art", text: "Art" },
@@ -182,7 +160,7 @@ export default function Page() {
     }
 
     if (validFiles.length + existingFilesCount >= maxFiles) {
-      toast(`You can only upload ${maxFiles} files!`, { icon: '📁'});
+      showToast(`You can only upload ${maxFiles} files!`, { icon: '📁'});
       break;
     }
   }
@@ -375,7 +353,7 @@ export default function Page() {
           type="text"
           placeholder="Title (Optional)"
           name="title"
-          className="text-sm placeholder:text-neutral"
+          className="text-sm "
           maxLength='250'
           value={formData.title}
           onChange={handleChange}
@@ -388,7 +366,7 @@ export default function Page() {
             ref={textareaRef}
             placeholder="Describe your topic"
             name='description'
-            className="textarea textarea-primary textarea-bordered border-neutral w-full h-36 pe-12"
+            className="textarea textarea-primary  textarea-bordered border-neutral w-full h-36 pe-12"
             value={formData.description}
             onChange={handleChange}
             maxLength={maxChars}
@@ -567,11 +545,12 @@ export default function Page() {
               <input
                 type="number"
                 name="duration"
-                className="grow text-sm"
-                placeholder="Skip for no limit (in s)"
+                className="grow text-sm "
+                placeholder="Leave empty for unlimited"
                 value={formData.duration}
                 onChange={handleChange}
               />
+              (in s)
             </label>
 
                 <label className="input input-bordered border-neutral flex items-center gap-2 w-full max-w-sm text-sm mt-1">
@@ -579,7 +558,7 @@ export default function Page() {
                   <input
                     type="number"
                     name="passing_score"
-                    className="text-sm w-full"
+                    className="text-sm w-full "
                     placeholder="% (Optional)"
                     value={formData.passing_score}
                     onChange={handleChange}

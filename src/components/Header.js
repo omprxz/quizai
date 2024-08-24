@@ -99,8 +99,9 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if(!theme){
     setTheme(mediaQuery.matches ? 'luxury' : 'autumn');
-
+    }
     const handler = (e) => setTheme(e.matches ? 'luxury' : 'autumn');
     mediaQuery.addEventListener('change', handler);
 
@@ -192,7 +193,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
             feedbackPublic &&
             <FaRegCircleQuestion className='text-xl' onClick={()=>setFbOpen(prev => !prev)} />
           }
-          { token &&
+          { token ?
           <div className="flex items-center">
             <button onClick={() => {
               setPpOpen((prev) => !prev)
@@ -209,6 +210,10 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
               />
               }
             </button>
+          </div> : <div className="flex items-center">
+            <Link href='/login' className="btn btn-ghost btn-circle">
+               <FaRegCircleUser className='text-xl' />
+            </Link>
           </div>
           }
         </div>

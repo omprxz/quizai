@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import showToast from '@/components/showToast';
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -17,8 +17,9 @@ export default function Page({ params }) {
   const [quizDetails, setQuizDetails] = useState({});
   const [loggedIn, setLoggedIn] = useState(false);
   const [dataStatus, setDataStatus] = useState(0);
-  const [oldTheme, setOldTheme] = useState(localStorage?.getItem('theme') || '')
-  const [quizTheme, setQuizTheme] = useState(localStorage?.getItem('theme') || 'light')
+  const [oldTheme] = useState(localStorage?.getItem('theme') || '')
+  const [quizTheme, setQuizTheme] = useState(localStorage?.getItem('theme') || 'autumn')
+
   const [dataMsg, setDataMsg] = useState('Loading quiz data, please hold on...');
   
   const formatTime = (timeInSeconds) => {
@@ -80,13 +81,12 @@ export default function Page({ params }) {
         console.log(e);
         setDataMsg(e?.response?.data?.message || e?.message);
       });
-  }, []);
+  }, [params.quizid]);
 
   const [hrs, setHrs] = useState(0);
   const [mins, setMins] = useState(0);
   const [secs, setSecs] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [subjectiveAnswerPairs, setSubjectiveAnswerPairs] = useState([])
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [resultContent, setResultContent] = useState(null);
@@ -99,14 +99,51 @@ export default function Page({ params }) {
     setUserName(e.target.value);
   };
 
-  const timeOver = () => {
-    if (!isSubmitted) {
-      toast('Time over! Quiz will be submitted in 2s.', {
-        icon: 'ℹ️'
-      });
-      setTimeout(() => handleSubmit(quizDuration), 2000);
+  const handleSubmit = useCallback((tOver) => {
+    setIsSubmitted(true);
+    let timeTaken;
+  
+    if (tOver) {
+      timeTaken = quizDuration;
+    } else if (quizDuration != null) {
+      timeTaken = quizDuration - quizDetails.duration;
+    } else {
+      timeTaken = Math.round((new Date() - startTime) / 1000);
     }
-  };
+  
+    if (!loggedIn && username === '') {
+      showToast.error('Name required since you are not logged in');
+      return;
+    }
+  
+    const data = {
+      quizid: quizDetails._id,
+      username,
+      selectedAnswers: selectedAnswers,
+      timeTaken: timeTaken,
+    };
+    setLoading(true);
+    axios.post('/api/quiz/response', data).then((res) => {
+      showToast.success(res?.data?.message);
+      setResponseId(res?.data?.data?.responseId);
+      setResultContent(`
+        <br />
+        <span class="text-success">Correct: ${res?.data?.data?.totalCorrect}</span><br />
+        <span class="text-error">Wrong: ${res?.data?.data?.totalWrong}</span><br />
+        <span class="text-warning">Not Attempted: ${res?.data?.data?.notAttempted}</span><br />
+        <span class="text-info">Percentage Scored: ${res?.data?.data?.percentageScored.toFixed(2)}%</span><br /><br />
+        <span class="text-primary">Time taken: ${formatTime(res?.data?.data?.timeTaken)}</span><br /><br />
+      `);
+      document.getElementById('result_summary').showModal();
+      setLoading(false);
+      setIsSubmitted(true);
+    }).catch(error => {
+      console.error('Error submitting quiz:', error?.response?.data || error?.message);
+      showToast.error(error.response?.data?.message || 'An error occurred');
+      setLoading(false);
+      setIsSubmitted(false);
+    });
+  }, [quizDetails, loggedIn, username, selectedAnswers, quizDuration, startTime]);
 
   useEffect(() => {
     let hours = 0, minutes = 0, seconds = 0;
@@ -122,6 +159,14 @@ export default function Page({ params }) {
   }, [quizDetails]);
 
   useEffect(() => {
+    const timeOver = () => {
+      if (!isSubmitted) {
+        showToast('Time over! Quiz will be submitted in 3s.', {
+          icon: 'ℹ️'
+        });
+        setTimeout(() => handleSubmit(quizDuration), 3000);
+      }
+    }
     if (quizDetails.duration != null && !isSubmitted) {
       if (quizDetails.duration <= 0) {
         timeOver();
@@ -145,7 +190,7 @@ export default function Page({ params }) {
 
       return () => clearInterval(intervalId);
     }
-  }, [quizDetails]);
+  }, [quizDetails,isSubmitted,handleSubmit,quizDuration]);
 
   const handleAnswerChange = (questionId, optionId, isSingleChoice) => {
     setSelectedAnswers((prevAnswers) => {
@@ -171,51 +216,6 @@ export default function Page({ params }) {
     }));
   };
 
-const handleSubmit = (tOver) => {
-  setIsSubmitted(true);
-  let timeTaken;
-
-  if (tOver) {
-    timeTaken = quizDuration;
-  } else if (quizDuration != null) {
-    timeTaken = quizDuration - quizDetails.duration;
-  } else {
-    timeTaken = Math.round((new Date() - startTime) / 1000);
-  }
-
-  if (!loggedIn && username === '') {
-    showToast.error('Name required since you are not logged in');
-    return;
-  }
-
-  const data = {
-        quizid: quizDetails._id,
-        username,
-        selectedAnswers: selectedAnswers,
-        timeTaken: timeTaken,
-      };
-  setLoading(true);
-  axios.post('/api/quiz/response', data).then((res) => {
-      showToast.success(res?.data?.message);
-      setResponseId(res?.data?.data?.responseId);
-      setResultContent(`
-        <br />
-        <span class="text-success">Correct: ${res?.data?.data?.totalCorrect}</span><br />
-        <span class="text-error">Wrong: ${res?.data?.data?.totalWrong}</span><br />
-        <span class="text-warning">Not Attempted: ${res?.data?.data?.notAttempted}</span><br />
-        <span class="text-info">Percentage Scored: ${res?.data?.data?.percentageScored.toFixed(2)}%</span><br /><br />
-        <span class="text-primary">Time taken: ${formatTime(res?.data?.data?.timeTaken)}</span><br /><br />
-      `);
-      document.getElementById('result_summary').showModal();
-      setLoading(false);
-      setIsSubmitted(true);
-}).catch(error => {
-      console.error('Error submitting quiz:', error?.response?.data || error?.message);
-      showToast.error(error.response?.data?.message || 'An error occurred');
-      setLoading(false);
-      setIsSubmitted(false);
-    });
-}
 
   if (dataStatus === 0) {
     return (
@@ -261,7 +261,7 @@ const handleSubmit = (tOver) => {
         <div className="flex flex-col justify-center gap-2 w-full max-w-sm">
           <h1 className="font-bold text-2xl">{quizDetails.title || 'No title'}</h1>
           <p className="text-sm text-base-1000">Created by {quizDetails.createdBy}</p>
-          <div className="breadcrumbs text-xs">
+          <div className="breadcrumbs text-xs py-0.5">
             <ul className="badge text-xs badge-neutral">
               <li>
                 <BiSolidCategory className="me-1" />
@@ -278,8 +278,9 @@ const handleSubmit = (tOver) => {
             </ul>
           </div>
           <p className="text-sm">Total questions: {quizDetails.total_questions || 'Null'}</p>
+          <div className="flex flex-col items-center justify-center w-full py-3 gap-y-3.5 backdrop-blur-xl sticky top-0 z-10">
           {quizDetails.duration && quizDetails.duration > 0 && (
-            <div className="flex justify-center w-full mt-2">
+            <div className="flex justify-center w-full">
               <span className={`countdown font-mono text-3xl ${hrs === 0 && mins === 0 && secs <= 10 && 'text-red-500'}`}>
                 <span style={{ "--value": hrs }}></span>h 
                 <span style={{ "--value": mins }}></span>m 
@@ -287,6 +288,33 @@ const handleSubmit = (tOver) => {
               </span>
             </div>
           )}
+          <div className="flex flex-col items-center justify-center gap-y-1 w-full px-2">
+            <progress className="progress w-full" value={selectedAnswers ? Object.keys(selectedAnswers).filter(questionId => {
+              const question = quizDetails.questions.find(q => q._id === questionId);
+              if (question) {
+                if (question.question_type === 'subjective') {
+                  return selectedAnswers[questionId][0] !== "";
+                } else {
+                  return selectedAnswers[questionId].length > 0;
+                }
+              }
+              return false;
+            }).length : 0
+            } max={quizDetails.questions.length}></progress>
+            <label>Attempted {selectedAnswers ? Object.keys(selectedAnswers).filter(questionId => {
+              const question = quizDetails.questions.find(q => q._id === questionId);
+              if (question) {
+                if (question.question_type === 'subjective') {
+                  return selectedAnswers[questionId][0] !== "";
+                } else {
+                  return selectedAnswers[questionId].length > 0;
+                }
+              }
+              return false;
+            }).length : 0
+            } of {quizDetails.questions.length}</label>
+          </div>
+          </div>
 
           {!loggedIn && (
             <label className="input input-bordered border-neutral flex items-center gap-2 text-sm w-full max-w-sm mt-1">
@@ -310,6 +338,7 @@ const handleSubmit = (tOver) => {
                 <div className="flex flex-col justify-center items-start gap-2 mt-3">
                   {question.question_type === 'subjective' ? (
                     <textarea
+                      disabled={isSubmitted}
                       className="textarea textarea-bordered w-full"
                       placeholder="Enter your answer here"
                       onChange={(e) => handleSubjectiveAnswerChange(question._id, e.target.value)}
@@ -318,6 +347,7 @@ const handleSubmit = (tOver) => {
                     question.options.map((option) => (
                       <label className="w-full space-y-2 whitespace-normal break-words" key={option.id}>
                         <input
+                          disabled={isSubmitted}
                           type={question.question_type === 'single_correct' ? 'radio' : 'checkbox'}
                           name={question._id}
                           value={option.id}

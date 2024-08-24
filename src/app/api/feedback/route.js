@@ -5,7 +5,8 @@ import Db from '@/utils/db'
 import Feedback from '@/models/feedback'
 
 export async function POST(req){
-  const { name, email, category, message } = await req.json()
+  let { name, email, category, message } = await req.json()
+  email = email.toLowerCase();
   try{
   await Db();
   

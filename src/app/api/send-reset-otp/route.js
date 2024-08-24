@@ -34,8 +34,8 @@ async function sendEmail(email, otp) {
 
 export async function POST(req){
   await Db()
-  const { email } = await req.json()
-  
+  let { email } = await req.json()
+  email = email.toLowerCase();
   if(!email){
     return NextResponse.json({
       message: "Email required"

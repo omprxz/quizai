@@ -103,9 +103,10 @@ export async function POST(req, {params}){
     
     
   }else if(action == "reset"){
-    const {
+    let {
       otp, email, newPassword
     } = await req.json()
+    email = email.toLowerCase();
     
     if(!otp){
       return NextResponse.json({
