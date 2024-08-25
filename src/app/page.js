@@ -19,7 +19,7 @@ const HomePage = () => {
 
       <section className="flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat px-3"
         style={{ backgroundImage: 'url(https://source.unsplash.com/random/1600x900?education)' }}>
-        <div className="text-center p-5 backdrop-blur-md bg-black/50 rounded-lg">
+        <div className="text-center p-5 backdrop-blur-xl bg-black/40 rounded-lg">
           <h1 className="text-5xl font-extrabold text-white drop-shadow-lg mb-5">Welcome to QuizAI</h1>
           <p className="text-lg text-gray-300 mb-10">Your Ultimate Platform for Creating and Participating in Quizzes</p>
           <p className="text text-gray-300 mb-10">Generate, Learn, Ace</p>
@@ -30,18 +30,18 @@ const HomePage = () => {
       <section id="features" className="py-20 px-3">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-10">Features</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 text-gray-400">
-            <div className="p-10 bg-black rounded-lg shadow-lg hover:shadow-2xl transition transform hover:-translate-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-400">
+            <div className="p-10 backdrop-blur-xl bg-black/60 rounded-lg shadow-lg hover:shadow-2xl transition transform hover:-translate-y-2">
               <FaBook className="text-6xl text-white mb-5 mx-auto" />
               <h3 className="text-2xl font-bold mb-3">Create Quizzes</h3>
               <p>Create custom quizzes with multiple question types and manage them effortlessly.</p>
             </div>
-            <div className="p-10 bg-black rounded-lg shadow-lg hover:shadow-2xl transition transform hover:-translate-y-2">
+            <div className="p-10 backdrop-blur-xl bg-black/60 rounded-lg shadow-lg hover:shadow-2xl transition transform hover:-translate-y-2">
               <FaUserAlt className="text-6xl text-white mb-5 mx-auto" />
               <h3 className="text-2xl font-bold mb-3">User Management</h3>
               <p>Manage user accounts, track progress, and view quiz participation statistics.</p>
             </div>
-            <div className="p-10 bg-black rounded-lg shadow-lg hover:shadow-2xl transition transform hover:-translate-y-2">
+            <div className="p-10 backdrop-blur-xl bg-black/60 rounded-lg shadow-lg hover:shadow-2xl transition transform hover:-translate-y-2">
               <FaRegQuestionCircle className="text-6xl text-white mb-5 mx-auto" />
               <h3 className="text-2xl font-bold mb-3">Responsive Design</h3>
               <p>Enjoy a seamless experience on both mobile and desktop devices.</p>
@@ -50,8 +50,8 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section id="about" className="bg-blue-900 py-20 px-3">
-        <div className="container mx-auto text-center">
+      <section id="about" className="py-20 px-3">
+        <div className="container mx-auto text-center backdrop-blur bg-black/50 rounded-lg shadow-lg py-14 px-3">
           <h2 className="text-4xl font-bold text-white mb-10">About QuizAI</h2>
           <p className="max-w-3xl mx-auto text-lg text-white">
             QuizAI is a modern platform designed to make quiz creation and participation easier and more enjoyable.

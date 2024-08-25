@@ -7,16 +7,15 @@ import { useRouter, usePathname } from 'next/navigation';
 import { FaHome, FaArrowLeft } from 'react-icons/fa';
 import { FaRegCircleQuestion, FaRegCircleUser } from "react-icons/fa6";
 import useLogout from "@/utils/logout";
-import { signIn, useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetAtPath, modifyAtPath } from '@/reduxStates/atPathSlice';
+import { modifyAtPath } from '@/reduxStates/atPathSlice';
 import { Feedback } from '@/components/forms'
 
 const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch()
-  const { data: session } = useSession();
   
   const config = JSON.parse(process.env.CONFIG);
   const authUrls = config.authUrls.map((pattern) => new RegExp(pattern));
@@ -24,7 +23,6 @@ const Header = () => {
   const { logOut, loggingOut } = useLogout();
   const [ppOpen, setPpOpen] = useState(false);
   const [fbOpen, setFbOpen] = useState(false);
-  const [userData, setUserData] = useState({});
   const [userImage, setUserImage] = useState('/user.png');
   const [token, setToken] = useState(null);
   const imgRef = useRef(null);
@@ -56,7 +54,6 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   useEffect(() => {
     axios.get('/api/user')
       .then((res) => {
-        setUserData(res?.data);
         setUserImage(res?.data?.data?.image || '/user.png');
       })
       .catch((e) => console.error(e.response.data));

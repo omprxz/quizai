@@ -1,8 +1,6 @@
 import Db from "@/utils/db";
-import User from "@/models/user";
 import mongoose from 'mongoose'
 import Quiz from "@/models/quiz";
-import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { NextResponse } from "next/server";
@@ -119,8 +117,6 @@ export async function PUT(req, { params }) {
 
     formData = filterAndRemoveInvalidIds(formData);
 
-    console.log(formData);
-
     const quizUpdate = await Quiz.updateOne({
       _id: id
     }, {
@@ -135,8 +131,6 @@ export async function PUT(req, { params }) {
         status: 403
       });
     }
-
-    console.log(quizUpdate);
 
     if (quizUpdate.modifiedCount < 1) {
       return NextResponse.json({

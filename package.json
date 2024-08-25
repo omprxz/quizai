@@ -21,6 +21,7 @@
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
+    "gsap": "^3.12.5",
     "jquery": "^3.7.1",
     "jquery-confirm": "^3.3.4",
     "jsonrepair": "^3.8.0",
@@ -39,6 +40,7 @@
     "react-redux": "^9.1.2",
     "react-select": "^5.8.0",
     "react-speech-recognition": "^3.10.0",
+    "redis": "^4.7.0",
     "styled-components": "^6.1.12"
   },
   "devDependencies": {

@@ -1,28 +1,35 @@
 import Db from "@/utils/db";
 import User from "@/models/user";
-import mongoose from "mongoose";
+import mongoose, { set } from "mongoose";
 import Quiz from "@/models/quiz";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-const {
-    GoogleGenerativeAI,
-    HarmCategory,
-    HarmBlockThreshold
-} = require("@google/generative-ai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { GoogleAIFileManager } = require("@google/generative-ai/server");
 import { promises as fs } from 'fs';
 import path from 'path';
 import { jsonrepair } from 'jsonrepair'
+import client from "@/utils/redisClient";
 
 export const maxDuration = 60;
 export const maxFiles = 2;
 export const maxFileSize = 4 * 1024 * 1024;
 
-async function uploadToGemini(path, mimeType) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  const fileManager = new GoogleAIFileManager(apiKey);
+const getAndSetNextGeminiApiIndex = async (maxLength) => {
+    let apiIndex = await client.get('current_gemini_api_index')
+    apiIndex = parseInt(apiIndex)
+    if(apiIndex >= (maxLength-1)){
+    await client.set('current_gemini_api_index', 0)
+    }else{
+    await client.set('current_gemini_api_index', apiIndex + 1)
+    }
+    return apiIndex ? (apiIndex > (maxLength-1) ? 0 : apiIndex) : 0
+}
+
+async function uploadToGemini(path, mimeType, geminiApiKey) {
+  const fileManager = new GoogleAIFileManager(geminiApiKey);
 
   if (mimeType.startsWith('video/')) {
     await new Promise(resolve => setTimeout(resolve, 5000));
@@ -39,33 +46,84 @@ async function uploadToGemini(path, mimeType) {
 
 export async function POST(req) {
     const cookieStore = cookies();
-    const apiKey = process.env.GEMINI_API_KEY;
+
+    const state = { tries: 0 };
+
+    async function generateQuiz(inputDataP, modelToUse="gemini-1.5-flash", filesP=null) {
+        
+    const geminiApis = process.env.GEMINI_APIS.split(',')
+    let apiKey = geminiApis[await getAndSetNextGeminiApiIndex(geminiApis.length)]
     const genAI = new GoogleGenerativeAI(apiKey);
-    const fileManager = new GoogleAIFileManager(apiKey);
     const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: modelToUse,
+        safetySettings: [
+            {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_NONE'
+            },
+            {
+                category: 'HARM_CATEGORY_HATE_SPEECH',
+                threshold: 'BLOCK_NONE'
+            },
+            {
+                category: 'HARM_CATEGORY_HARASSMENT',
+                threshold: 'BLOCK_NONE'
+            },
+            {
+                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold: 'BLOCK_NONE'
+            }
+        ],
     });
 
     const generationConfig = {
-        temperature: 1,
+        temperature: Math.random() * (1.65 - 1.4) + 1.4,
         topP: 0.95,
         topK: 64,
         maxOutputTokens: 20000,
         responseMimeType: "application/json"
     };
 
-    const state = { tries: 0 };
+        let parts = [{text: "You are an advanced AI designed to generate quiz questions based on user-provided input. Your task is to output a well-structured JSON response that includes both quiz metadata and a set of questions. Ensure your response follows the exact schema provided below and is accurate, complete, and formatted correctly.\n\n### JSON Schema for Quiz Generation:\n```json\n{\n  \"quiz\": {\n  \"meta\": {\n    \"title\": \"(Generated Title)\",\n    \"category\": \"(Generated Category)\",\n    \"description\": \"(Merged summary of provided file content and description, if any file is included. Leave empty if no file is provided.)\"\n  }\n,  \"questions\": [\n      {\n        \"question_type\": \"single_correct\",\n        \"question_text\": \"What is the capital of France?\",\n        \"options\": [\n          {\n            \"id\": 1,\n            \"text\": \"Paris\"\n          },\n          {\n            \"id\": 2,\n            \"text\": \"London\"\n          },\n          {\n            \"id\": 3,\n            \"text\": \"Berlin\"\n          },\n          {\n            \"id\": 4,\n            \"text\": \"Madrid\"\n          }\n        ],\n        \"correct_answers\": [\n          1\n        ],\n        \"reason\": \"Paris is the capital city of France, known for its rich history, culture, and landmarks like the Eiffel Tower.\"\n      },\n      {\n        \"question_type\": \"multi_correct\",\n        \"question_text\": \"Which of the following are programming languages?\",\n        \"options\": [\n          {\n            \"id\": 1,\n            \"text\": \"Python\"\n          },\n          {\n            \"id\": 2,\n            \"text\": \"HTML\"\n          },\n          {\n            \"id\": 3,\n            \"text\": \"Java\"\n          },\n          {\n            \"id\": 4,\n            \"text\": \"CSS\"\n          }\n        ],\n        \"correct_answers\": [\n          1,\n          3\n        ],\n        \"reason\": \"Python and Java are both widely-used programming languages, while HTML and CSS are primarily used for web development.\"\n      },\n      {\n        \"question_type\": \"subjective\",\n        \"question_text\": \"What is the most significant impact of the Industrial Revolution on societal structures?\",\n        \"correct_answers\": [\n          \"The Industrial Revolution reshaped society by shifting the economy from agriculture to industry, driving urbanization as people moved to cities for factory jobs. The traditional social hierarchy, rooted in land ownership, eroded, giving rise to a new middle class of industrialists. Labor became more specialized, and as women and children entered the workforce, traditional gender roles and family dynamics changed significantly.\"\n        ],\n\n      },\n    ]\n}\n}\n```\n\n### Your Responsibilities:\n1. **Quiz Generation**: Create quiz questions based on the provided input data, maintaining the correct JSON structure.\n2. **Metadata Inclusion**: Incorporate a `meta` field with:\n   - `meta.title`: A concise, relevant title based on the provided description.\n   - `meta.category`: A suitable category derived from the description.\n   - `meta.description`: A summary that combines the content of any provided files and the given description (if applicable).\n3. **Question Types**: Use `single_correct` for questions with one correct answer, `multi_correct` for questions with multiple correct answers and `subjective` for questions with subjective type answers. If the input specifies a mix of types, include all three.\n4. **Reasoning**: Provide a clear and concise explanation for the correct answers in the `reason` field for each question.\n4. **Questions generation from file contents**: If any files are provided (regardless of type), analyze their content, and use its content to generate quiz. Provided files may be one or more than one. If no files provided then go with provided description. Supported file types may include, but are not limited to, text documents, images, PDFs, audio files, video files, and others.\n5. **File Handling**: If any files are provided (regardless of type), analyze their content, summarize the relevant information, and include this summary in the `meta.description`. Supported file types may include, but are not limited to, text documents, images, PDFs, audio files, video files, and others.\n6. **Accuracy**: Ensure the entire response adheres strictly to the specified JSON schema.\n7. **Subjective Questions**: Dont't include options field in `subjective` type question and place its correct answer to the first elements of `correct_answers` array and valid reason for that correct answer to `reason` field of that respective question.\n8.Keep the number of options range from 4 to 6 (highly preferred 4) in single_correct and multi_correct type question.\n9.Total numbers of questions in quiz must be as mentioned in provided input data in `total_questions` field.\n10.Don\'t give reason for `subjective` type questions. Correct answer is enought for that.\n\n### Input Data:\n- The quiz data will be provided in JSON format. Additionally, files of any type might be included for you to incorporate into the quiz generation.\n\n### Example Scenario:\nGiven JSON input and various types of files, output a well-structured JSON response containing the quiz questions, their corresponding correct answers with reasoning, and a complete metadata section."},]
 
-    async function generateQuiz(inputDataP, filesUsedP, filePartsP) {
-        let parts = [
-    {
-      text: "You are an advanced AI designed to generate quiz questions based on user-provided input. Your task is to output a well-structured JSON response that includes both quiz metadata and a set of questions. Ensure your response follows the exact schema provided below and is accurate, complete, and formatted correctly.\n\n### JSON Schema for Quiz Generation:\n```json\n{\n  \"quiz\": {\n  \"meta\": {\n    \"title\": \"(Generated Title)\",\n    \"category\": \"(Generated Category)\",\n    \"description\": \"(Merged summary of provided file content and description, if any file is included. Leave empty if no file is provided.)\"\n  }\n,  \"questions\": [\n      {\n        \"question_type\": \"single_correct\",\n        \"question_text\": \"What is the capital of France?\",\n        \"options\": [\n          {\n            \"id\": 1,\n            \"text\": \"Paris\"\n          },\n          {\n            \"id\": 2,\n            \"text\": \"London\"\n          },\n          {\n            \"id\": 3,\n            \"text\": \"Berlin\"\n          },\n          {\n            \"id\": 4,\n            \"text\": \"Madrid\"\n          }\n        ],\n        \"correct_answers\": [\n          1\n        ],\n        \"reason\": \"Paris is the capital city of France, known for its rich history, culture, and landmarks like the Eiffel Tower.\"\n      },\n      {\n        \"question_type\": \"multi_correct\",\n        \"question_text\": \"Which of the following are programming languages?\",\n        \"options\": [\n          {\n            \"id\": 1,\n            \"text\": \"Python\"\n          },\n          {\n            \"id\": 2,\n            \"text\": \"HTML\"\n          },\n          {\n            \"id\": 3,\n            \"text\": \"Java\"\n          },\n          {\n            \"id\": 4,\n            \"text\": \"CSS\"\n          }\n        ],\n        \"correct_answers\": [\n          1,\n          3\n        ],\n        \"reason\": \"Python and Java are both widely-used programming languages, while HTML and CSS are primarily used for web development.\"\n      },\n      {\n        \"question_type\": \"subjective\",\n        \"question_text\": \"What is the most significant impact of the Industrial Revolution on societal structures?\",\n        \"correct_answers\": [\n          \"The Industrial Revolution reshaped society by shifting the economy from agriculture to industry, driving urbanization as people moved to cities for factory jobs. The traditional social hierarchy, rooted in land ownership, eroded, giving rise to a new middle class of industrialists. Labor became more specialized, and as women and children entered the workforce, traditional gender roles and family dynamics changed significantly.\"\n        ],\n\n      },\n    ]\n}\n}\n```\n\n### Your Responsibilities:\n1. **Quiz Generation**: Create quiz questions based on the provided input data, maintaining the correct JSON structure.\n2. **Metadata Inclusion**: Incorporate a `meta` field with:\n   - `meta.title`: A concise, relevant title based on the provided description.\n   - `meta.category`: A suitable category derived from the description.\n   - `meta.description`: A summary that combines the content of any provided files and the given description (if applicable).\n3. **Question Types**: Use `single_correct` for questions with one correct answer, `multi_correct` for questions with multiple correct answers and `subjective` for questions with subjective type answers. If the input specifies a mix of types, include all three.\n4. **Reasoning**: Provide a clear and concise explanation for the correct answers in the `reason` field for each question.\n4. **Questions generation from file contents**: If any files are provided (regardless of type), analyze their content, and use its content to generate quiz. Provided files may be one or more than one. If no files provided then go with provided description. Supported file types may include, but are not limited to, text documents, images, PDFs, audio files, video files, and others.\n5. **File Handling**: If any files are provided (regardless of type), analyze their content, summarize the relevant information, and include this summary in the `meta.description`. Supported file types may include, but are not limited to, text documents, images, PDFs, audio files, video files, and others.\n6. **Accuracy**: Ensure the entire response adheres strictly to the specified JSON schema.\n7. **Subjective Questions**: Dont't include options field in `subjective` type question and place its correct answer to the first elements of `correct_answers` array and valid reason for that correct answer to `reason` field of that respective question.\n8.Keep the number of options range from 4 to 6 (highly preferred 4) in single_correct and multi_correct type question.\n9.Total numbers of questions in quiz must be as mentioned in provided input data in `total_questions` field.\n10.Don\'t give reason for `subjective` type questions. Correct answer is enought for that.\n\n### Input Data:\n- The quiz data will be provided in JSON format. Additionally, files of any type might be included for you to incorporate into the quiz generation.\n\n### Example Scenario:\nGiven JSON input and various types of files, output a well-structured JSON response containing the quiz questions, their corresponding correct answers with reasoning, and a complete metadata section."},]
-      
+
+
+        let fileParts =[]
+        if (filesP) {
+            if (filesP.length > maxFiles) {
+                return NextResponse.json(
+                    { message: `Max files limit is ${maxFiles}` },
+                    { status: 400 }
+                );
+            }
+            let uploadsDir = path.join(process.cwd(), 'tmp')
+            if(process.env.NODE_ENV == 'production'){
+              uploadsDir = '/tmp'
+            }
+    await fs.mkdir(uploadsDir, { recursive: true });
+
+    const savedFiles = [];
+
+    for (const file of filesP) {
+        if (file.size > maxFileSize) {
+            return NextResponse.json({ message: `Max file size limit is ${maxFileSize / (1024 * 1024)} MB` }, { status: 400 });
+        }
+
+        const filePath = path.join(uploadsDir, `${path.basename(file.name, path.extname(file.name))}-${Math.random().toString(36).substr(2, 8)}${path.extname(file.name)}`);
+        await fs.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
+
+        savedFiles.push({ path: filePath, mimeType: file.type });
+    }
+    fileParts = await Promise.all(
+    savedFiles.map(file => uploadToGemini(file.path, file.mimeType, apiKey))
+);
+        }
+
     let newParts = []
-    if(filesUsedP){
+    if(fileParts.length > 0){
       newParts = [{
          text: `input: ${inputDataP}`}]
-      for(const filePart of filePartsP){
+      for(const filePart of fileParts){
         newParts.push({
       fileData: {
         mimeType: filePart.mimeType,
@@ -83,14 +141,32 @@ export async function POST(req) {
       text: "output: "}];
     }
     parts.push(...newParts)
-        const result = await model.generateContent({
+
+    try{
+         const result = await model.generateContent({
           contents: [{ role: "user", parts }],
           generationConfig,
           });
-        
         return result.response.text();
+    }catch(error){
+        console.log(error)
+        if(error?.status == 429 || error?.status == 500){
+            generateQuiz(inputDataP, "gemini-1.5-flash", filesP)
+        }else if(error?.status == 503){
+            generateQuiz(inputDataP, "gemini-1.5-pro", filesP)
+        }else{
+            return NextResponse.json({
+                message: 'Error generating questions',
+                success: false,
+                error: error.message
+            },
+            {
+                status: 400
+            })
+        }
+        }
     }
-
+/*
     async function extractJson(inputData, jsonResponse) {
         if (state.tries < 3) {
             state.tries++;
@@ -99,7 +175,7 @@ export async function POST(req) {
             if (matchedJson) {
                 return JSON.parse(matchedJson[1]);
             } else {
-                const retryJsonResponse = await generateQuiz(inputData);
+                const retryJsonResponse = await generateQuiz(inputData, "gemini-1.5-flash");
                 return extractJson(inputData, retryJsonResponse);
             }
         } else {
@@ -115,7 +191,7 @@ export async function POST(req) {
             );
         }
     }
-
+*/
     try {
         const formData = await req.formData();
         const title = formData.get("title");
@@ -282,47 +358,14 @@ export async function POST(req) {
             quizMetaData.category = category;
         }
         
-        let filesUsed = false, fileParts =[]
-        if (files) {
-            if (files.length > maxFiles) {
-                return NextResponse.json(
-                    { message: `Max files limit is ${maxFiles}` },
-                    { status: 400 }
-                );
-            }
-            let uploadsDir = path.join(process.cwd(), 'tmp')
-            if(process.env.NODE_ENV == 'production'){
-              uploadsDir = '/tmp'
-            }
-    await fs.mkdir(uploadsDir, { recursive: true });
-
-    const savedFiles = [];
-
-    for (const file of files) {
-        if (file.size > maxFileSize) {
-            return NextResponse.json({ message: `Max file size limit is ${maxFileSize / (1024 * 1024)} MB` }, { status: 400 });
-        }
-
-        const filePath = path.join(uploadsDir, `${path.basename(file.name, path.extname(file.name))}-${Math.random().toString(36).substr(2, 8)}${path.extname(file.name)}`);
-        await fs.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
-
-        savedFiles.push({ path: filePath, mimeType: file.type });
-    }
-    filesUsed = true
-    fileParts = await Promise.all(
-    savedFiles.map(file => uploadToGemini(file.path, file.mimeType))
-);
-        }
-
         const inputData = `#### Input Data For Quiz Generation:\n\n\`\`\`json${JSON.stringify(
             quizMetaData
         )}\`\`\``;
         let quizResponse
-        //return NextResponse.json({message: 'success'})
-        if(filesUsed){
-         quizResponse = await generateQuiz(inputData, true, fileParts);
+        if(files){
+         quizResponse = await generateQuiz(inputData, "gemini-1.5-flash", files);
         }else{
-         quizResponse = await generateQuiz(inputData, false, []);
+         quizResponse = await generateQuiz(inputData, "gemini-1.5-flash");
         }
         let quizData
         try{
