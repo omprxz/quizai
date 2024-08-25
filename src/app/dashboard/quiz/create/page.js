@@ -54,7 +54,7 @@ export default function Page() {
     language: 'English',
     shuffle_question: false,
     shuffle_option: false,
-    theme: 'luxury'
+    theme: localStorage.getItem('theme') || 'autumn'
   });
   
   const fileInputRef = useRef(null)
@@ -99,6 +99,29 @@ export default function Page() {
     { value: "sports", text: "Sports" },
     { value: "technology", text: "Technology" }
 ];
+
+  useEffect(() => {
+    const handleThemeChange = () => {
+      const theme = document.querySelector("html").getAttribute("data-theme");
+      if (theme) {
+        setFormData((prevData) => ({
+          ...prevData,
+          theme: theme,
+        }));
+      }
+    };
+  
+    const observer = new MutationObserver(handleThemeChange);
+    observer.observe(document.querySelector("html"), {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+  
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+  
 
   const maxChars = 5000;
   const remainingChars = maxChars - formData.description.length;
