@@ -53,7 +53,7 @@ export async function POST(req) {
         
     const geminiApis = process.env.GEMINI_APIS.split(',')
     let apiKey = geminiApis[await getAndSetNextGeminiApiIndex(geminiApis.length)]
-    const genAI = new GoogleGenerativeAI(geminiApis[0]);
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
         model: modelToUse,
         safetySettings: [
@@ -115,7 +115,7 @@ export async function POST(req) {
         savedFiles.push({ path: filePath, mimeType: file.type });
     }
     fileParts = await Promise.all(
-    savedFiles.map(file => uploadToGemini(file.path, file.mimeType, geminiApis[0]))
+    savedFiles.map(file => uploadToGemini(file.path, file.mimeType, apiKey))
 );
         }
 
