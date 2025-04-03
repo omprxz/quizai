@@ -6,7 +6,6 @@ import { PieChart } from '@mui/x-charts/PieChart';
 import { useTheme } from '@mui/material/styles';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
-import showToast from '@/components/showToast';
 
 const formatTime = (timeInSeconds) => {
   if (timeInSeconds >= 3600) {

@@ -21,6 +21,7 @@
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.2",
     "bcryptjs": "^2.4.3",
+    "date-fns": "^4.1.0",
     "gsap": "^3.12.5",
     "jquery": "^3.7.1",
     "jquery-confirm": "^3.3.4",
