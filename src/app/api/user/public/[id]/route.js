@@ -31,15 +31,25 @@ export async function GET(req, { params }) {
     const quizzes = await Quiz.find({ 
       userid: id,
       visibility: 'public'
-    }).select('title description category level language total_questions duration passing_score createdAt');
+    }).select('_id title description category level language total_questions duration passing_score createdAt');
+
+    // Convert user ID to string to ensure proper matching in aggregation
+    const userIdStr = id.toString();
 
     // Get quiz responses by the user (only public quizzes)
+    // We need to handle string IDs properly for the lookup
     const responses = await Response.aggregate([
-      { $match: { userid: id } },
+      { $match: { userid: userIdStr } },
+      {
+        $addFields: {
+          // Convert string quizid to ObjectId for proper lookup
+          quizObjectId: { $toObjectId: "$quizid" }
+        }
+      },
       {
         $lookup: {
           from: 'quizzes',
-          localField: 'quizid',
+          localField: 'quizObjectId',
           foreignField: '_id',
           as: 'quizDetails'
         }

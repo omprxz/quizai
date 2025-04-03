@@ -10,6 +10,7 @@ const CONFIG = {
   ],
   dynamicPublicUrls: [
     '^/dashboard/quiz/[^/]+/view$',
+    '^/dashboard/user/[^/]+',
     '^/dashboard/quiz/response/[^/]+',
     '^/pub/[^/]+',
   ],

@@ -92,7 +92,7 @@ export default function UserProfile() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-8">
       {/* User Profile Header */}
       <div className="card bg-base-100 shadow-xl mb-8">
         <div className="card-body">
@@ -265,7 +265,7 @@ export default function UserProfile() {
                 </div>
               ) : (
                 <div className="flex flex-col md:flex-row gap-8 items-center">
-                  <div className="stats shadow">
+                  <div className="stats shadow flex flex-col sm:flex-row w-full max-w-sm">
                     <div className="stat">
                       <div className="stat-title">Passed Quizzes</div>
                       <div className="stat-value text-success">{stats.passedResponses}</div>
@@ -282,7 +282,7 @@ export default function UserProfile() {
                     </div>
                   </div>
                   
-                  <div className="w-full max-w-sm mx-auto">
+                  <div className="w-full max-w-sm sm:mx-auto">
                     <PieChart
                       series={[
                         {
