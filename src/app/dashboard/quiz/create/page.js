@@ -663,7 +663,7 @@ export default function Page() {
         )}
 
         <div className='mx-auto mt-6'>
-          <AiGenerateButton text={`${loading ? 'Generating Quiz' : 'Generate Quiz'}`} loading={loading} />
+          <AiGenerateButton text={`${!loading ? 'Creating Quiz' : 'Create Quiz'}`} loading={!loading} />
         </div>
       </form>
     </div>

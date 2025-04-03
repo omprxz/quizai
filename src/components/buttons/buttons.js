@@ -1,21 +1,45 @@
 import '@/styles/buttonsComponent.css';
+import React from 'react';
 
-export function AiGenerateButton({ text = 'Generate', loading = false, action=()=>{} }) {
+export const AiGenerateButton = ({ text, loading, onClick, disabled }) => {
   return (
-    <button className="aiGenerateButton-btn" onClick={action} disabled={loading}>
-      <svg
-        height="24"
-        width="24"
-        fill="#FFFFFF"
-        viewBox="0 0 24 24"
-        data-name="Layer 1"
-        id="Layer_1"
-        className={`aiGenerateButton-sparkle ${loading ? 'loadingAi' : ''}`}
-      >
-        <path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z"></path>
-      </svg>
-
-      <span className="aiGenerateButton-text">{text}</span>
+    <button
+      onClick={onClick}
+      disabled={loading || disabled}
+      className={`
+        relative flex items-center justify-center w-48 h-12 rounded-md font-medium 
+        transition-all duration-300 overflow-hidden
+        ${loading || disabled
+          ? 'bg-base-300 text-base-content cursor-not-allowed'
+          : 'bg-primary text-primary-content hover:bg-primary-focus'
+        }
+      `}
+    >
+      {loading ? (
+        <div className="flex items-center justify-center space-x-1">
+          <span className="w-2 h-2 rounded-full bg-primary/40 animate-[pulse_0.7s_ease-in-out_0s_infinite]"></span>
+          <span className="w-2 h-2 rounded-full bg-primary/40 animate-[pulse_0.7s_ease-in-out_0.2s_infinite]"></span>
+          <span className="w-2 h-2 rounded-full bg-primary/40 animate-[pulse_0.7s_ease-in-out_0.4s_infinite]"></span>
+        </div>
+      ) : (
+        <span className="flex items-center gap-2">
+          {text}
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            strokeWidth={1.5} 
+            stroke="currentColor" 
+            className="w-5 h-5"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+          </svg>
+        </span>
+      )}
+      
+      {!loading && !disabled && (
+        <span className="absolute bottom-0 left-0 w-full h-1 bg-secondary transform scale-x-0 transition-transform origin-left group-hover:scale-x-100"></span>
+      )}
     </button>
   );
-}
+};

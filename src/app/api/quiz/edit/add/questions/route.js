@@ -8,21 +8,21 @@ const {
   HarmBlockThreshold,
 } = require("@google/generative-ai");
 import { jsonrepair } from 'jsonrepair'
-import client from "@/utils/redisClient";
+// import client from "@/utils/redisClient";
 
 export const maxDuration = 60;
 
 
-const getAndSetNextGeminiApiIndex = async (maxLength) => {
-  let apiIndex = await client.get('current_gemini_api_index')
-  apiIndex = parseInt(apiIndex)
-  if(apiIndex >= (maxLength-1)){
-  await client.set('current_gemini_api_index', 0)
-  }else{
-  await client.set('current_gemini_api_index', apiIndex + 1)
-  }
-  return apiIndex ? (apiIndex > (maxLength-1) ? 0 : apiIndex) : 0
-}
+// const getAndSetNextGeminiApiIndex = async (maxLength) => {
+//   let apiIndex = await client.get('current_gemini_api_index')
+//   apiIndex = parseInt(apiIndex)
+//   if(apiIndex >= (maxLength-1)){
+//   await client.set('current_gemini_api_index', 0)
+//   }else{
+//   await client.set('current_gemini_api_index', apiIndex + 1)
+//   }
+//   return apiIndex ? (apiIndex > (maxLength-1) ? 0 : apiIndex) : 0
+// }
 
 
 export async function POST(req) {
@@ -30,8 +30,10 @@ export async function POST(req) {
   const state = { tries: 0 };
 
   async function generateQuiz(inputData, modelToUse = "gemini-1.5-flash") {
-    const geminiApis = process.env.GEMINI_APIS.split(',')
-    let apiKey = geminiApis[await getAndSetNextGeminiApiIndex(geminiApis.length)]
+    // const geminiApis = process.env.GEMINI_APIS.split(',')
+    // let apiKey = geminiApis[await getAndSetNextGeminiApiIndex(geminiApis.length)]
+
+    const apiKey = process.env.GEMINI_API_KEY
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
     model: modelToUse,
