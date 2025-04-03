@@ -4,13 +4,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import axios from 'axios';
 import { useRouter, usePathname } from 'next/navigation';
-import { FaHome, FaArrowLeft } from 'react-icons/fa';
+import { FaHome, FaArrowLeft, FaSearch } from 'react-icons/fa';
 import { FaRegCircleQuestion, FaRegCircleUser } from "react-icons/fa6";
 import useLogout from "@/utils/logout";
-import { signIn } from 'next-auth/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { modifyAtPath } from '@/reduxStates/atPathSlice';
-import { Feedback } from '@/components/forms'
+import { Feedback } from '@/components/forms';
+import SearchOverlay from '@/components/SearchOverlay';
 
 const Header = () => {
   const router = useRouter();
@@ -23,6 +23,7 @@ const Header = () => {
   const { logOut, loggingOut } = useLogout();
   const [ppOpen, setPpOpen] = useState(false);
   const [fbOpen, setFbOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [userImage, setUserImage] = useState('/user.png');
   const [token, setToken] = useState(null);
   const imgRef = useRef(null);
@@ -48,6 +49,15 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
       initialRender.current = false;
     } else {
       dispatch(modifyAtPath(atPath+1));
+    }
+  }, [pathname]);
+
+  // on change pathname toggle the search open false
+
+  useEffect(() => {
+    if (searchOpen) {
+      setSearchOpen(false);
+      document.body.style.overflow = '';
     }
   }, [pathname]);
 
@@ -119,6 +129,16 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
       setTheme("autumn")
     }
   }
+  
+  const handleSearchToggle = () => {
+    setSearchOpen(prev => !prev);
+    if (searchOpen) {
+      document.body.style.overflow = '';
+    } else {
+      document.body.style.overflow = 'hidden';
+    }
+  };
+  
   if(pathname == '/'){
     return null;
   }
@@ -149,6 +169,9 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
     <Feedback setFbOpen={setFbOpen} />
   </div>
 }
+
+      {/* Search Overlay */}
+      <SearchOverlay isOpen={searchOpen} onClose={handleSearchToggle} />
 
       <header className="fixed bottom-0 w-full backdrop-blur z-40 border-t-[1.5px] border-base print:hidden">
         <div className="navbar flex justify-around items-center h-16">
@@ -186,6 +209,14 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
               <FaHome className="text-xl" />
             </Link>
           </div>
+          
+          {/* Search Button */}
+          <div className="flex items-center">
+            <button onClick={handleSearchToggle} className="btn btn-ghost btn-circle">
+              <FaSearch className="text-xl" />
+            </button>
+          </div>
+          
           {
             feedbackPublic &&
             <FaRegCircleQuestion className='text-xl' onClick={()=>setFbOpen(prev => !prev)} />
