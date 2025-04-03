@@ -14,7 +14,7 @@ module.exports = {
     darkMode: ['class', '[data-theme="luxury"]'],
     daisyui: {
         themes: [
-            "autumn", {
+            "retro", {
               "luxury": {
                 ...require("daisyui/src/theming/themes")["luxury"],
                 error: "hsl(0, 84.2%, 60.2%)",

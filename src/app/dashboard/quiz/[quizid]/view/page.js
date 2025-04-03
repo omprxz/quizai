@@ -18,7 +18,7 @@ export default function Page({ params }) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [dataStatus, setDataStatus] = useState(0);
   const [oldTheme] = useState(localStorage?.getItem('theme') || '')
-  const [quizTheme, setQuizTheme] = useState(localStorage?.getItem('theme') || 'autumn')
+  const [quizTheme, setQuizTheme] = useState(localStorage?.getItem('theme') || 'retro')
 
   const [dataMsg, setDataMsg] = useState('Loading quiz data, please hold on...');
   

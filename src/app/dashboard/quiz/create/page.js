@@ -54,14 +54,14 @@ export default function Page() {
     language: 'English',
     shuffle_question: false,
     shuffle_option: false,
-    theme: localStorage.getItem('theme') || 'autumn'
+    theme: localStorage.getItem('theme') || 'retro'
   });
   
   const fileInputRef = useRef(null)
   const textareaRef = useRef(null)
   
   const themes = [
-      "autumn",
+      "retro",
       "luxury",
       "light",
       "dark",
@@ -298,7 +298,7 @@ export default function Page() {
       total_questions: formData.total_questions ? parseInt(+formData.total_questions) : 10,
       type: formData.type.length == 0 ? ['single_correct'] : formData.type,
       shuffle_option: formData.type.some(type => ['single_correct', 'multi_correct'].includes(type)) ? formData.shuffle_option : false,
-      theme: formData['theme'] ? formData['theme'] : 'autumn',
+      theme: formData['theme'] ? formData['theme'] : 'retro',
       duration: formData.duration ? +formData.duration : null
     };
     

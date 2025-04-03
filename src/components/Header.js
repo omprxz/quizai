@@ -107,9 +107,9 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     if(!theme){
-    setTheme(mediaQuery.matches ? 'luxury' : 'autumn');
+    setTheme(mediaQuery.matches ? 'luxury' : 'retro');
     }
-    const handler = (e) => setTheme(e.matches ? 'luxury' : 'autumn');
+    const handler = (e) => setTheme(e.matches ? 'luxury' : 'retro');
     mediaQuery.addEventListener('change', handler);
 
     return () => mediaQuery.removeEventListener('change', handler);
@@ -126,7 +126,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
     if(e.target.checked){
       setTheme("luxury")
     }else{
-      setTheme("autumn")
+      setTheme("retro")
     }
   }
   
