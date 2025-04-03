@@ -1,13 +1,14 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import showToast from '@/components/showToast'
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaShare, FaCopy, FaCheck } from 'react-icons/fa';
 import { CgSpinnerTwo } from "react-icons/cg";
 
 export default function ProfilePage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [userId, setUserId] = useState('');
   const [loading, setLoading] = useState(true);
   const [loadingUP, setLoadingUP] = useState(false);
   const [loadingCP, setLoadingCP] = useState(false);
@@ -17,13 +18,17 @@ export default function ProfilePage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const shareUrlRef = useRef(null);
 
   useEffect(() => {
     axios.get('/api/user')
       .then((response) => {
-        const { name, email } = response.data.data;
+        const { name, email, _id } = response.data.data;
         setName(name);
         setEmail(email);
+        setUserId(_id);
         setLoading(false);
       })
       .catch(() => {
@@ -99,6 +104,35 @@ export default function ProfilePage() {
     setPasswordVisibility(prevState => !prevState);
   };
 
+  const getProfileUrl = () => {
+    // Use APP_URL from environment if available, otherwise use current window location
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+    return `${baseUrl}/dashboard/user/${userId}`;
+  };
+
+  const copyToClipboard = () => {
+    const profileUrl = getProfileUrl();
+    navigator.clipboard.writeText(profileUrl)
+      .then(() => {
+        setCopied(true);
+        showToast.success('Profile URL copied to clipboard!');
+        setTimeout(() => setCopied(false), 3000);
+      })
+      .catch((error) => {
+        console.error('Failed to copy: ', error);
+        showToast.error('Failed to copy URL');
+      });
+  };
+
+  const openShareModal = () => {
+    setShowShareModal(true);
+  };
+
+  const closeShareModal = () => {
+    setShowShareModal(false);
+    setCopied(false);
+  };
+
   if (loading) {
     return <div className="min-h-screen flex flex-col gap-3 items-center justify-center">
     <CgSpinnerTwo className='animate-spin text-2xl' />
@@ -137,6 +171,14 @@ export default function ProfilePage() {
             {
               loadingUP ? (<><CgSpinnerTwo className='animate-spin' /> Updating</>) : (<>Update Profile</>)
             }
+            </button>
+
+            {/* Share Profile Button */}
+            <button
+              onClick={openShareModal}
+              className="btn btn-secondary w-full"
+            >
+              <FaShare className="mr-2" /> Share Profile
             </button>
           </div>
         </div>
@@ -204,6 +246,38 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Share Profile Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-base-100 p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-bold mb-4">Share Your Profile</h3>
+            <p className="text-sm mb-4">Share this link with others so they can view your public profile and quiz stats:</p>
+            
+            <div className="form-control">
+              <div className="input-group">
+                <input 
+                  type="text" 
+                  ref={shareUrlRef}
+                  value={getProfileUrl()} 
+                  readOnly 
+                  className="input input-bordered flex-1"
+                />
+                <button 
+                  className="btn btn-primary"
+                  onClick={copyToClipboard}
+                >
+                  {copied ? <FaCheck /> : <FaCopy />}
+                </button>
+              </div>
+            </div>
+            
+            <div className="mt-4 flex justify-end">
+              <button onClick={closeShareModal} className="btn">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
