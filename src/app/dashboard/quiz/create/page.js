@@ -54,15 +54,15 @@ export default function Page() {
     language: 'English',
     shuffle_question: false,
     shuffle_option: false,
-    theme: localStorage.getItem('theme') || 'retro'
+    theme: localStorage.getItem('theme') || 'autumn'
   });
   
   const fileInputRef = useRef(null)
   const textareaRef = useRef(null)
   
   const themes = [
-      "retro",
-      "luxury",
+      "autumn",
+      "night",
       "light",
       "dark",
       "coffee",
@@ -298,7 +298,7 @@ export default function Page() {
       total_questions: formData.total_questions ? parseInt(+formData.total_questions) : 10,
       type: formData.type.length == 0 ? ['single_correct'] : formData.type,
       shuffle_option: formData.type.some(type => ['single_correct', 'multi_correct'].includes(type)) ? formData.shuffle_option : false,
-      theme: formData['theme'] ? formData['theme'] : 'retro',
+      theme: formData['theme'] ? formData['theme'] : 'autumn',
       duration: formData.duration ? +formData.duration : null
     };
     
@@ -663,7 +663,7 @@ export default function Page() {
         )}
 
         <div className='mx-auto mt-6'>
-          <AiGenerateButton text={`${!loading ? 'Creating Quiz' : 'Create Quiz'}`} loading={!loading} />
+          <AiGenerateButton text={`${loading ? 'Creating Quiz' : 'Create Quiz'}`} loading={loading} />
         </div>
       </form>
     </div>

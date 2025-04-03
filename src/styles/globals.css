@@ -8,12 +8,12 @@ html{
 html * {
   transition: background-color 0.3s ease-in-out;
 }
-[data-theme="luxury"] input[type="number"]::placeholder,
-[data-theme="luxury"] input[type="password"]::placeholder,
-[data-theme="luxury"] input[type="email"]::placeholder,
-[data-theme="luxury"] input[type="url"]::placeholder,
-[data-theme="luxury"] input[type="text"]::placeholder,
-[data-theme="luxury"] textarea::placeholder {
+[data-theme="night"] input[type="number"]::placeholder,
+[data-theme="night"] input[type="password"]::placeholder,
+[data-theme="night"] input[type="email"]::placeholder,
+[data-theme="night"] input[type="url"]::placeholder,
+[data-theme="night"] input[type="text"]::placeholder,
+[data-theme="night"] textarea::placeholder {
     color: oklch(var(--nc));
     opacity: 0.6;
 }

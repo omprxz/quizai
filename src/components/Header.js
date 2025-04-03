@@ -107,9 +107,9 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     if(!theme){
-    setTheme(mediaQuery.matches ? 'luxury' : 'retro');
+    setTheme(mediaQuery.matches ? 'night' : 'autumn');
     }
-    const handler = (e) => setTheme(e.matches ? 'luxury' : 'retro');
+    const handler = (e) => setTheme(e.matches ? 'night' : 'autumn');
     mediaQuery.addEventListener('change', handler);
 
     return () => mediaQuery.removeEventListener('change', handler);
@@ -124,9 +124,9 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
   
   const handleThemeChange = (e) => {
     if(e.target.checked){
-      setTheme("luxury")
+      setTheme("night")
     }else{
-      setTheme("retro")
+      setTheme("autumn")
     }
   }
   
@@ -185,7 +185,7 @@ const [feedbackPublic, setFeedbackPublic] = useState(false)
           )}
           {
             <label className="swap swap-rotate">
-  <input type="checkbox" checked={theme=== 'luxury'} onChange={handleThemeChange} />
+  <input type="checkbox" checked={theme=== 'night'} onChange={handleThemeChange} />
 
   <svg
     className="swap-on h-6 w-6 fill-current"

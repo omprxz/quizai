@@ -63,8 +63,8 @@ export default function Page({ params }) {
   const [dataMsg, setDataMsg] = useState('Loading quiz data, please hold on...');
 
   const themes = [
-    "retro",
-    "luxury",
+    "autumn",
+    "night",
     "light",
     "dark",
     "coffee",
@@ -320,7 +320,7 @@ export default function Page({ params }) {
 
     const processedData = {
       ...formData,
-      theme: formData['theme'] ? formData['theme'] : 'retro',
+      theme: formData['theme'] ? formData['theme'] : 'autumn',
       duration: formData.duration ? +formData.duration : null
     };
     console.log(processedData);

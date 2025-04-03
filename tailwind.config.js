@@ -11,16 +11,16 @@ module.exports = {
     plugins: [
         require("daisyui"),
     ],
-    darkMode: ['class', '[data-theme="luxury"]'],
+    darkMode: ['class', '[data-theme="night"]'],
     daisyui: {
         themes: [
-            "retro", {
-              "luxury": {
-                ...require("daisyui/src/theming/themes")["luxury"],
+            "autumn", {
+              "night": {
+                ...require("daisyui/src/theming/themes")["night"],
                 error: "hsl(0, 84.2%, 60.2%)",
               }
             }, "light", "dark", "coffee", "corporate", "retro", "black", "valentine", "night"
         ],
-        darkTheme: "luxury",
+        darkTheme: "night",
     }
 };

@@ -92,7 +92,7 @@ const quizSchema = new mongoose.Schema({
   theme: {
     type: String,
     required: true,
-    default: 'retro'
+    default: 'autumn'
   },
   questions: [questionSchema]
 }, {
