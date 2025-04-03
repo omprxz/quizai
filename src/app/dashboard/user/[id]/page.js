@@ -178,7 +178,6 @@ export default function UserProfile() {
                         <th>Result</th>
                         <th>Time Taken</th>
                         <th>Date</th>
-                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -189,21 +188,16 @@ export default function UserProfile() {
                           <td>
                             {response.passing_score !== null ? (
                               response.percentage >= response.passing_score ? (
-                                <div className="badge badge-success">Passed</div>
+                                <div className="badge badge-success whitespace-nowrap">Passed</div>
                               ) : (
-                                <div className="badge badge-error">Failed</div>
+                                <div className="badge badge-error whitespace-nowrap">Failed</div>
                               )
                             ) : (
-                              <div className="badge badge-info">No Pass Score</div>
+                              <div className="badge badge-info whitespace-nowrap">No Pass Score</div>
                             )}
                           </td>
                           <td>{formatTime(response.timeTaken)}</td>
                           <td>{formatDistanceToNow(new Date(response.createdAt), { addSuffix: true })}</td>
-                          <td>
-                            <Link href={`/dashboard/quiz/response/${response._id}`} className="btn btn-xs btn-primary">
-                              View Details
-                            </Link>
-                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -317,7 +311,7 @@ export default function UserProfile() {
                           },
                         },
                       ]}
-                      width={400}
+                      width={300}
                       height={200}
                       slotProps={{
                         pieArcLabel: {
